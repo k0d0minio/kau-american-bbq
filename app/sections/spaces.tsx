@@ -109,14 +109,17 @@ export function Spaces({ spaces }: { spaces: SpaceCardData[] }) {
                       Pick your day, lunch or dinner, and how you&apos;d like to be served — we
                       confirm by email.
                     </p>
+                    <p className="mt-3 text-xs uppercase tracking-[0.18em] text-bone/60">
+                      {space.fromLabel}
+                    </p>
                   </div>
                   <span
                     className={cn(
-                      buttonVariants({ variant: "light", size: "lg" }),
+                      buttonVariants({ variant: "ember", size: "lg" }),
                       "shrink-0 self-start lg:self-center"
                     )}
                   >
-                    {space.fromLabel}
+                    Book a table
                     <ArrowUpRight className="size-4" />
                   </span>
                 </div>

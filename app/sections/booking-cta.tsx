@@ -54,10 +54,10 @@ export function BookingCta() {
         </Reveal>
         <Reveal delay={0.3}>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
-            <a href="#spaces" className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
+            <Link href="/book" className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
               <CalendarHeart className="size-4" />
               Book a table
-            </a>
+            </Link>
             <Link href="/enquire" className={cn(buttonVariants({ variant: "light", size: "lg" }))}>
               Send an enquiry
             </Link>

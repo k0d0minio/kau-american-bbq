@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Phone, Send } from "lucide-react";
+import { Menu, X, Phone, CalendarHeart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { site } from "@/lib/site";
 import { buttonVariants } from "./ui/button";
@@ -12,7 +12,6 @@ import { buttonVariants } from "./ui/button";
 // Section anchors live on the home page. `hash` is prefixed with "/" when the
 // nav is rendered on a sub-page so the links jump back to the landing page.
 const sectionLinks = [
-  { hash: "#spaces", label: "Book a Table" },
   { hash: "#smokehouse", label: "The Smokehouse" },
   { hash: "#gallery", label: "Gallery" },
   { hash: "#location", label: "Location" },
@@ -28,6 +27,7 @@ export function Nav() {
   const links = [
     ...sectionLinks.map((l) => ({ href: sectionHref(l.hash), label: l.label })),
     { href: "/history", label: "Our Story" },
+    { href: "/enquire", label: "Enquire" },
   ];
   const homeHref = onHome ? "#top" : "/";
 
@@ -94,13 +94,13 @@ export function Nav() {
               </a>
             ))}
             <Link
-              href="/enquire"
+              href="/book"
               className={cn(
-                buttonVariants({ variant: scrolled ? "primary" : "light", size: "sm" })
+                buttonVariants({ variant: scrolled ? "ember" : "light", size: "sm" })
               )}
             >
-              <Send className="size-3.5" />
-              Enquire
+              <CalendarHeart className="size-3.5" />
+              Book a table
             </Link>
           </div>
 
@@ -158,12 +158,12 @@ export function Nav() {
             </motion.ul>
             <div className="space-y-3 px-6 pt-10">
               <Link
-                href="/enquire"
+                href="/book"
                 onClick={() => setOpen(false)}
                 className={cn(buttonVariants({ variant: "ember", size: "lg" }), "w-full")}
               >
-                <Send className="size-4" />
-                Send an enquiry
+                <CalendarHeart className="size-4" />
+                Book a table
               </Link>
               <a
                 href={site.phoneHref}
@@ -171,7 +171,7 @@ export function Nav() {
                 className={cn(buttonVariants({ variant: "light", size: "lg" }), "w-full")}
               >
                 <Phone className="size-4" />
-                Call to enquire
+                Call the smokehouse
               </a>
             </div>
           </motion.div>
