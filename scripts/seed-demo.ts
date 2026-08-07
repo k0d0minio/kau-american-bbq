@@ -1,24 +1,22 @@
-// Fills the platform with realistic demo data — guests, bookings across every
-// status, blackouts and enquiries — so the estate can be shown off end to end
-// (public availability calendars, the admin pipeline, the guests CRM, the
-// dashboard stats). It is NOT a schema migration: it seeds *content*, on
-// demand, and is safe to run against any database that already has the
-// booking-platform tables and the four spaces (created by migrations 0002 and
-// 0003).
+// Fills the platform with realistic demo data — guests, reservations across
+// every status, closures and enquiries — so KAU can be shown off end to end
+// (public availability, the admin pipeline, the guests CRM, the dashboard
+// stats). It is NOT a schema migration: it seeds *content*, on demand, and is
+// safe to run against any database that already has the booking-platform
+// tables and the KAU space (created by migrations 0002, 0003 and 0005).
 //
 //   DATABASE_URL="postgres://..." npm run db:seed:demo
 //   DATABASE_URL="postgres://..." npm run db:seed:demo -- --reset   # wipe only
 //
-// Why a script and not a static SQL seed: bookings carry computed quotes,
-// unique references and secret tokens, and their dates are anchored to *today*
-// so the demo always shows a live mix of past stays, upcoming arrivals and
-// fresh requests. A hardcoded SQL file would drift into the past and can't
-// compute any of that.
+// Why a script and not a static SQL seed: reservations carry unique references
+// and secret tokens, and their dates are anchored to *today* so the demo always
+// shows a live mix of past sittings, upcoming covers and fresh requests. A
+// hardcoded SQL file would drift into the past and can't compute any of that.
 //
 // Idempotent: every run first removes the data it previously created (demo
-// guests are tagged by a reserved email domain, blackouts by their reason) and
-// then re-inserts a fresh set. Real guests, real bookings and owner-created
-// blackouts are never touched.
+// guests are tagged by a reserved email domain, closures by their reason) and
+// then re-inserts a fresh set. Real guests, real reservations and owner-created
+// closures are never touched.
 import "dotenv/config";
 import { inArray, like } from "drizzle-orm";
 import { db } from "../lib/db";
@@ -32,9 +30,10 @@ import {
   type NewBooking,
   type NewEnquiry,
   type NewGuest,
-  type Space,
 } from "../lib/db/schema";
 import { addDays, todayAtRestaurant, type ISODate } from "../lib/booking/dates";
+import { isOpenDay, type Service } from "../lib/booking/availability";
+import type { DiningFormat } from "../lib/booking/dining-formats";
 import { computeQuote } from "../lib/booking/pricing";
 import { makeManageToken, makeReference } from "../lib/booking/tokens";
 
@@ -44,7 +43,7 @@ const DEMO_EMAIL_DOMAIN = "demo.kaubarbecue.dev";
 const today = todayAtRestaurant();
 
 // A stable millisecond clock for created/decided timestamps, anchored to the
-// start of today at the estate so repeat runs land on tidy round times.
+// start of today in Lisbon so repeat runs land on tidy round times.
 const NOW = new Date(`${today}T12:00:00Z`).getTime();
 const DAY_MS = 86_400_000;
 /** A timestamp `days` from today (negative = in the past), for created_at etc. */
@@ -59,104 +58,114 @@ function ts(days: number): Date {
 type GuestSeed = Omit<NewGuest, "email"> & { key: string };
 
 const GUESTS: GuestSeed[] = [
-  { key: "harper", firstName: "Amelia", lastName: "Harper", phone: "+1 716-555-0142", notes: "Repeat farmhouse guest — always books the first week of summer. Prefers the lake-facing room.", createdAt: ts(-380) },
-  { key: "okafor", firstName: "Daniel", lastName: "Okafor", phone: "+1 585-555-0119", notes: "Anniversary trips to the carriage house. Loves a quiet arrival.", createdAt: ts(-300) },
-  { key: "bianchi", firstName: "Sofia", lastName: "Bianchi", phone: "+1 716-555-0177", notes: "Booked the barn for her sister's wedding — big family, lots of vendors.", createdAt: ts(-250) },
-  { key: "nguyen", firstName: "Linh", lastName: "Nguyen", phone: "+1 212-555-0188", notes: "Writing retreats. Came twice last year, very tidy.", createdAt: ts(-220) },
-  { key: "carter", firstName: "Marcus", lastName: "Carter", phone: "+1 716-555-0164", notes: "Corporate offsite organiser. Asks a lot of questions but pays promptly.", createdAt: ts(-190) },
-  { key: "delgado", firstName: "Elena", lastName: "Delgado", phone: "+1 646-555-0133", notes: null, createdAt: ts(-160) },
-  { key: "kowalski", firstName: "Peter", lastName: "Kowalski", phone: "+1 716-555-0150", notes: "Reunion every couple of years — the whole family fills the estate.", createdAt: ts(-140) },
-  { key: "obrien", firstName: "Grace", lastName: "O'Brien", phone: "+1 315-555-0128", notes: "Photographer scouting the barn for a styled shoot.", createdAt: ts(-120) },
-  { key: "patel", firstName: "Ravi", lastName: "Patel", phone: "+1 716-555-0191", notes: null, createdAt: ts(-95) },
-  { key: "schneider", firstName: "Hannah", lastName: "Schneider", phone: "+1 585-555-0107", notes: "First-timer, found us through the Chautauqua listing.", createdAt: ts(-70) },
-  { key: "romano", firstName: "Luca", lastName: "Romano", phone: "+1 716-555-0173", notes: "Wedding enquiry — comparing us with a couple of other venues.", createdAt: ts(-45) },
-  { key: "fitzgerald", firstName: "Claire", lastName: "Fitzgerald", phone: "+1 716-555-0116", notes: null, createdAt: ts(-30) },
-  { key: "andersson", firstName: "Erik", lastName: "Andersson", phone: "+1 917-555-0155", notes: "Big birthday celebration in the works.", createdAt: ts(-20) },
-  { key: "morales", firstName: "Isabella", lastName: "Morales", phone: "+1 716-555-0102", notes: null, createdAt: ts(-12) },
-  { key: "thompson", firstName: "James", lastName: "Thompson", phone: "+1 716-555-0139", notes: "Called about a last-minute long weekend.", createdAt: ts(-6) },
-  { key: "walsh", firstName: "Nora", lastName: "Walsh", phone: "+1 518-555-0148", notes: null, createdAt: ts(-2) },
+  { key: "sousa", firstName: "Mariana", lastName: "Sousa", phone: "+351 91 234 5678", notes: "Regular — always Sunday lunch, always the counter.", createdAt: ts(-380) },
+  { key: "ferreira", firstName: "Tiago", lastName: "Ferreira", phone: "+351 96 118 2244", notes: "Brings clients from Lisbon. Books dinner, asks for the beef rib.", createdAt: ts(-300) },
+  { key: "matos", firstName: "Beatriz", lastName: "Matos", phone: "+351 93 552 0917", notes: "Asked about full-venue hire for a company party.", createdAt: ts(-250) },
+  { key: "carvalho", firstName: "Nuno", lastName: "Carvalho", phone: "+351 92 704 6631", notes: "Followed KAU from the NOS Alive pop-up.", createdAt: ts(-220) },
+  { key: "lopes", firstName: "Inês", lastName: "Lopes", phone: "+351 91 880 3345", notes: "Vegetarian in the group — always checks the sides.", createdAt: ts(-190) },
+  { key: "rodrigues", firstName: "André", lastName: "Rodrigues", phone: "+351 96 445 1120", notes: null, createdAt: ts(-160) },
+  { key: "santos", firstName: "Catarina", lastName: "Santos", phone: "+351 93 219 7708", notes: "Big family table every few months.", createdAt: ts(-140) },
+  { key: "almeida", firstName: "Miguel", lastName: "Almeida", phone: "+351 92 663 4409", notes: "Food writer — came in after the Time Out piece.", createdAt: ts(-120) },
+  { key: "pereira", firstName: "Rita", lastName: "Pereira", phone: "+351 91 337 5582", notes: null, createdAt: ts(-95) },
+  { key: "costa", firstName: "Diogo", lastName: "Costa", phone: "+351 96 902 1174", notes: "First visit — driving up from Ericeira.", createdAt: ts(-70) },
+  { key: "martins", firstName: "Sofia", lastName: "Martins", phone: "+351 93 774 6650", notes: "Birthday dinner in the works.", createdAt: ts(-45) },
+  { key: "silva", firstName: "Joana", lastName: "Silva", phone: "+351 91 445 9982", notes: null, createdAt: ts(-30) },
+  { key: "gomes", firstName: "Pedro", lastName: "Gomes", phone: "+351 92 118 3367", notes: "Wants the counter every time — likes watching the cut.", createdAt: ts(-20) },
+  { key: "fonseca", firstName: "Helena", lastName: "Fonseca", phone: "+351 96 550 7723", notes: null, createdAt: ts(-12) },
+  { key: "ribeiro", firstName: "Bruno", lastName: "Ribeiro", phone: "+351 93 806 2215", notes: "Called about a last-minute Saturday table.", createdAt: ts(-6) },
+  { key: "azevedo", firstName: "Marta", lastName: "Azevedo", phone: "+351 91 662 4438", notes: null, createdAt: ts(-2) },
 ];
 
 function emailFor(g: GuestSeed): string {
   return `${g.firstName}.${g.lastName}`
     .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z]+/g, ".")
     .replace(/\.+/g, ".")
     .replace(/^\.|\.$/g, "") + `@${DEMO_EMAIL_DOMAIN}`;
 }
 
+/** Nudge an offset forward until it lands on a day KAU actually serves. */
+function openDayOffset(offset: number): number {
+  let n = offset;
+  while (!isOpenDay(addDays(today, n))) n += 1;
+  return n;
+}
+
 // ---------------------------------------------------------------------------
-// Bookings — a lifelike spread across statuses and time. Approved bookings are
-// laid out so that no two of them ever conflict (same-space overlaps, or the
-// estate-wide holds taken by barn/estate events), which keeps the public
-// availability calendars clean and honest. Pending/declined/cancelled rows
-// don't block anything, so they can sit wherever tells a good story.
+// Reservations — a lifelike spread across statuses and time. Every reservation
+// is a single date plus a sitting; approved covers stay well inside the room's
+// capacity so the public availability stays honest. Pending, declined and
+// cancelled rows never block covers, so they can sit wherever tells a good
+// story. Offsets are nudged onto Thursday–Sunday, the days KAU serves.
 // ---------------------------------------------------------------------------
 
 type BookingSeed = {
-  slug: Space["slug"];
   guestKey: string;
   status: NonNullable<NewBooking["status"]>;
-  /** Check-in offset in days from today (negative = past). */
+  /** Offset in days from today (negative = past), nudged onto an open day. */
   startOffset: number;
-  nights: number;
+  service: Service;
+  diningFormat: DiningFormat;
   partySize: number;
   eventType?: string;
+  /** Full-venue private hire: takes the whole restaurant for that sitting. */
+  blocksEstate?: boolean;
   guestMessage?: string;
   paymentStatus?: NonNullable<NewBooking["paymentStatus"]>;
   source?: NonNullable<NewBooking["source"]>;
   decisionNote?: string;
   adminNotes?: string;
-  /** Days before check-in that the request came in. */
+  /** Days before the reservation that the request came in. */
   leadDays: number;
 };
 
 const BOOKINGS: BookingSeed[] = [
-  // ---- Past, completed & paid (history + guests CRM + "past" tab) ----------
-  { slug: "farmhouse", guestKey: "harper", status: "approved", startOffset: -90, nights: 7, partySize: 8, guestMessage: "Our annual family week — can't wait to be back on the porch.", paymentStatus: "paid", source: "website", leadDays: 60, adminNotes: "Lovely as always. Left the place spotless." },
-  { slug: "carriage-house", guestKey: "okafor", status: "approved", startOffset: -60, nights: 5, partySize: 2, guestMessage: "Celebrating our anniversary.", paymentStatus: "paid", source: "website", leadDays: 40 },
-  { slug: "barn", guestKey: "bianchi", status: "approved", startOffset: -45, nights: 3, partySize: 120, eventType: "Wedding", guestMessage: "Saturday ceremony, Friday setup, Sunday teardown. ~120 guests.", paymentStatus: "paid", source: "email", leadDays: 210, adminNotes: "Beautiful wedding. Caterer used the north lawn." },
-  { slug: "farmhouse", guestKey: "nguyen", status: "approved", startOffset: -30, nights: 5, partySize: 3, guestMessage: "Quiet writing retreat.", paymentStatus: "paid", source: "website", leadDays: 25 },
+  // ---- Past sittings (history + guests CRM + the "past" tab) ---------------
+  { guestKey: "sousa", status: "approved", startOffset: -90, service: "lunch", diningFormat: "counter", partySize: 4, guestMessage: "The usual Sunday — counter if you have it.", source: "website", leadDays: 10, adminNotes: "Regular. Knows the whole menu." },
+  { guestKey: "ferreira", status: "approved", startOffset: -60, service: "dinner", diningFormat: "table", partySize: 6, guestMessage: "Clients coming up from Lisbon — we'll want the beef rib.", source: "phone", leadDays: 14 },
+  { guestKey: "carvalho", status: "approved", startOffset: -45, service: "dinner", diningFormat: "counter", partySize: 2, guestMessage: "Been following since the NOS Alive pop-up.", source: "website", leadDays: 7 },
+  { guestKey: "almeida", status: "approved", startOffset: -30, service: "lunch", diningFormat: "table", partySize: 3, guestMessage: "Writing about the room — happy to sit wherever.", source: "email", leadDays: 9, adminNotes: "Time Out follow-up piece." },
 
-  // ---- Upcoming, confirmed (block the calendar + dashboard arrivals) --------
-  { slug: "carriage-house", guestKey: "schneider", status: "approved", startOffset: 10, nights: 4, partySize: 2, guestMessage: "First visit — so excited!", paymentStatus: "deposit_paid", source: "website", leadDays: 20 },
-  { slug: "farmhouse", guestKey: "delgado", status: "approved", startOffset: 20, nights: 7, partySize: 9, guestMessage: "Full week for the extended family.", paymentStatus: "deposit_paid", source: "website", leadDays: 45 },
-  { slug: "estate", guestKey: "romano", status: "approved", startOffset: 45, nights: 3, partySize: 140, eventType: "Wedding", guestMessage: "Whole-estate wedding weekend, roughly 140 guests. Party staying in the houses.", paymentStatus: "deposit_paid", source: "email", leadDays: 160, adminNotes: "Deposit in. Final headcount due 30 days out." },
-  { slug: "barn", guestKey: "kowalski", status: "approved", startOffset: 80, nights: 2, partySize: 90, eventType: "Reunion", guestMessage: "Kowalski family reunion — hog roast on the Saturday.", paymentStatus: "deposit_paid", source: "phone", leadDays: 120 },
-  { slug: "farmhouse", guestKey: "harper", status: "approved", startOffset: 95, nights: 5, partySize: 8, guestMessage: "Booking our usual again for the autumn.", paymentStatus: "unpaid", source: "website", leadDays: 30, adminNotes: "Repeat guest — invoice sent, deposit pending." },
-  { slug: "carriage-house", guestKey: "okafor", status: "approved", startOffset: 95, nights: 4, partySize: 2, paymentStatus: "unpaid", source: "website", leadDays: 28 },
+  // ---- Upcoming, confirmed (capacity + dashboard arrivals) ------------------
+  { guestKey: "costa", status: "approved", startOffset: 3, service: "lunch", diningFormat: "table", partySize: 2, guestMessage: "First time — driving up from Ericeira.", source: "website", leadDays: 6 },
+  { guestKey: "santos", status: "approved", startOffset: 5, service: "lunch", diningFormat: "table", partySize: 8, guestMessage: "The whole family, grandparents included.", source: "website", leadDays: 21 },
+  { guestKey: "gomes", status: "approved", startOffset: 5, service: "dinner", diningFormat: "counter", partySize: 2, guestMessage: "Counter seats please — we like the show.", source: "website", leadDays: 11 },
+  { guestKey: "lopes", status: "approved", startOffset: 12, service: "dinner", diningFormat: "table", partySize: 5, guestMessage: "One vegetarian in the group — what are the sides?", source: "website", leadDays: 15, adminNotes: "Flagged to the kitchen: smoked eggplant + mac & cheese." },
+  { guestKey: "rodrigues", status: "approved", startOffset: 19, service: "dinner", diningFormat: "table", partySize: 4, source: "phone", leadDays: 8 },
+  { guestKey: "sousa", status: "approved", startOffset: 26, service: "lunch", diningFormat: "counter", partySize: 4, guestMessage: "Same as always.", source: "website", leadDays: 12 },
 
   // ---- Pending requests (the admin inbox / dashboard "needs a decision") ----
-  { slug: "farmhouse", guestKey: "patel", status: "pending", startOffset: 35, nights: 5, partySize: 6, guestMessage: "Hoping for a long weekend with friends — flexible by a day or two.", source: "website", leadDays: 12 },
-  { slug: "carriage-house", guestKey: "fitzgerald", status: "pending", startOffset: 30, nights: 3, partySize: 2, guestMessage: "Is the porch room available these dates?", source: "website", leadDays: 8 },
-  { slug: "estate", guestKey: "morales", status: "pending", startOffset: 120, nights: 4, partySize: 130, eventType: "Wedding", guestMessage: "Considering Vine Cliff for our wedding — would love to visit.", source: "website", leadDays: 5 },
-  { slug: "barn", guestKey: "andersson", status: "pending", startOffset: 150, nights: 2, partySize: 70, eventType: "Birthday or celebration", guestMessage: "50th birthday party — evening reception with a band.", source: "website", leadDays: 4 },
-  { slug: "farmhouse", guestKey: "thompson", status: "pending", startOffset: 6, nights: 3, partySize: 5, guestMessage: "Last-minute I know! Any chance for this coming weekend?", source: "phone", leadDays: 1 },
+  { guestKey: "pereira", status: "pending", startOffset: 9, service: "dinner", diningFormat: "table", partySize: 6, guestMessage: "Flexible by a day either way if dinner is full.", source: "website", leadDays: 4 },
+  { guestKey: "silva", status: "pending", startOffset: 16, service: "lunch", diningFormat: "counter", partySize: 2, guestMessage: "Is the counter bookable for two?", source: "website", leadDays: 3 },
+  { guestKey: "martins", status: "pending", startOffset: 33, service: "dinner", diningFormat: "table", partySize: 14, eventType: "Birthday or celebration", guestMessage: "Birthday dinner for 14 — can you seat us together?", source: "website", leadDays: 6 },
+  { guestKey: "matos", status: "pending", startOffset: 61, service: "dinner", diningFormat: "table", partySize: 80, eventType: "Full-venue private event", blocksEstate: true, guestMessage: "Company party for about 80 — we'd take the whole restaurant.", source: "email", leadDays: 20, adminNotes: "Quote to build by hand — full venue, one sitting." },
+  { guestKey: "ribeiro", status: "pending", startOffset: 2, service: "dinner", diningFormat: "table", partySize: 3, guestMessage: "Last minute I know — any chance this weekend?", source: "phone", leadDays: 1 },
 
   // ---- Declined (archive tab) ----------------------------------------------
-  { slug: "barn", guestKey: "walsh", status: "declined", startOffset: 45, nights: 3, partySize: 100, eventType: "Wedding", guestMessage: "Hoping for that weekend in particular.", decisionNote: "So sorry — the estate is already booked for a wedding that weekend. We'd love to host you on another date.", source: "website", leadDays: 20 },
+  { guestKey: "azevedo", status: "declined", startOffset: 5, service: "dinner", diningFormat: "table", partySize: 12, guestMessage: "Hoping for that Saturday in particular.", decisionNote: "That sitting is full — Sunday lunch is wide open though, and we'd love to have you.", source: "website", leadDays: 5 },
 
   // ---- Cancelled (archive tab) ---------------------------------------------
-  { slug: "farmhouse", guestKey: "carter", status: "cancelled", startOffset: 55, nights: 5, partySize: 7, eventType: undefined, guestMessage: "Team offsite for the week.", adminNotes: "Guest cancelled — offsite postponed to next quarter. Deposit refunded.", paymentStatus: "refunded", source: "website", leadDays: 35 },
+  { guestKey: "fonseca", status: "cancelled", startOffset: 40, service: "lunch", diningFormat: "table", partySize: 7, guestMessage: "Family lunch, seven of us.", adminNotes: "Guest cancelled — travelling that weekend after all.", source: "website", leadDays: 18 },
 ];
 
 // ---------------------------------------------------------------------------
-// Blackouts — the owner-blocked side of availability. Tagged by reason so a
-// reset removes exactly these and leaves any real blackouts alone.
+// Closures — the owner-blocked side of availability. Tagged by reason so a
+// reset removes exactly these and leaves any real closures alone.
 // ---------------------------------------------------------------------------
 
 type BlackoutSeed = {
-  slug: Space["slug"] | null;
   startOffset: number;
-  nights: number;
+  /** How many consecutive days stay closed. */
+  days: number;
   reason: string;
 };
 
 const BLACKOUTS: BlackoutSeed[] = [
-  { slug: "carriage-house", startOffset: 5, nights: 3, reason: "Owner's family visiting (demo)" },
-  { slug: "farmhouse", startOffset: 130, nights: 4, reason: "Porch restoration (demo)" },
-  { slug: "barn", startOffset: 170, nights: 2, reason: "Annual barn inspection (demo)" },
-  { slug: null, startOffset: 210, nights: 45, reason: "Estate winterized for the season (demo)" },
+  { startOffset: 48, days: 14, reason: "Closed — summer holidays (demo)" },
+  { startOffset: 61, days: 1, reason: "Private event — full venue (demo)" },
+  { startOffset: 96, days: 2, reason: "Godzilla maintenance (demo)" },
 ];
 
 const DEMO_BLACKOUT_REASONS = BLACKOUTS.map((b) => b.reason);
@@ -168,7 +177,6 @@ const DEMO_BLACKOUT_REASONS = BLACKOUTS.map((b) => b.reason);
 
 type EnquirySeed = {
   guestKey: string;
-  slug?: Space["slug"];
   message: string;
   status: NonNullable<NewEnquiry["status"]>;
   /** Link to the pending booking created for this guest+space, if any. */
@@ -177,13 +185,14 @@ type EnquirySeed = {
 };
 
 const ENQUIRIES: EnquirySeed[] = [
-  { guestKey: "romano", slug: "barn", message: "Do you host winter weddings? Curious about heating in the barn.", status: "new", createdOffset: -3 },
-  { guestKey: "walsh", slug: "farmhouse", message: "What's the largest group the farmhouse comfortably sleeps?", status: "new", createdOffset: -1 },
-  { guestKey: "schneider", slug: "carriage-house", message: "Is early check-in ever possible? Arriving mid-morning.", status: "replied", createdOffset: -9 },
-  { guestKey: "morales", slug: "estate", message: "We'd love to tour the estate for our wedding before committing.", status: "converted", linkToBookingOfGuest: "morales", createdOffset: -6 },
-  { guestKey: "delgado", message: "General question — do you allow well-behaved dogs?", status: "replied", createdOffset: -18 },
-  { guestKey: "andersson", message: "Interested in a corporate booking, will follow up by phone.", status: "archived", createdOffset: -25 },
+  { guestKey: "martins", message: "Can you do a birthday dinner for 14 on a Saturday?", status: "new", linkToBookingOfGuest: "martins", createdOffset: -3 },
+  { guestKey: "lopes", message: "Do you have vegetarian options for a mixed group?", status: "new", createdOffset: -1 },
+  { guestKey: "matos", message: "What does full-venue hire cost for ~80 people?", status: "converted", linkToBookingOfGuest: "matos", createdOffset: -6 },
+  { guestKey: "costa", message: "Is the counter bookable in advance, or is it walk-up only?", status: "replied", createdOffset: -9 },
+  { guestKey: "rodrigues", message: "Do you deliver? A friend mentioned Glovo.", status: "replied", createdOffset: -18 },
+  { guestKey: "almeida", message: "Interested in photographing the smoker for a piece — who do I ask?", status: "archived", createdOffset: -25 },
 ];
+
 
 // ---------------------------------------------------------------------------
 // Runner
@@ -212,14 +221,13 @@ async function clearDemoData(): Promise<void> {
 }
 
 async function seed(): Promise<void> {
-  // Space lookup by slug — the bookable space comes from migration 0003.
+  // KAU is one bookable space, seeded by migration 0003 (and narrowed by 0005).
   const spaceRows = await db.select().from(spaces);
   const bySlug = new Map(spaceRows.map((s) => [s.slug, s]));
-  const need = ["kau-barbecue"];
-  const missing = need.filter((slug) => !bySlug.has(slug));
-  if (missing.length) {
+  const space = bySlug.get("kau-barbecue");
+  if (!space) {
     throw new Error(
-      `Missing spaces ${missing.join(", ")}. Run migrations first (npm run db:migrate) so the booking platform is seeded.`
+      "Missing space kau-barbecue. Run migrations first (npm run db:migrate) so the booking platform is seeded."
     );
   }
 
@@ -252,30 +260,33 @@ async function seed(): Promise<void> {
   }
 
   const bookingValues: NewBooking[] = BOOKINGS.map((b) => {
-    const space = bySlug.get(b.slug)!;
     const guestId = guestIdByKey.get(b.guestKey);
     if (!guestId) throw new Error(`Unknown guest key: ${b.guestKey}`);
 
-    const startDate: ISODate = addDays(today, b.startOffset);
-    const endDate: ISODate = addDays(startDate, b.nights);
+    // One date, one sitting. The half-open range keeps the date-range queries
+    // working: every reservation ends the day after it starts.
+    const offset = openDayOffset(b.startOffset);
+    const startDate: ISODate = addDays(today, offset);
+    const endDate: ISODate = addDays(startDate, 1);
     const quote = computeQuote(space, startDate, endDate);
-    const createdAt = ts(b.startOffset - b.leadDays);
+    const createdAt = ts(offset - b.leadDays);
 
-    // Approved bookings carry a final price (here, equal to the quote) and a
-    // deposit (~30%, rounded to whole dollars). Others just keep the quote.
+    // Reservations are free, so most of these carry no money at all. Only a
+    // booking that actually has a total gets a final price and a deposit.
     const isApproved = b.status === "approved";
     const finalTotalCents = isApproved ? quote.totalCents : null;
-    const depositCents = isApproved
-      ? Math.round((quote.totalCents * 0.3) / 100) * 100
-      : null;
+    const depositCents =
+      isApproved && quote.totalCents > 0
+        ? Math.round((quote.totalCents * 0.3) / 100) * 100
+        : null;
 
     // Timeline: decisions land a day or two after the request; cancellations a
     // little after that.
     const decidedAt =
-      b.status === "pending" ? null : ts(b.startOffset - b.leadDays + 2);
-    const cancelledAt = b.status === "cancelled" ? ts(b.startOffset - 10) : null;
+      b.status === "pending" ? null : ts(offset - b.leadDays + 2);
+    const cancelledAt = b.status === "cancelled" ? ts(offset - 10) : null;
     const cancelRequestedAt =
-      b.status === "cancelled" ? ts(b.startOffset - 11) : null;
+      b.status === "cancelled" ? ts(offset - 11) : null;
 
     return {
       reference: uniqueReference(),
@@ -284,14 +295,16 @@ async function seed(): Promise<void> {
       status: b.status,
       startDate,
       endDate,
+      service: b.service,
+      diningFormat: b.diningFormat,
       partySize: b.partySize,
-      eventType: b.eventType ?? (space.isEvent ? "Other" : null),
+      eventType: b.eventType ?? null,
       guestMessage: b.guestMessage ?? null,
       quotedTotalCents: quote.totalCents,
       finalTotalCents,
       depositCents,
       paymentStatus: b.paymentStatus ?? "unpaid",
-      blocksEstate: space.blocksEstate,
+      blocksEstate: b.blocksEstate ?? space.blocksEstate,
       source: b.source ?? "website",
       manageToken: makeManageToken(),
       decisionNote: b.decisionNote ?? null,
@@ -309,11 +322,14 @@ async function seed(): Promise<void> {
 
   // --- Blackouts -----------------------------------------------------------
   const blackoutValues: NewBlackout[] = BLACKOUTS.map((b) => {
-    const startDate: ISODate = addDays(today, b.startOffset);
+    // Nudged onto an open day so each closure actually removes sittings —
+    // closing a Wednesday the restaurant is already shut on shows nothing.
+    const startDate: ISODate = addDays(today, openDayOffset(b.startOffset));
     return {
-      spaceId: b.slug ? bySlug.get(b.slug)!.id : null,
+      // A closure with no space closes the whole restaurant.
+      spaceId: null,
       startDate,
-      endDate: addDays(startDate, b.nights),
+      endDate: addDays(startDate, b.days),
       reason: b.reason,
     } satisfies NewBlackout;
   });
@@ -335,7 +351,7 @@ async function seed(): Promise<void> {
       name: `${guest.firstName} ${guest.lastName}`,
       email: emailFor(guest),
       phone: guest.phone ?? null,
-      spaceId: e.slug ? bySlug.get(e.slug)!.id : null,
+      spaceId: space.id,
       message: e.message,
       status: e.status,
       bookingId,
@@ -356,7 +372,7 @@ async function seed(): Promise<void> {
       `(${counts.approved ?? 0} approved, ${counts.pending ?? 0} pending, ` +
       `${counts.declined ?? 0} declined, ${counts.cancelled ?? 0} cancelled)`
   );
-  console.log(`  • ${blackoutValues.length} blackouts`);
+  console.log(`  • ${blackoutValues.length} closures`);
   console.log(`  • ${enquiryValues.length} enquiries`);
 }
 

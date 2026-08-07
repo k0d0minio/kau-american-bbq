@@ -36,10 +36,10 @@ ON CONFLICT ("slug") DO NOTHING;
 INSERT INTO "settings" ("key", "value") VALUES
 (
   'notify_email',
-  'hello@vinecliff.com'
+  'reservas@kaubarbecue.pt'
 ),
 (
   'cancellation_policy',
-  'Deposits are fully refundable up to 30 days before arrival. Within 30 days of arrival, deposits are non-refundable, but we''re always happy to move your dates where the calendar allows. Event cancellations are handled case by case — please call us and we''ll work something out.'
+  'Reservations are free — if your plans change, cancel from your booking page or call us so we can release the table. No-shows hurt a small smokehouse. Private-hire deposits are handled case by case; call us and we''ll work something out.'
 )
 ON CONFLICT ("key") DO NOTHING;
