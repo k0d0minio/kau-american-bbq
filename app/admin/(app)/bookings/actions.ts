@@ -12,11 +12,12 @@ import {
   type BookingWithRelations,
 } from "@/lib/db/queries";
 import { requireAdmin } from "@/lib/auth/require-admin";
-import { isValidISODate } from "@/lib/booking/dates";
+import { addDays, isValidISODate } from "@/lib/booking/dates";
 import {
   blockedRanges,
-  dayHasRoom,
   isDateBlocked,
+  isService,
+  serviceHasRoom,
 } from "@/lib/booking/availability";
 import { computeQuote } from "@/lib/booking/pricing";
 import { makeManageToken, makeReference } from "@/lib/booking/tokens";
@@ -35,14 +36,14 @@ function text(formData: FormData, name: string, maxLength = 4000): string {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 }
 
-/** Parse a human dollar amount ("4,500", "$4500.50") into cents; null if blank. */
+/** Parse a human euro amount ("1.250", "€480,50") into cents; null if blank. */
 function parseMoney(raw: string): number | null {
   if (!raw) return null;
   const cleaned = raw.replace(/[^0-9.]/g, "");
   if (!cleaned) return null;
-  const dollars = Number.parseFloat(cleaned);
-  if (!Number.isFinite(dollars) || dollars < 0) return null;
-  return Math.round(dollars * 100);
+  const amount = Number.parseFloat(cleaned);
+  if (!Number.isFinite(amount) || amount < 0) return null;
+  return Math.round(amount * 100);
 }
 
 function guestEmailData(row: BookingWithRelations, policy: string | null) {
@@ -52,6 +53,7 @@ function guestEmailData(row: BookingWithRelations, policy: string | null) {
     isEvent: row.space.isEvent,
     startDate: row.booking.startDate,
     endDate: row.booking.endDate,
+    service: row.booking.service,
     partySize: row.booking.partySize,
     guestFirstName: row.guest.firstName,
     manageToken: row.booking.manageToken,
@@ -250,7 +252,7 @@ export async function createManualBooking(
 
     const spaceId = text(formData, "spaceId", 40);
     const startDate = text(formData, "startDate", 10);
-    const endDate = text(formData, "endDate", 10);
+    const service = text(formData, "service", 10);
     const firstName = text(formData, "firstName", 80);
     const lastName = text(formData, "lastName", 80);
     const email = text(formData, "email", 200).toLowerCase();
@@ -269,21 +271,26 @@ export async function createManualBooking(
     if (!space) return { error: "Pick a space." };
     if (!firstName || !lastName) return { error: "The guest needs a name." };
     if (!EMAIL_PATTERN.test(email)) return { error: "That email address doesn't look right." };
-    if (!isValidISODate(startDate) || !isValidISODate(endDate) || endDate <= startDate) {
-      return {
-        error: space.isEvent
-          ? "The departure day must be after the first day."
-          : "Checkout must be after check-in.",
-      };
-    }
+    if (!isValidISODate(startDate)) return { error: "Pick a date." };
+    if (!isService(service)) return { error: "Pick a sitting." };
     if (!Number.isInteger(partySize) || partySize < 1) {
       return { error: "How many guests are coming?" };
     }
 
+    // Every reservation is a single day; the half-open range keeps the
+    // existing date-range queries working unchanged.
+    const endDate = addDays(startDate, 1);
+
     if (status === "approved") {
       const availability = await getAvailabilityData(startDate, endDate);
       const closures = blockedRanges(space, availability.blackouts);
-      const full = !dayHasRoom(space, availability.bookings, startDate, partySize);
+      const full = !serviceHasRoom(
+        space,
+        availability.bookings,
+        startDate,
+        service,
+        partySize
+      );
       if (isDateBlocked(startDate, closures) || full) {
         return {
           error:
@@ -316,6 +323,7 @@ export async function createManualBooking(
             status,
             startDate,
             endDate,
+            service,
             partySize,
             quotedTotalCents: quote.totalCents,
             finalTotalCents: totalCents ?? quote.totalCents,
@@ -358,6 +366,7 @@ export async function createManualBooking(
           isEvent: space.isEvent,
           startDate,
           endDate,
+          service,
           partySize,
           guestFirstName: firstName,
           manageToken: booking.manageToken,

@@ -48,7 +48,7 @@ export default async function NewBookingPage({ searchParams }: Props) {
       </Link>
       <PageHeader
         title="New booking"
-        description="Enter a booking taken over the phone or by email. Confirmed bookings block the calendar immediately; owner bookings skip lead-time and minimum-stay rules but never double-book."
+        description="Enter a reservation taken over the phone. Confirmed reservations block capacity immediately; owner bookings skip lead-time rules but never overbook."
       />
       <Card>
         <NewBookingForm spaces={options} prefill={prefill} />

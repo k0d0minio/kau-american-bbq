@@ -20,12 +20,12 @@ function SubmitButton() {
       {pending ? (
         <>
           <Loader2 className="size-4 animate-spin" />
-          Blocking…
+          Closing…
         </>
       ) : (
         <>
           <ShieldMinus className="size-4" />
-          Block dates
+          Close dates
         </>
       )}
     </button>
@@ -47,7 +47,7 @@ export function BlackoutForm({
       <div className="space-y-1.5">
         <Label htmlFor="blackoutSpace">Space</Label>
         <Select id="blackoutSpace" name="spaceId" defaultValue="">
-          <option value="">Whole estate — every space</option>
+          <option value="">Whole restaurant — every space</option>
           {spaceOptions.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
@@ -57,24 +57,24 @@ export function BlackoutForm({
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="firstDay">First blocked day</Label>
+          <Label htmlFor="firstDay">First closed day</Label>
           <Input id="firstDay" name="firstDay" type="date" required />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="lastDay">Last blocked day</Label>
+          <Label htmlFor="lastDay">Last closed day</Label>
           <Input id="lastDay" name="lastDay" type="date" required />
         </div>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="reason">Reason <span className="font-normal text-stone">(optional, shows on the calendar)</span></Label>
-        <Input id="reason" name="reason" maxLength={200} placeholder="Winterized, family week, roof repairs…" />
+        <Input id="reason" name="reason" maxLength={200} placeholder="Summer holidays, private event, Godzilla maintenance…" />
       </div>
       <div className="flex items-center gap-3">
         <SubmitButton />
         {state.ok ? (
           <p className="inline-flex items-center gap-1.5 text-sm font-medium text-char-700">
             <Check className="size-4" />
-            Blocked
+            Closed
           </p>
         ) : null}
       </div>

@@ -30,7 +30,7 @@ export type BookingActionData = {
   isEvent: boolean;
 };
 
-function dollars(cents: number | null): string {
+function euros(cents: number | null): string {
   if (cents === null) return "";
   const value = cents / 100;
   return Number.isInteger(value) ? String(value) : value.toFixed(2);
@@ -90,8 +90,8 @@ export function PendingActions({ booking }: { booking: BookingActionData }) {
       {booking.conflict ? (
         <p className="flex items-start gap-2 rounded-2xl bg-ember/10 px-4 py-3 text-sm leading-relaxed text-[#7c2d12]">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-          These dates now overlap another confirmed booking, a turnover buffer or a blackout.
-          You can still approve if you know it works — the calendar won&apos;t stop you.
+          That sitting has filled up, or the day has since been closed. You can still
+          approve if you know it works — the calendar won&apos;t stop you.
         </p>
       ) : null}
 
@@ -99,17 +99,17 @@ export function PendingActions({ booking }: { booking: BookingActionData }) {
         <input type="hidden" name="bookingId" value={booking.id} />
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="finalTotal">Final total ($)</Label>
+            <Label htmlFor="finalTotal">Final total (€)</Label>
             <Input
               id="finalTotal"
               name="finalTotal"
               inputMode="decimal"
-              defaultValue={dollars(booking.finalTotalCents ?? booking.quotedTotalCents)}
+              defaultValue={euros(booking.finalTotalCents ?? booking.quotedTotalCents)}
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="deposit">Deposit ($, optional)</Label>
-            <Input id="deposit" name="deposit" inputMode="decimal" defaultValue={dollars(booking.depositCents)} />
+            <Label htmlFor="deposit">Deposit (€, optional)</Label>
+            <Input id="deposit" name="deposit" inputMode="decimal" defaultValue={euros(booking.depositCents)} />
           </div>
         </div>
         <label className="flex items-start gap-2.5 text-sm text-ink-soft">
@@ -119,7 +119,7 @@ export function PendingActions({ booking }: { booking: BookingActionData }) {
             defaultChecked={booking.blocksEstate}
             className="mt-0.5 size-4 accent-char-700"
           />
-          Reserve the whole estate for these dates (blocks every space)
+          Close the whole restaurant for this booking (blocks every space)
         </label>
         <div className="space-y-1.5">
           <Label htmlFor="approveNote">Note to the guest (optional, goes in the email)</Label>
@@ -127,7 +127,7 @@ export function PendingActions({ booking }: { booking: BookingActionData }) {
             id="approveNote"
             name="decisionNote"
             className="min-h-20"
-            placeholder="We can't wait to host you — we'll call this week about the deposit."
+            placeholder="See you Saturday — ask for the counter seats if you want the show."
           />
         </div>
         <div className="flex items-center gap-3">
@@ -155,7 +155,7 @@ export function PendingActions({ booking }: { booking: BookingActionData }) {
                 id="declineNote"
                 name="decisionNote"
                 className="min-h-20"
-                placeholder="We're already hosting a wedding that weekend — early September is wide open though."
+                placeholder="That sitting is full — Sunday lunch is wide open though."
               />
             </div>
             <div className="flex items-center gap-3">
@@ -240,12 +240,12 @@ export function ApprovedActions({ booking }: { booking: BookingActionData }) {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="paymentDeposit">Deposit ($)</Label>
+            <Label htmlFor="paymentDeposit">Deposit (€)</Label>
             <Input
               id="paymentDeposit"
               name="deposit"
               inputMode="decimal"
-              defaultValue={dollars(booking.depositCents)}
+              defaultValue={euros(booking.depositCents)}
             />
           </div>
         </div>
@@ -269,7 +269,7 @@ export function ApprovedActions({ booking }: { booking: BookingActionData }) {
           <form action={cancelAction} className="space-y-3">
             <input type="hidden" name="bookingId" value={booking.id} />
             <p className="text-sm text-ink-soft">
-              This frees the dates immediately and emails the guest. Refunds stay in your hands.
+              This frees the covers immediately and emails the guest. Refunds stay in your hands.
             </p>
             <div className="space-y-1.5">
               <Label htmlFor="cancelNote">Note to the guest (optional, goes in the email)</Label>

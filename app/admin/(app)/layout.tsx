@@ -4,7 +4,7 @@ import { Sidebar } from "./components/sidebar";
 export const metadata: Metadata = {
   title: {
     default: "Admin",
-    template: "%s · Vine Cliff Admin",
+    template: "%s · KAU Admin",
   },
   robots: { index: false, follow: false },
 };

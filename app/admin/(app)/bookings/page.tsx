@@ -5,6 +5,7 @@ import { buttonVariants } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/field";
 import { listBookingsForAdmin, type BookingTab } from "@/lib/db/queries";
 import { formatDayMonth, todayAtRestaurant } from "@/lib/booking/dates";
+import { SERVICE_SHORT_LABELS, isService } from "@/lib/booking/availability";
 import { formatMoney } from "@/lib/booking/pricing";
 import { PageHeader, EmptyState } from "../components/page-shell";
 import { AlertBadge, BookingStatusBadge, PaymentStatusBadge } from "../components/badges";
@@ -37,7 +38,7 @@ export default async function BookingsPage({ searchParams }: Props) {
     <div className="space-y-6">
       <PageHeader
         title="Bookings"
-        description="Requests to review, plus every stay and event across the estate."
+        description="Reservation requests to review, plus every table and event at KAU."
         actions={
           <Link
             href="/admin/bookings/new"
@@ -107,9 +108,12 @@ export default async function BookingsPage({ searchParams }: Props) {
                     </p>
                   </div>
                   <div className="text-sm text-ink-soft">
-                    {formatDayMonth(booking.startDate)} → {formatDayMonth(booking.endDate)}
+                    {formatDayMonth(booking.startDate)}
+                    {isService(booking.service)
+                      ? ` · ${SERVICE_SHORT_LABELS[booking.service]}`
+                      : ""}
                     <span className="ml-2 text-xs text-stone">
-                      {booking.partySize} guests
+                      {booking.partySize} covers
                     </span>
                   </div>
                   <div className="ml-auto flex flex-wrap items-center gap-2">

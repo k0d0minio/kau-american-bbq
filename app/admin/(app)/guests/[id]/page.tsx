@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, Mail, Phone } from "lucide-react";
 import { getGuestWithBookings } from "@/lib/db/queries";
 import { formatDayMonth, todayAtRestaurant } from "@/lib/booking/dates";
+import { SERVICE_SHORT_LABELS, isService } from "@/lib/booking/availability";
 import { formatMoney } from "@/lib/booking/pricing";
 import { PageHeader, Card } from "../../components/page-shell";
 import { BookingStatusBadge } from "../../components/badges";
@@ -88,7 +89,10 @@ export default async function GuestDetailPage({ params }: Props) {
                     <span className="text-sm font-medium text-ink">{booking.reference}</span>
                     <span className="text-sm text-ink-soft">{space.name}</span>
                     <span className="text-sm text-ink-soft">
-                      {formatDayMonth(booking.startDate)} → {formatDayMonth(booking.endDate)}
+                      {formatDayMonth(booking.startDate)}
+                      {isService(booking.service)
+                        ? ` · ${SERVICE_SHORT_LABELS[booking.service]}`
+                        : ""}
                     </span>
                     <span className="ml-auto flex items-center gap-3">
                       <BookingStatusBadge

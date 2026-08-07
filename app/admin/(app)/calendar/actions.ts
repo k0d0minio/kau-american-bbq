@@ -44,7 +44,7 @@ export async function createBlackout(
     return { ok: true };
   } catch (error) {
     console.error("Blackout create failed:", error);
-    return { error: "Could not add the blackout — please try again." };
+    return { error: "Could not add the closure — please try again." };
   }
 }
 

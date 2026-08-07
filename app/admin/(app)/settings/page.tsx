@@ -27,7 +27,7 @@ export default async function SettingsPage() {
     <div className="space-y-8">
       <PageHeader
         title="Settings"
-        description="Estate-wide knobs for the booking system, plus business details and admin access."
+        description="Restaurant-wide settings for reservations, plus business details and admin access."
       />
 
       <Card>
@@ -66,7 +66,7 @@ export default async function SettingsPage() {
             <h2 className="font-display text-lg text-ink">Access</h2>
             <p className="mt-1 text-sm text-ink-soft">
               Admin access is tied to individual accounts, each signing in with
-              their own email and password. Accounts are stored in the estate
+              their own email and password. Accounts are stored in the
               database; account management will be available here soon.
             </p>
           </div>

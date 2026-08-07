@@ -28,7 +28,8 @@ const SPACE_COLORS = [
   "bg-char-900 text-bone",
 ];
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+// Monday-first: KAU opens Thursday–Sunday, so the weekend reads as one block.
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 type Props = { searchParams: Promise<{ month?: string }> };
 
@@ -51,7 +52,7 @@ export default async function CalendarPage({ searchParams }: Props) {
   );
   const shortName = (name: string) => name.replace(/^The /, "");
 
-  const lead = parseISO(monthFirst).getUTCDay();
+  const lead = (parseISO(monthFirst).getUTCDay() + 6) % 7;
   const dayCount = diffDays(monthFirst, monthEnd);
   const prevMonth = addMonths(monthFirst, -1).slice(0, 7);
   const nextMonth = addMonths(monthFirst, 1).slice(0, 7);
@@ -60,7 +61,7 @@ export default async function CalendarPage({ searchParams }: Props) {
     <div className="space-y-6">
       <PageHeader
         title="Calendar"
-        description="Confirmed bookings and blackout dates across every space. Pending requests don't block dates and aren't shown here."
+        description="Confirmed reservations and closure dates across every space. Pending requests don't block capacity and aren't shown here."
       />
 
       <Card className="overflow-x-auto p-4 sm:p-5">
@@ -100,7 +101,7 @@ export default async function CalendarPage({ searchParams }: Props) {
               ))}
               <span className="flex items-center gap-1.5 text-xs text-ink-soft">
                 <span className="size-2.5 rounded-full border border-stone/50 bg-parchment" />
-                Blackout
+                Closed
               </span>
             </div>
           </div>
@@ -160,7 +161,7 @@ export default async function CalendarPage({ searchParams }: Props) {
                     return (
                       <div
                         key={blackout.id}
-                        title={`${spaceName ?? "Whole estate"}${blackout.reason ? ` — ${blackout.reason}` : ""}`}
+                        title={`${spaceName ?? "Whole restaurant"}${blackout.reason ? ` — ${blackout.reason}` : ""}`}
                         className={cn(
                           "truncate rounded border border-stone/30 bg-parchment px-1.5 text-[0.68rem] leading-5 text-stone",
                           !isStart && "h-1.5 rounded-full border-dashed p-0"
@@ -181,25 +182,25 @@ export default async function CalendarPage({ searchParams }: Props) {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
-          <h2 className="font-display text-lg text-ink">Block dates</h2>
+          <h2 className="font-display text-lg text-ink">Closure dates</h2>
           <p className="mb-4 mt-1 text-sm text-ink-soft">
-            Close a space (or the whole estate) for maintenance, family time or the winter —
-            guests can&apos;t request blocked dates.
+            Close the restaurant (or one space) for holidays, private events or maintenance —
+            guests can&apos;t book closed dates.
           </p>
           <BlackoutForm spaceOptions={spaces.map((s) => ({ id: s.id, name: s.name }))} />
         </Card>
 
         <Card>
-          <h2 className="font-display text-lg text-ink">Upcoming blackouts</h2>
+          <h2 className="font-display text-lg text-ink">Upcoming closures</h2>
           {upcomingBlackouts.length === 0 ? (
-            <p className="mt-3 text-sm text-stone">Nothing blocked ahead.</p>
+            <p className="mt-3 text-sm text-stone">Nothing closed ahead.</p>
           ) : (
             <ul className="mt-3 divide-y divide-char-100">
               {upcomingBlackouts.map(({ blackout, spaceName }) => (
                 <li key={blackout.id} className="flex items-center justify-between gap-3 py-2.5">
                   <div>
                     <p className="text-sm font-medium text-ink">
-                      {spaceName ?? "Whole estate"}
+                      {spaceName ?? "Whole restaurant"}
                       {blackout.reason ? (
                         <span className="font-normal text-stone"> · {blackout.reason}</span>
                       ) : null}
@@ -214,7 +215,7 @@ export default async function CalendarPage({ searchParams }: Props) {
                     <input type="hidden" name="blackoutId" value={blackout.id} />
                     <button
                       type="submit"
-                      aria-label="Delete blackout"
+                      aria-label="Delete closure"
                       className="flex size-8 items-center justify-center rounded-full text-stone transition-colors hover:bg-ember/10 hover:text-[#7c2d12]"
                     >
                       <Trash2 className="size-4" />

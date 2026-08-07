@@ -6,6 +6,7 @@ import { Loader2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/app/components/ui/button";
 import { FormError, Input, Label, Select, Textarea } from "@/app/components/ui/field";
+import { SERVICES, SERVICE_LABELS } from "@/lib/booking/availability";
 import { createManualBooking, type AdminActionState } from "../actions";
 
 export type SpaceOption = {
@@ -88,21 +89,25 @@ export function NewBookingForm({
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="partySize">Guests</Label>
+          <Label htmlFor="partySize">Party size</Label>
           <Input id="partySize" name="partySize" type="number" min={1} defaultValue={2} required />
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="startDate">{space?.isEvent ? "First day" : "Check-in"}</Label>
+          <Label htmlFor="startDate">Date</Label>
           <Input id="startDate" name="startDate" type="date" required />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="endDate">
-            {space?.isEvent ? "Departure day (day after last event day)" : "Checkout"}
-          </Label>
-          <Input id="endDate" name="endDate" type="date" required />
+          <Label htmlFor="service">Sitting</Label>
+          <Select id="service" name="service" defaultValue="dinner">
+            {SERVICES.map((option) => (
+              <option key={option} value={option}>
+                {SERVICE_LABELS[option]}
+              </option>
+            ))}
+          </Select>
         </div>
       </div>
 
@@ -145,7 +150,7 @@ export function NewBookingForm({
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="total">
-            Total ($) <span className="font-normal text-stone">(blank = auto quote)</span>
+            Total (€) <span className="font-normal text-stone">(blank = auto quote)</span>
           </Label>
           <Input id="total" name="total" inputMode="decimal" placeholder="Auto" />
         </div>
@@ -153,7 +158,7 @@ export function NewBookingForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="deposit">Deposit ($, optional)</Label>
+          <Label htmlFor="deposit">Deposit (€, optional)</Label>
           <Input id="deposit" name="deposit" inputMode="decimal" />
         </div>
         <div className="space-y-1.5">
@@ -171,7 +176,7 @@ export function NewBookingForm({
             defaultChecked={space?.blocksEstate ?? false}
             className="mt-0.5 size-4 accent-char-700"
           />
-          Reserve the whole estate for these dates (blocks every space)
+          Close the whole restaurant for this booking (blocks every space)
         </label>
         <label className="flex items-start gap-2.5 text-sm text-ink-soft">
           <input

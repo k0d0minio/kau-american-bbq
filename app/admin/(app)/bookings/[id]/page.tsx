@@ -115,21 +115,26 @@ export default async function BookingDetailPage({ params }: Props) {
                   <dd className="text-right text-sm text-ink">{value}</dd>
                 </div>
               ))}
-              <div className="flex items-center justify-between gap-4 py-2.5">
-                <dt className="text-sm text-stone">Quoted estimate</dt>
-                <dd className="text-right text-sm text-ink">
-                  {formatMoney(booking.quotedTotalCents)}
-                </dd>
-              </div>
-              <div className="flex items-center justify-between gap-4 py-2.5">
-                <dt className="text-sm text-stone">Final total</dt>
-                <dd className="text-right text-sm font-semibold text-ink">
-                  {booking.finalTotalCents !== null
-                    ? formatMoney(booking.finalTotalCents)
-                    : "—"}
-                </dd>
-              </div>
-              {booking.depositCents !== null ? (
+              {/* Reservations are free, so the money rows only appear once
+                  there is money on the booking (private hire, or an owner
+                  total entered by hand). */}
+              {booking.quotedTotalCents > 0 ? (
+                <div className="flex items-center justify-between gap-4 py-2.5">
+                  <dt className="text-sm text-stone">Quoted estimate</dt>
+                  <dd className="text-right text-sm text-ink">
+                    {formatMoney(booking.quotedTotalCents)}
+                  </dd>
+                </div>
+              ) : null}
+              {booking.finalTotalCents ? (
+                <div className="flex items-center justify-between gap-4 py-2.5">
+                  <dt className="text-sm text-stone">Final total</dt>
+                  <dd className="text-right text-sm font-semibold text-ink">
+                    {formatMoney(booking.finalTotalCents)}
+                  </dd>
+                </div>
+              ) : null}
+              {booking.depositCents ? (
                 <div className="flex items-center justify-between gap-4 py-2.5">
                   <dt className="text-sm text-stone">Deposit</dt>
                   <dd className="text-right text-sm text-ink">
@@ -168,7 +173,7 @@ export default async function BookingDetailPage({ params }: Props) {
             </p>
             <div className="mt-2 space-y-1.5 text-sm text-ink-soft">
               <a
-                href={`mailto:${guest.email}?subject=Your Vine Cliff booking ${booking.reference}`}
+                href={`mailto:${guest.email}?subject=Your KAU reservation ${booking.reference}`}
                 className="flex items-center gap-2 hover:text-char-700"
               >
                 <Mail className="size-4 text-stone" />
