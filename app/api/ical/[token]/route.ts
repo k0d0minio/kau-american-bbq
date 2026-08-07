@@ -3,8 +3,8 @@
 // bookings and closures.
 //
 // The feed emits everything that makes the space unavailable: its own
-// approved bookings (padded by the turnover buffer), estate-reserving
-// bookings on other spaces, and applicable blackouts.
+// approved reservations, full-venue bookings on other spaces, and any
+// closures that apply.
 import { and, eq, gt, lt, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { blackouts, bookings } from "@/lib/db/schema";
@@ -69,8 +69,8 @@ export async function GET(
           ne(bookings.spaceId, space.id),
           eq(bookings.status, "approved"),
           overlapping,
-          // Estate-wide spaces are blocked by *any* booking elsewhere;
-          // ordinary spaces only by estate-reserving ones.
+          // A full-venue space is blocked by *any* booking elsewhere;
+          // ordinary spaces only by bookings that close the whole restaurant.
           space.blocksEstate ? undefined : eq(bookings.blocksEstate, true)
         )
       ),

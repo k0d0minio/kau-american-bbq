@@ -92,7 +92,7 @@ export function Hero() {
       </motion.div>
 
       <motion.a
-        href="#estate"
+        href="#smokehouse"
         aria-label="Scroll to explore"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
