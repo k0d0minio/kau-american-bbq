@@ -4,8 +4,13 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { bookings, guests, type Booking } from "@/lib/db/schema";
 import { getAvailabilityData, getSpaceBySlug } from "@/lib/db/queries";
-import { todayAtEstate } from "@/lib/booking/dates";
-import { bookingWindow, validateRequest } from "@/lib/booking/availability";
+import { todayAtRestaurant } from "@/lib/booking/dates";
+import {
+  bookingWindow,
+  isService,
+  reservationEndDate,
+  validateRequest,
+} from "@/lib/booking/availability";
 import { computeQuote } from "@/lib/booking/pricing";
 import { makeManageToken, makeReference } from "@/lib/booking/tokens";
 import { EVENT_TYPES } from "@/lib/booking/event-types";
@@ -33,8 +38,8 @@ export async function requestBooking(
   if (cleanText(formData.get("website"), 100)) redirect("/");
 
   const slug = cleanText(formData.get("space"), 100);
-  const startDate = cleanText(formData.get("startDate"), 10);
-  const endDate = cleanText(formData.get("endDate"), 10);
+  const date = cleanText(formData.get("date"), 10);
+  const serviceRaw = cleanText(formData.get("service"), 10);
   const firstName = cleanText(formData.get("firstName"), 80);
   const lastName = cleanText(formData.get("lastName"), 80);
   const email = cleanText(formData.get("email"), 200).toLowerCase();
@@ -57,25 +62,28 @@ export async function requestBooking(
       return { error: "This space isn't taking bookings right now." };
     }
 
-    const eventType = space.isEvent
-      ? (EVENT_TYPES as readonly string[]).find((t) => t === eventTypeRaw) ?? "Other"
-      : null;
+    // The occasion is optional for every space now, but still has to be one
+    // of ours.
+    const eventType =
+      (EVENT_TYPES as readonly string[]).find((t) => t === eventTypeRaw) ?? null;
+    const service = isService(serviceRaw) ? serviceRaw : null;
 
     // Authoritative availability check against fresh data.
-    const today = todayAtEstate();
+    const today = todayAtRestaurant();
     const window = bookingWindow(space, today);
     const availability = await getAvailabilityData(today, window.lastEnd);
-    const validation = validateRequest({
+    const validation = validateRequest(
       space,
-      startDate,
-      endDate,
-      partySize,
+      { date, service, partySize },
       today,
-      bookings: availability.bookings,
-      blackouts: availability.blackouts,
-    });
+      availability.bookings,
+      availability.blackouts
+    );
     if (!validation.ok) return { error: validation.error };
 
+    const startDate = date;
+    const endDate = reservationEndDate(date);
+    // Reservations are free; only private-hire event days carry a quote.
     const quote = computeQuote(space, startDate, endDate);
 
     // Guests are deduplicated by email; details refresh to the latest request
@@ -109,6 +117,7 @@ export async function requestBooking(
             status: "pending",
             startDate,
             endDate,
+            service,
             partySize,
             eventType,
             guestMessage: message || null,
@@ -139,6 +148,7 @@ export async function requestBooking(
       isEvent: space.isEvent,
       startDate,
       endDate,
+      service,
       partySize,
       guestFirstName: firstName,
       manageToken: booking.manageToken,

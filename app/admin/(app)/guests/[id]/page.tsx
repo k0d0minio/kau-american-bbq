@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, Mail, Phone } from "lucide-react";
 import { getGuestWithBookings } from "@/lib/db/queries";
-import { formatDayMonth, todayAtEstate } from "@/lib/booking/dates";
+import { formatDayMonth, todayAtRestaurant } from "@/lib/booking/dates";
 import { formatMoney } from "@/lib/booking/pricing";
 import { PageHeader, Card } from "../../components/page-shell";
 import { BookingStatusBadge } from "../../components/badges";
@@ -18,7 +18,7 @@ export default async function GuestDetailPage({ params }: Props) {
   const data = await getGuestWithBookings(id).catch(() => null);
   if (!data) notFound();
   const { guest, bookings } = data;
-  const today = todayAtEstate();
+  const today = todayAtRestaurant();
   const totalSpentCents = bookings
     .filter(({ booking }) => booking.status === "approved")
     .reduce(

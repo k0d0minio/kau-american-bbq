@@ -1,10 +1,10 @@
-// Occasion options offered on event-space booking forms. Shared between the
-// client form and the server action that validates it.
+// Occasion options offered on the reservation form. Shared between the client
+// form and the server action that validates it.
 export const EVENT_TYPES = [
-  "Wedding",
-  "Reunion",
-  "Retreat",
-  "Birthday or celebration",
-  "Corporate or workshop",
+  "Birthday",
+  "Anniversary or celebration",
+  "Business lunch or dinner",
+  "Group or team meal",
+  "Full-venue private event",
   "Other",
 ] as const;

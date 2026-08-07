@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { adminNav } from "@/lib/admin";
 import { getDashboardData } from "@/lib/db/queries";
-import { formatDayMonth, formatMonth, todayAtEstate } from "@/lib/booking/dates";
+import { formatDayMonth, formatMonth, todayAtRestaurant } from "@/lib/booking/dates";
 import { formatMoney } from "@/lib/booking/pricing";
 import { PageHeader, Card } from "./components/page-shell";
 
@@ -19,7 +19,7 @@ export const metadata = { title: "Dashboard" };
 const shortcuts = adminNav.filter((item) => item.href !== "/admin");
 
 export default async function AdminDashboardPage() {
-  const today = todayAtEstate();
+  const today = todayAtRestaurant();
   const data = await getDashboardData(today);
 
   const stats = [

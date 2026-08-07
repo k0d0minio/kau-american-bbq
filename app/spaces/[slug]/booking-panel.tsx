@@ -13,11 +13,16 @@ import {
   type ISODate,
 } from "@/lib/booking/dates";
 import {
+  SERVICES,
+  SERVICE_LABELS,
   bookingWindow,
   isDateBlocked,
+  isDayAvailable,
+  serviceHasRoom,
+  type BookingBlock,
   type DateRange,
+  type Service,
 } from "@/lib/booking/availability";
-import { computeQuote, formatMoney, unitLabel } from "@/lib/booking/pricing";
 import { EVENT_TYPES } from "@/lib/booking/event-types";
 import { buttonVariants } from "@/app/components/ui/button";
 import { FormError, Input, Label, Select, Textarea } from "@/app/components/ui/field";
@@ -30,14 +35,10 @@ export type PanelSpace = {
   name: string;
   isEvent: boolean;
   blocksEstate: boolean;
-  minNights: number;
   maxGuests: number;
-  bufferDays: number;
+  capacityCovers: number;
   minLeadDays: number;
   maxHorizonMonths: number;
-  nightlyRateCents: number;
-  weeklyRateCents: number | null;
-  cleaningFeeCents: number;
 };
 
 function firstOfMonth(date: ISODate): ISODate {
@@ -60,7 +61,7 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
       ) : (
         <>
           <Send className="size-4" />
-          Request to book
+          Request a table
         </>
       )}
     </button>
@@ -69,19 +70,22 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
 
 export function BookingPanel({
   space,
-  blocked,
+  blocks,
+  closures,
   today,
 }: {
   space: PanelSpace;
-  blocked: DateRange[];
+  /** Approved bookings across every space — capacity is cross-space aware. */
+  blocks: BookingBlock[];
+  /** Closure ranges that apply to this space. */
+  closures: DateRange[];
   today: ISODate;
 }) {
   const window = useMemo(() => bookingWindow(space, today), [space, today]);
   const [month, setMonth] = useState<ISODate>(firstOfMonth(window.firstStart));
-  const [start, setStart] = useState<ISODate | null>(null);
-  /** Exclusive end: checkout day for stays, day after the last event day. */
-  const [endEx, setEndEx] = useState<ISODate | null>(null);
-  const [rangeError, setRangeError] = useState<string | null>(null);
+  const [date, setDate] = useState<ISODate | null>(null);
+  const [service, setService] = useState<Service | null>(null);
+  const [partySize, setPartySize] = useState(2);
   const [state, formAction] = useActionState<BookingFormState, FormData>(
     requestBooking,
     {}
@@ -91,67 +95,40 @@ export function BookingPanel({
   const canNext = addMonths(month, 1) <= firstOfMonth(addDays(window.lastEnd, -1));
 
   const isSelectable = (day: ISODate) =>
-    day >= window.firstStart && day < window.lastEnd && !isDateBlocked(day, blocked);
+    day >= window.firstStart &&
+    day < window.lastEnd &&
+    isDayAvailable(space, blocks, closures, day, 1);
 
   const pickDay = (day: ISODate) => {
-    setRangeError(null);
-    if (!start || (start && endEx)) {
-      setStart(day);
-      setEndEx(null);
-      return;
+    setDate(day);
+    // A sitting that no longer fits the party is dropped rather than silently
+    // carried over to the new day.
+    if (service && !serviceHasRoom(space, blocks, day, service, partySize)) {
+      setService(null);
     }
-    if (day === start) {
-      // Second tap on the same day: a single-day event; stays need a night.
-      if (space.isEvent) setEndEx(addDays(day, 1));
-      return;
-    }
-    if (day < start) {
-      setStart(day);
-      return;
-    }
-    const candidateEnd = space.isEvent ? addDays(day, 1) : day;
-    for (let d = start; d < candidateEnd; d = addDays(d, 1)) {
-      if (isDateBlocked(d, blocked)) {
-        setRangeError("That range crosses unavailable dates — please pick a shorter span.");
-        return;
-      }
-    }
-    setEndEx(candidateEnd);
   };
 
-  const clearDates = () => {
-    setStart(null);
-    setEndEx(null);
-    setRangeError(null);
+  const clearDate = () => {
+    setDate(null);
+    setService(null);
   };
 
-  // The last day to *display* as selected — checkout day for stays (guests
-  // read it as part of the trip), the final event day for events.
-  const displayEnd = endEx ? (space.isEvent ? addDays(endEx, -1) : endEx) : null;
-
-  const quote = start && endEx ? computeQuote(space, start, endEx) : null;
-  const nights = start && endEx ? diffDays(start, endEx) : 0;
-
-  // --- Month grid -----------------------------------------------------------
+  // --- Month grid (Monday first) -------------------------------------------
   const monthDays = useMemo(() => {
     const count = diffDays(month, addMonths(month, 1));
-    const lead = parseISO(month).getUTCDay();
+    const lead = (parseISO(month).getUTCDay() + 6) % 7;
     return { count, lead };
   }, [month]);
 
-  const dayLabels = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  const dayLabels = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
   return (
     <div className="rounded-3xl border border-pine-100 bg-cream-100 p-6 shadow-soft sm:p-7">
-      <p className="eyebrow text-amber">Request to book</p>
-      <h2 className="mt-2 font-display text-2xl text-pine-900">
-        {space.isEvent ? "Pick your days" : "Pick your dates"}
-      </h2>
+      <p className="eyebrow text-amber">Reserve a table</p>
+      <h2 className="mt-2 font-display text-2xl text-pine-900">Pick your day</h2>
       <p className="mt-2 text-sm leading-relaxed text-stone">
-        {space.isEvent
-          ? "Select your first and last day, including any setup and teardown time."
-          : "Select your check-in and checkout days."}{" "}
-        We review every request personally — nothing is charged online.
+        We&apos;re open Thursday to Sunday for lunch and dinner. Choose a day and a
+        sitting — we review every request personally.
       </p>
 
       {/* Calendar */}
@@ -189,13 +166,8 @@ export function BookingPanel({
           {Array.from({ length: monthDays.count }).map((_, i) => {
             const day = addDays(month, i);
             const selectable = isSelectable(day);
-            const isEndpoint = day === start || (displayEnd !== null && day === displayEnd);
-            const inRange =
-              start !== null &&
-              displayEnd !== null &&
-              day > start &&
-              day < displayEnd;
-            const blockedDay = isDateBlocked(day, blocked);
+            const selected = day === date;
+            const closed = isDateBlocked(day, closures);
             return (
               <button
                 key={day}
@@ -203,18 +175,16 @@ export function BookingPanel({
                 disabled={!selectable}
                 onClick={() => pickDay(day)}
                 aria-label={formatDate(day)}
-                aria-pressed={isEndpoint || inRange}
+                aria-pressed={selected}
                 className={cn(
                   "mx-auto flex size-9 items-center justify-center rounded-full text-sm transition-colors",
-                  isEndpoint
+                  selected
                     ? "bg-pine-700 font-medium text-cream"
-                    : inRange
-                      ? "bg-pine-100 text-pine-900"
-                      : selectable
-                        ? "cursor-pointer text-ink hover:bg-pine-100"
-                        : blockedDay
-                          ? "text-stone/40 line-through decoration-stone/40"
-                          : "text-stone/35"
+                    : selectable
+                      ? "cursor-pointer text-ink hover:bg-pine-100"
+                      : closed
+                        ? "text-stone/40 line-through decoration-stone/40"
+                        : "text-stone/35"
                 )}
               >
                 {i + 1}
@@ -224,13 +194,12 @@ export function BookingPanel({
         </div>
         <div className="mt-3 flex items-center justify-between border-t border-pine-100 pt-3">
           <p className="text-xs text-stone">
-            Minimum {space.minNights} {unitLabel(space, space.minNights)} · up to{" "}
-            {space.maxGuests} guests
+            Thursday to Sunday · tables up to {space.maxGuests}
           </p>
-          {start ? (
+          {date ? (
             <button
               type="button"
-              onClick={clearDates}
+              onClick={clearDate}
               className="inline-flex items-center gap-1 text-xs font-medium text-pine-700 hover:text-amber"
             >
               <Undo2 className="size-3" />
@@ -240,46 +209,47 @@ export function BookingPanel({
         </div>
       </div>
 
-      {rangeError ? <p className="mt-3 text-sm text-[#9a5a12]">{rangeError}</p> : null}
-
-      {/* Selection + quote */}
-      {start && endEx && quote ? (
+      {/* Sitting */}
+      {date ? (
         <div className="mt-5 rounded-2xl bg-pine-50 p-4">
-          <p className="text-sm font-medium text-pine-900">
-            {formatDate(start)} → {formatDate(space.isEvent ? addDays(endEx, -1) : endEx)}
-            <span className="ml-2 font-normal text-pine-600">
-              {nights} {unitLabel(space, nights)}
-            </span>
-          </p>
-          <dl className="mt-3 space-y-1.5 border-t border-pine-100 pt-3">
-            {quote.lines.map((line) => (
-              <div key={line.label} className="flex justify-between text-sm text-ink-soft">
-                <dt>{line.label}</dt>
-                <dd>{formatMoney(line.amountCents)}</dd>
-              </div>
-            ))}
-            <div className="flex justify-between border-t border-pine-100 pt-2 text-sm font-semibold text-ink">
-              <dt>Estimated total</dt>
-              <dd>{formatMoney(quote.totalCents)}</dd>
-            </div>
-          </dl>
-          <p className="mt-2 text-xs text-stone">
-            An estimate — we confirm the final price with your booking.
-          </p>
+          <p className="text-sm font-medium text-pine-900">{formatDate(date)}</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {SERVICES.map((option) => {
+              const room = serviceHasRoom(space, blocks, date, option, partySize);
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  disabled={!room}
+                  aria-pressed={service === option}
+                  onClick={() => setService(option)}
+                  className={cn(
+                    "rounded-xl border px-3 py-2.5 text-sm transition-colors",
+                    service === option
+                      ? "border-pine-700 bg-pine-700 font-medium text-cream"
+                      : room
+                        ? "cursor-pointer border-pine-100 bg-cream text-ink hover:border-pine-400"
+                        : "border-pine-100 bg-cream/50 text-stone/50 line-through"
+                  )}
+                >
+                  {SERVICE_LABELS[option]}
+                </button>
+              );
+            })}
+          </div>
+          {!service ? (
+            <p className="mt-2 text-xs text-stone">
+              Pick lunch or dinner to finish your request.
+            </p>
+          ) : null}
         </div>
-      ) : start ? (
-        <p className="mt-4 text-sm text-stone">
-          {space.isEvent
-            ? "Now pick your last day (or tap the same day again for a single-day event)."
-            : "Now pick your checkout day."}
-        </p>
       ) : null}
 
       {/* Details form */}
       <form action={formAction} className="mt-6 space-y-4">
         <input type="hidden" name="space" value={space.slug} />
-        <input type="hidden" name="startDate" value={start ?? ""} />
-        <input type="hidden" name="endDate" value={endEx ?? ""} />
+        <input type="hidden" name="date" value={date ?? ""} />
+        <input type="hidden" name="service" value={service ?? ""} />
         {/* Honeypot — humans never see or fill this. */}
         <div aria-hidden="true" className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden">
           <label>
@@ -308,55 +278,50 @@ export function BookingPanel({
             <Input id="phone" name="phone" type="tel" autoComplete="tel" maxLength={40} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="partySize">Guests</Label>
+            <Label htmlFor="partySize">How many people?</Label>
             <Input
               id="partySize"
               name="partySize"
               type="number"
               min={1}
               max={space.maxGuests}
-              defaultValue={2}
+              value={partySize}
+              onChange={(e) => setPartySize(Number(e.target.value))}
               required
             />
           </div>
         </div>
-        {space.isEvent ? (
-          <div className="space-y-1.5">
-            <Label htmlFor="eventType">Occasion</Label>
-            <Select id="eventType" name="eventType" required defaultValue="">
-              <option value="" disabled>
-                What are we celebrating?
+        <div className="space-y-1.5">
+          <Label htmlFor="eventType">
+            Occasion <span className="font-normal text-stone">(optional)</span>
+          </Label>
+          <Select id="eventType" name="eventType" defaultValue="">
+            <option value="">No special occasion</option>
+            {EVENT_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
               </option>
-              {EVENT_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </Select>
-          </div>
-        ) : null}
+            ))}
+          </Select>
+        </div>
         <div className="space-y-1.5">
           <Label htmlFor="message">
-            Your plans <span className="font-normal text-stone">(optional)</span>
+            Anything else <span className="font-normal text-stone">(optional)</span>
           </Label>
           <Textarea
             id="message"
             name="message"
             maxLength={2000}
-            placeholder={
-              space.isEvent
-                ? "Tell us about the occasion, rough guest count, timings…"
-                : "Anything we should know about your stay?"
-            }
+            placeholder="Allergies, highchairs, a birthday surprise — anything we should know?"
           />
         </div>
 
         <FormError message={state.error} />
 
-        <SubmitButton disabled={!start || !endEx} />
+        <SubmitButton disabled={!date || !service} />
         <p className="text-center text-xs leading-relaxed text-stone">
-          Submitting sends a request, not a charge. We&apos;ll confirm availability and payment
-          details personally.
+          Submitting sends a reservation request — nothing is charged online. We confirm
+          by email.
         </p>
       </form>
     </div>

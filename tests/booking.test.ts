@@ -13,7 +13,10 @@ import { computeQuote, formatMoney } from "../lib/booking/pricing";
 import {
   blockedRanges,
   bookingWindow,
+  dayHasRoom,
   isDateBlocked,
+  isOpenDay,
+  serviceHasRoom,
   validateRequest,
   type BlackoutBlock,
   type BookingBlock,
@@ -38,203 +41,264 @@ describe("dates", () => {
     assert.equal(addMonths("2026-07-15", 18), "2028-01-15");
   });
 
-  it("counts nights as half-open ranges", () => {
+  it("counts whole days as half-open ranges", () => {
     assert.equal(diffDays("2026-06-05", "2026-06-08"), 3);
-    assert.equal(diffDays("2026-06-05", "2026-06-05"), 0);
+    assert.equal(diffDays("2026-06-05", "2026-06-06"), 1);
   });
 
   it("treats back-to-back half-open ranges as non-overlapping", () => {
-    assert.equal(rangesOverlap("2026-06-05", "2026-06-08", "2026-06-08", "2026-06-10"), false);
+    assert.equal(rangesOverlap("2026-06-05", "2026-06-06", "2026-06-06", "2026-06-07"), false);
     assert.equal(rangesOverlap("2026-06-05", "2026-06-08", "2026-06-07", "2026-06-10"), true);
-    assert.equal(rangesOverlap("2026-06-05", "2026-06-08", "2026-06-01", "2026-06-06"), true);
   });
 });
 
 describe("pricing", () => {
-  const farmhouse = {
+  const dining = {
     isEvent: false,
-    nightlyRateCents: 45000,
-    weeklyRateCents: 275000,
-    cleaningFeeCents: 15000,
+    nightlyRateCents: 0,
+    weeklyRateCents: null,
+    cleaningFeeCents: 0,
   };
 
-  it("prices a short stay at the nightly rate plus cleaning", () => {
-    const quote = computeQuote(farmhouse, "2026-06-05", "2026-06-08");
-    assert.equal(quote.nights, 3);
-    assert.equal(quote.totalCents, 3 * 45000 + 15000);
-    assert.equal(quote.lines.length, 2);
-    assert.match(quote.lines[0].label, /3 nights × \$450/);
+  const privateHire = {
+    isEvent: true,
+    nightlyRateCents: 250000,
+    weeklyRateCents: null,
+    cleaningFeeCents: 0,
+  };
+
+  it("formats money in euros, dropping cents when whole", () => {
+    assert.equal(formatMoney(4500), "€45");
+    assert.equal(formatMoney(123456), "€1,234.56");
   });
 
-  it("applies the weekly rate per full week with nightly remainder", () => {
-    const quote = computeQuote(farmhouse, "2026-06-01", "2026-06-11");
-    assert.equal(quote.nights, 10);
-    assert.equal(quote.totalCents, 275000 + 3 * 45000 + 15000);
-    assert.match(quote.lines[0].label, /1 week × \$2,750/);
-    assert.match(quote.lines[1].label, /3 nights/);
+  it("quotes reservations at nothing at all", () => {
+    const quote = computeQuote(dining, "2026-06-05", "2026-06-06");
+    assert.equal(quote.totalCents, 0);
+    assert.deepEqual(quote.lines, []);
   });
 
-  it("speaks in days for event spaces and skips absent fees", () => {
-    const barn = {
-      isEvent: true,
-      nightlyRateCents: 250000,
-      weeklyRateCents: null,
-      cleaningFeeCents: 0,
-    };
-    const quote = computeQuote(barn, "2026-09-04", "2026-09-05");
-    assert.equal(quote.nights, 1);
-    assert.equal(quote.totalCents, 250000);
+  it("prices private hire per event day", () => {
+    const quote = computeQuote(privateHire, "2026-09-04", "2026-09-06");
+    assert.equal(quote.days, 2);
+    assert.equal(quote.totalCents, 2 * 250000);
     assert.equal(quote.lines.length, 1);
-    assert.match(quote.lines[0].label, /1 day × \$2,500/);
+    assert.match(quote.lines[0].label, /2 days × €2,500/);
   });
 
-  it("formats money without cents when whole", () => {
-    assert.equal(formatMoney(275000), "$2,750");
-    assert.equal(formatMoney(123456), "$1,234.56");
+  it("treats a zero rate as price-on-request, not a free event", () => {
+    const quote = computeQuote({ ...privateHire, nightlyRateCents: 0 }, "2026-09-04", "2026-09-05");
+    assert.equal(quote.totalCents, 0);
+    assert.deepEqual(quote.lines, []);
   });
 });
 
-const farmhouseRules: SpaceRules = {
-  id: "farmhouse-id",
+// 2026-06-05 is a Friday; 2026-06-09 a Tuesday.
+const tableService: SpaceRules = {
+  id: "table-service-id",
   isEvent: false,
   blocksEstate: false,
-  minNights: 2,
-  maxGuests: 10,
-  bufferDays: 1,
-  minLeadDays: 2,
-  maxHorizonMonths: 18,
+  maxGuests: 8,
+  capacityCovers: 60,
+  minLeadDays: 0,
+  maxHorizonMonths: 3,
 };
 
-const barnRules: SpaceRules = {
-  ...farmhouseRules,
-  id: "barn-id",
+const privateHire: SpaceRules = {
+  id: "private-hire-id",
   isEvent: true,
   blocksEstate: true,
-  minNights: 1,
-  maxGuests: 150,
+  maxGuests: 120,
+  capacityCovers: 120,
   minLeadDays: 14,
+  maxHorizonMonths: 6,
 };
 
-describe("availability", () => {
-  const farmhouseBooking: BookingBlock = {
-    spaceId: "farmhouse-id",
+function lunchBooking(
+  spaceId: string,
+  partySize: number,
+  overrides: Partial<BookingBlock> = {}
+): BookingBlock {
+  return {
+    spaceId,
     startDate: "2026-06-05",
-    endDate: "2026-06-08",
+    endDate: "2026-06-06",
     blocksEstate: false,
+    service: "lunch",
+    partySize,
+    ...overrides,
   };
-  const wedding: BookingBlock = {
-    spaceId: "barn-id",
-    startDate: "2026-07-10",
-    endDate: "2026-07-12",
-    blocksEstate: true,
-  };
+}
 
-  it("pads same-space bookings with the turnover buffer", () => {
-    const ranges = blockedRanges(farmhouseRules, [farmhouseBooking], []);
-    assert.deepEqual(ranges, [{ startDate: "2026-06-04", endDate: "2026-06-09" }]);
+describe("opening days", () => {
+  it("opens Thursday through Sunday only", () => {
+    assert.equal(isOpenDay("2026-06-04"), true); // Thursday
+    assert.equal(isOpenDay("2026-06-05"), true); // Friday
+    assert.equal(isOpenDay("2026-06-07"), true); // Sunday
+    assert.equal(isOpenDay("2026-06-08"), false); // Monday
+    assert.equal(isOpenDay("2026-06-09"), false); // Tuesday
+    assert.equal(isOpenDay("2026-06-10"), false); // Wednesday
+  });
+});
+
+describe("availability", () => {
+  it("sums approved covers per sitting", () => {
+    const blocks = [
+      lunchBooking("table-service-id", 4),
+      lunchBooking("table-service-id", 4),
+      lunchBooking("table-service-id", 6, { service: "dinner" }),
+    ];
+    assert.equal(serviceHasRoom(tableService, blocks, "2026-06-05", "lunch", 52), true);
+    assert.equal(serviceHasRoom(tableService, blocks, "2026-06-05", "lunch", 53), false);
+    // The dinner sitting keeps its own capacity.
+    assert.equal(serviceHasRoom(tableService, blocks, "2026-06-05", "dinner", 54), true);
   });
 
-  it("blocks every space during estate-blocking bookings, unbuffered", () => {
-    const ranges = blockedRanges(farmhouseRules, [wedding], []);
-    assert.deepEqual(ranges, [{ startDate: "2026-07-10", endDate: "2026-07-12" }]);
+  it("ignores covers booked in other spaces", () => {
+    const blocks = [lunchBooking("texan-counter-id", 20)];
+    assert.equal(serviceHasRoom(tableService, blocks, "2026-06-05", "lunch", 60), true);
   });
 
-  it("blocks estate-wide spaces whenever anything is booked", () => {
-    const ranges = blockedRanges(barnRules, [farmhouseBooking], []);
-    assert.deepEqual(ranges, [{ startDate: "2026-06-05", endDate: "2026-06-08" }]);
+  it("lets a full-venue booking close that sitting everywhere", () => {
+    const blocks = [
+      lunchBooking("private-hire-id", 80, { blocksEstate: true }),
+    ];
+    assert.equal(serviceHasRoom(tableService, blocks, "2026-06-05", "lunch", 2), false);
+    assert.equal(serviceHasRoom(tableService, blocks, "2026-06-05", "dinner", 2), true);
+    assert.equal(dayHasRoom(tableService, blocks, "2026-06-05", 2), true);
   });
 
-  it("ignores unrelated bookings for independent spaces", () => {
-    const carriage: BookingBlock = { ...farmhouseBooking, spaceId: "carriage-id" };
-    assert.deepEqual(blockedRanges(farmhouseRules, [carriage], []), []);
+  it("needs the sitting completely empty for full-venue hire", () => {
+    const blocks = [lunchBooking("table-service-id", 2)];
+    assert.equal(serviceHasRoom(privateHire, blocks, "2026-06-05", "lunch", 80), false);
+    assert.equal(serviceHasRoom(privateHire, blocks, "2026-06-05", "dinner", 80), true);
   });
 
-  it("applies blackouts to their space, estate-wide when spaceId is null", () => {
-    const own: BlackoutBlock = { spaceId: "farmhouse-id", startDate: "2026-08-01", endDate: "2026-08-05" };
-    const estateWide: BlackoutBlock = { spaceId: null, startDate: "2026-11-01", endDate: "2027-04-01" };
-    const other: BlackoutBlock = { spaceId: "carriage-id", startDate: "2026-09-01", endDate: "2026-09-03" };
-    const ranges = blockedRanges(farmhouseRules, [], [own, estateWide, other]);
+  it("applies closures to their space, restaurant-wide when spaceId is null", () => {
+    const own: BlackoutBlock = {
+      spaceId: "table-service-id",
+      startDate: "2026-08-01",
+      endDate: "2026-08-05",
+    };
+    const wholeRestaurant: BlackoutBlock = {
+      spaceId: null,
+      startDate: "2026-11-01",
+      endDate: "2026-11-08",
+    };
+    const other: BlackoutBlock = {
+      spaceId: "texan-counter-id",
+      startDate: "2026-09-01",
+      endDate: "2026-09-03",
+    };
+    const ranges = blockedRanges(tableService, [own, wholeRestaurant, other]);
     assert.equal(ranges.length, 2);
-    // ...but an estate-wide space is blocked by any building's blackout.
-    assert.equal(blockedRanges(barnRules, [], [other]).length, 1);
+    assert.equal(isDateBlocked("2026-08-04", ranges), true);
+    assert.equal(isDateBlocked("2026-08-05", ranges), false);
+    // ...but a full-venue space is closed by any single space's closure.
+    assert.equal(blockedRanges(privateHire, [other]).length, 1);
   });
 
   it("computes the bookable window from lead time and horizon", () => {
-    const window = bookingWindow(farmhouseRules, "2026-07-15");
-    assert.equal(window.firstStart, "2026-07-17");
-    assert.equal(window.lastEnd, "2028-01-15");
-  });
-
-  it("flags blocked days for calendars", () => {
-    const ranges = blockedRanges(farmhouseRules, [farmhouseBooking], []);
-    assert.equal(isDateBlocked("2026-06-04", ranges), true); // buffer day
-    assert.equal(isDateBlocked("2026-06-09", ranges), false);
+    const window = bookingWindow(tableService, "2026-06-01");
+    assert.equal(window.firstStart, "2026-06-01");
+    assert.equal(window.lastEnd, "2026-09-01");
   });
 });
 
 describe("validateRequest", () => {
-  const base = {
-    space: farmhouseRules,
-    today: "2026-07-15",
-    bookings: [] as BookingBlock[],
-    blackouts: [] as BlackoutBlock[],
-    partySize: 4,
-  };
+  const today = "2026-06-01";
+  const request = { date: "2026-06-05", service: "lunch" as const, partySize: 4 };
 
   it("accepts a clean request", () => {
-    const result = validateRequest({ ...base, startDate: "2026-08-10", endDate: "2026-08-14" });
-    assert.deepEqual(result, { ok: true });
+    assert.deepEqual(validateRequest(tableService, request, today, [], []), { ok: true });
   });
 
-  it("rejects inverted and too-short stays", () => {
-    assert.equal(
-      validateRequest({ ...base, startDate: "2026-08-14", endDate: "2026-08-10" }).ok,
-      false
+  it("rejects an invalid date and a missing sitting", () => {
+    const badDate = validateRequest(
+      tableService,
+      { ...request, date: "2026-02-31" },
+      today,
+      [],
+      []
     );
-    const short = validateRequest({ ...base, startDate: "2026-08-10", endDate: "2026-08-11" });
-    assert.equal(short.ok, false);
-    assert.match((short as { error: string }).error, /2-night minimum/);
+    assert.equal(badDate.ok, false);
+    assert.match((badDate as { error: string }).error, /valid date/);
+
+    const noService = validateRequest(tableService, { ...request, service: null }, today, [], []);
+    assert.equal(noService.ok, false);
+    assert.match((noService as { error: string }).error, /lunch or dinner/);
   });
 
-  it("rejects oversized parties", () => {
-    const result = validateRequest({
-      ...base,
-      partySize: 12,
-      startDate: "2026-08-10",
-      endDate: "2026-08-14",
-    });
+  it("rejects closed weekdays", () => {
+    // 2026-06-09 is a Tuesday.
+    const result = validateRequest(tableService, { ...request, date: "2026-06-09" }, today, [], []);
     assert.equal(result.ok, false);
-    assert.match((result as { error: string }).error, /up to 10 guests/);
+    assert.match((result as { error: string }).error, /Thursday to Sunday/);
   });
 
-  it("enforces lead time and horizon", () => {
-    assert.equal(
-      validateRequest({ ...base, startDate: "2026-07-16", endDate: "2026-07-20" }).ok,
-      false
-    );
-    assert.equal(
-      validateRequest({ ...base, startDate: "2028-01-10", endDate: "2028-01-20" }).ok,
-      false
-    );
+  it("rejects past dates and anything beyond the horizon", () => {
+    const past = validateRequest(tableService, { ...request, date: "2026-05-29" }, today, [], []);
+    assert.equal(past.ok, false);
+    const far = validateRequest(tableService, { ...request, date: "2026-10-02" }, today, [], []);
+    assert.equal(far.ok, false);
+    assert.match((far as { error: string }).error, /3 months ahead/);
   });
 
-  it("rejects conflicts including the turnover buffer, allows the day after", () => {
-    const bookings = [
-      {
-        spaceId: "farmhouse-id",
-        startDate: "2026-08-05",
-        endDate: "2026-08-08",
-        blocksEstate: false,
-      },
+  it("caps the party size a single online booking may request", () => {
+    const result = validateRequest(tableService, { ...request, partySize: 9 }, today, [], []);
+    assert.equal(result.ok, false);
+    assert.match((result as { error: string }).error, /larger than 8/);
+
+    const none = validateRequest(tableService, { ...request, partySize: 0 }, today, [], []);
+    assert.equal(none.ok, false);
+    assert.match((none as { error: string }).error, /how many people/);
+  });
+
+  it("rejects closure days", () => {
+    const closed: BlackoutBlock[] = [
+      { spaceId: null, startDate: "2026-06-05", endDate: "2026-06-07" },
     ];
-    // 2026-08-08 is checkout day but the 1-day buffer keeps it blocked.
-    assert.equal(
-      validateRequest({ ...base, bookings, startDate: "2026-08-08", endDate: "2026-08-11" }).ok,
-      false
+    const result = validateRequest(tableService, request, today, [], closed);
+    assert.equal(result.ok, false);
+    assert.match((result as { error: string }).error, /closed that day/);
+  });
+
+  it("rejects a party that would push the sitting past capacity", () => {
+    const blocks = [
+      lunchBooking("table-service-id", 4),
+      lunchBooking("table-service-id", 4),
+    ];
+    const tight: SpaceRules = { ...tableService, capacityCovers: 12 };
+    const overflow = validateRequest(tight, { ...request, partySize: 5 }, today, blocks, []);
+    assert.equal(overflow.ok, false);
+    assert.match((overflow as { error: string }).error, /fully booked/);
+
+    const roomier: SpaceRules = { ...tableService, capacityCovers: 13 };
+    assert.deepEqual(
+      validateRequest(roomier, { ...request, partySize: 5 }, today, blocks, []),
+      { ok: true }
     );
-    assert.equal(
-      validateRequest({ ...base, bookings, startDate: "2026-08-09", endDate: "2026-08-12" }).ok,
-      true
+  });
+
+  it("keeps full-venue exclusivity in both directions", () => {
+    const buyout = lunchBooking("private-hire-id", 80, { blocksEstate: true });
+    const dinnerTable = lunchBooking("table-service-id", 2, { service: "dinner" });
+
+    // A buyout blocks an ordinary reservation for that sitting...
+    const blocked = validateRequest(tableService, request, today, [buyout], []);
+    assert.equal(blocked.ok, false);
+    assert.match((blocked as { error: string }).error, /fully booked/);
+
+    // ...and any booking blocks a buyout for that sitting.
+    const hireRequest = { date: "2026-07-03", service: "dinner" as const, partySize: 80 };
+    const taken = validateRequest(
+      privateHire,
+      hireRequest,
+      today,
+      [{ ...dinnerTable, startDate: "2026-07-03", endDate: "2026-07-04" }],
+      []
     );
+    assert.equal(taken.ok, false);
+    assert.deepEqual(validateRequest(privateHire, hireRequest, today, [], []), { ok: true });
   });
 });

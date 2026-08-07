@@ -17,14 +17,15 @@ import { Footer } from "@/app/components/footer";
 import { site } from "@/lib/site";
 import { getBookingByManageToken } from "@/lib/db/queries";
 import { getCancellationPolicy } from "@/lib/settings";
-import { formatDate, todayAtEstate } from "@/lib/booking/dates";
+import { formatDate, todayAtRestaurant } from "@/lib/booking/dates";
+import { SERVICE_LABELS, isService } from "@/lib/booking/availability";
 import { formatMoney } from "@/lib/booking/pricing";
 import { CancelControls } from "./cancel-controls";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Your booking",
+  title: "Your reservation",
   robots: { index: false, follow: false },
 };
 
@@ -40,26 +41,26 @@ const STATUS_CONTENT: Record<
   pending: {
     icon: Clock,
     title: "Request received",
-    body: "We review every request personally and will confirm by email, usually within a day or two.",
+    body: "We review every request personally and will confirm by email — usually within a few hours.",
   },
   approved: {
     icon: CalendarCheck,
-    title: "You're booked",
-    body: "Your dates are confirmed — we can't wait to welcome you to the cliff top.",
+    title: "Your table is booked",
+    body: "See you in Malveira — come hungry.",
   },
   completed: {
     icon: CheckCircle2,
-    title: "Thanks for staying with us",
-    body: "This booking is complete. We'd love to see you at Vine Cliff again.",
+    title: "Thanks for eating with us",
+    body: "This reservation is done and dusted. We'd love to see you at KAU again.",
   },
   declined: {
     icon: XCircle,
-    title: "We couldn't host these dates",
-    body: "See our email for details — different dates often work beautifully, so do get in touch.",
+    title: "We couldn't seat you this time",
+    body: "See our email for details — the other sitting or another day often works, so do get in touch.",
   },
   cancelled: {
     icon: Ban,
-    title: "This booking is cancelled",
+    title: "This reservation is cancelled",
     body: "If that's a surprise, or you'd like to rebook, call or email us any time.",
   },
 };
@@ -71,7 +72,7 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
 
   const { booking, space, guest } = row;
   const policy = await getCancellationPolicy();
-  const today = todayAtEstate();
+  const today = todayAtRestaurant();
   const isCompleted = booking.status === "approved" && booking.endDate <= today;
   const statusKey = isCompleted ? "completed" : booking.status;
   const status = STATUS_CONTENT[statusKey];
@@ -84,7 +85,7 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
       : booking.paymentStatus === "paid"
         ? "Paid in full — thank you."
         : booking.paymentStatus === "deposit_paid"
-          ? `Deposit received${booking.depositCents ? ` (${formatMoney(booking.depositCents)})` : ""} — balance due before arrival.`
+          ? `Deposit received${booking.depositCents ? ` (${formatMoney(booking.depositCents)})` : ""} — balance due before the event.`
           : booking.paymentStatus === "refunded"
             ? "Refunded."
             : "We'll be in touch personally about the deposit and payment.";
@@ -92,7 +93,7 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
   const detailRows: Array<[string, React.ReactNode]> = [
     ["Reference", <strong key="ref">{booking.reference}</strong>],
     [
-      "Space",
+      "Where",
       <Link
         key="space"
         href={`/spaces/${space.slug}`}
@@ -101,9 +102,11 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
         {space.name}
       </Link>,
     ],
-    [space.isEvent ? "First day" : "Check-in", formatDate(booking.startDate)],
-    [space.isEvent ? "Departure day" : "Checkout", formatDate(booking.endDate)],
-    ["Guests", String(booking.partySize)],
+    ["Date", formatDate(booking.startDate)],
+    ...(isService(booking.service)
+      ? ([["Sitting", SERVICE_LABELS[booking.service]]] as Array<[string, string]>)
+      : []),
+    ["Party size", String(booking.partySize)],
     ...(booking.eventType ? ([["Occasion", booking.eventType]] as Array<[string, string]>) : []),
     ["Booked by", `${guest.firstName} ${guest.lastName}`],
   ];
@@ -144,7 +147,7 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
           ) : null}
 
           <div className="rounded-3xl border border-pine-100 bg-cream-100 p-6 shadow-soft sm:p-7">
-            <h2 className="font-display text-xl text-pine-900">Booking details</h2>
+            <h2 className="font-display text-xl text-pine-900">Reservation details</h2>
             <dl className="mt-4 divide-y divide-pine-100">
               {detailRows.map(([label, value]) => (
                 <div key={label} className="flex items-center justify-between gap-4 py-3">
@@ -152,22 +155,24 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
                   <dd className="text-right text-sm text-ink">{value}</dd>
                 </div>
               ))}
-              <div className="flex items-center justify-between gap-4 py-3">
-                <dt className="text-sm text-stone">
-                  {booking.status === "pending" ? "Estimated total" : "Total"}
-                </dt>
-                <dd className="text-right text-sm font-semibold text-ink">
-                  {formatMoney(total)}
-                </dd>
-              </div>
+              {total > 0 ? (
+                <div className="flex items-center justify-between gap-4 py-3">
+                  <dt className="text-sm text-stone">
+                    {booking.status === "pending" ? "Estimated total" : "Total"}
+                  </dt>
+                  <dd className="text-right text-sm font-semibold text-ink">
+                    {formatMoney(total)}
+                  </dd>
+                </div>
+              ) : null}
             </dl>
-            {booking.status === "pending" ? (
+            {total > 0 && booking.status === "pending" ? (
               <p className="mt-3 text-xs leading-relaxed text-stone">
-                An estimate — we confirm the final price when we confirm your dates. Nothing is
-                charged online.
+                An estimate — we confirm the final price when we confirm your booking. Nothing
+                is charged online.
               </p>
             ) : null}
-            {paymentLine ? (
+            {total > 0 && paymentLine ? (
               <p className="mt-3 rounded-xl bg-cream px-4 py-3 text-sm text-ink-soft">
                 {paymentLine}
               </p>
@@ -191,7 +196,7 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
               <h2 className="font-display text-xl text-pine-900">Change of plans?</h2>
               <p className="mb-4 mt-2 text-sm leading-relaxed text-ink-soft">
                 Need to move or cancel? Send a cancellation request and we&apos;ll take it from
-                there — moving dates is often easier than you&apos;d think.
+                there — moving to another day is often easier than you&apos;d think.
               </p>
               <CancelControls token={booking.manageToken} mode="request" />
             </div>
@@ -212,7 +217,7 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
             </a>{" "}
             or email{" "}
             <a
-              href={`mailto:${site.email}?subject=Booking ${booking.reference}`}
+              href={`mailto:${site.email}?subject=Reservation ${booking.reference}`}
               className="inline-flex items-center gap-1 font-medium text-pine-700 hover:text-amber"
             >
               <Mail className="size-3.5" />

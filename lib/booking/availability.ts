@@ -2,36 +2,53 @@
 // rules run in server actions, route handlers, unit tests and (for calendar
 // rendering) client components.
 //
-// The model: spaces are open by default. A date is unavailable when it falls
-// inside a blocked range, which come from two sources:
+// The model: a reservation is one date + one sitting (lunch or dinner) + a
+// party size. A space seats `capacityCovers` guests per sitting, so many
+// bookings share a date until those covers run out. A sitting is unavailable
+// when:
 //
-//   1. Approved bookings. A booking blocks its own space (padded by the
-//      space's turnover buffer on both sides), and — when it has
-//      `blocksEstate` (weddings, whole-estate hire) — every other space too.
-//      Symmetrically, a space with `blocksEstate` (the barn, the estate
-//      package) needs the entire property free, so *any* approved booking
-//      anywhere blocks it.
-//   2. Blackouts. A blackout blocks its own space, or every space when its
-//      spaceId is null. Estate-wide spaces are blocked by any blackout —
-//      you can't promise the whole property while a building is closed.
+//   1. The restaurant is closed that weekday (Thursday–Sunday only), or a
+//      blackout covers the date. A blackout closes its own space, or every
+//      space when its spaceId is null; full-venue spaces are closed by any
+//      blackout — you can't promise the whole restaurant while a room is shut.
+//   2. Approved covers for (space, date, sitting) plus the requested party
+//      would exceed the space's capacity.
+//   3. Full-venue private hire is involved: an approved booking that closes
+//      the venue takes that date+sitting away from every space, and a
+//      full-venue request needs the sitting completely empty.
 //
-// Pending requests never block anything; only approval claims dates.
-import {
-  addDays,
-  addMonths,
-  diffDays,
-  isValidISODate,
-  rangesOverlap,
-  type ISODate,
-} from "./dates";
+// Pending requests never consume covers; only approval claims them.
+import { addDays, addMonths, isValidISODate, parseISO, type ISODate } from "./dates";
+
+export const SERVICES = ["lunch", "dinner"] as const;
+export type Service = (typeof SERVICES)[number];
+
+export const SERVICE_LABELS: Record<Service, string> = {
+  lunch: "Lunch · 12:00–15:00",
+  dinner: "Dinner · 19:00–22:00",
+};
+
+/** Thursday(4) through Sunday(0), matching `getUTCDay()` on a parsed date. */
+export const OPEN_WEEKDAYS = new Set([0, 4, 5, 6]);
+
+export function isService(value: unknown): value is Service {
+  return (SERVICES as readonly unknown[]).includes(value);
+}
+
+/** Is the restaurant open on this calendar date at all? */
+export function isOpenDay(date: ISODate): boolean {
+  return OPEN_WEEKDAYS.has(parseISO(date).getUTCDay());
+}
 
 export type SpaceRules = {
   id: string;
   isEvent: boolean;
+  /** True for full-venue private hire: bookings here close the restaurant. */
   blocksEstate: boolean;
-  minNights: number;
+  /** Largest party a single online booking may request. */
   maxGuests: number;
-  bufferDays: number;
+  /** Total covers this space seats per sitting. */
+  capacityCovers: number;
   minLeadDays: number;
   maxHorizonMonths: number;
 };
@@ -39,12 +56,16 @@ export type SpaceRules = {
 export type BookingBlock = {
   spaceId: string;
   startDate: ISODate;
+  /** Exclusive — always startDate + 1 for reservations. */
   endDate: ISODate;
   blocksEstate: boolean;
+  /** Null (legacy or whole-day private hire) counts against every sitting. */
+  service: Service | null;
+  partySize: number;
 };
 
 export type BlackoutBlock = {
-  /** null = blocks every space. */
+  /** null = closes every space. */
   spaceId: string | null;
   startDate: ISODate;
   endDate: ISODate;
@@ -52,42 +73,121 @@ export type BlackoutBlock = {
 
 export type DateRange = { startDate: ISODate; endDate: ISODate };
 
-/** All ranges within which `space` cannot be booked. Not merged or sorted. */
+export type BookingRequest = {
+  date: ISODate;
+  service: Service | null;
+  partySize: number;
+};
+
+/** Closure ranges that apply to `space` — bookings are handled per sitting. */
 export function blockedRanges(
-  space: SpaceRules,
-  bookings: BookingBlock[],
+  space: Pick<SpaceRules, "id" | "blocksEstate">,
   blackouts: BlackoutBlock[]
 ): DateRange[] {
-  const ranges: DateRange[] = [];
+  return blackouts
+    .filter(
+      (blackout) =>
+        blackout.spaceId === null ||
+        blackout.spaceId === space.id ||
+        space.blocksEstate
+    )
+    .map((blackout) => ({
+      startDate: blackout.startDate,
+      endDate: blackout.endDate,
+    }));
+}
 
-  for (const booking of bookings) {
-    const ownBooking = booking.spaceId === space.id;
-    if (!ownBooking && !booking.blocksEstate && !space.blocksEstate) continue;
-    // Turnover buffer is a per-unit cleaning concern, so it only pads
-    // same-space bookings; estate-wide blocks use their exact range.
-    const buffer = ownBooking ? space.bufferDays : 0;
-    ranges.push({
-      startDate: addDays(booking.startDate, -buffer),
-      endDate: addDays(booking.endDate, buffer),
-    });
-  }
+export function isDateBlocked(date: ISODate, ranges: DateRange[]): boolean {
+  return ranges.some((r) => date >= r.startDate && date < r.endDate);
+}
 
-  for (const blackout of blackouts) {
-    const applies =
-      blackout.spaceId === null ||
-      blackout.spaceId === space.id ||
-      space.blocksEstate;
-    if (!applies) continue;
-    ranges.push({ startDate: blackout.startDate, endDate: blackout.endDate });
-  }
+function coversDate(block: BookingBlock, date: ISODate): boolean {
+  return date >= block.startDate && date < block.endDate;
+}
 
-  return ranges;
+function coversService(block: BookingBlock, service: Service): boolean {
+  return block.service === null || block.service === service;
+}
+
+/** Approved covers already committed for this space, date and sitting. */
+export function bookedCovers(
+  space: Pick<SpaceRules, "id">,
+  blocks: BookingBlock[],
+  date: ISODate,
+  service: Service
+): number {
+  return blocks
+    .filter(
+      (b) => b.spaceId === space.id && coversDate(b, date) && coversService(b, service)
+    )
+    .reduce((sum, b) => sum + b.partySize, 0);
 }
 
 /**
- * The window of bookable start days given lead time and horizon.
- * `firstStart` is the earliest allowed check-in; `lastEnd` the latest allowed
- * checkout (exclusive bound of the whole window).
+ * Covers booked anywhere else that make this sitting unavailable: a venue-
+ * closing booking blocks every space, and a full-venue space needs the whole
+ * sitting empty.
+ */
+function conflictingCoversElsewhere(
+  space: Pick<SpaceRules, "id" | "blocksEstate">,
+  blocks: BookingBlock[],
+  date: ISODate,
+  service: Service
+): number {
+  return blocks
+    .filter(
+      (b) =>
+        b.spaceId !== space.id &&
+        coversDate(b, date) &&
+        coversService(b, service) &&
+        (b.blocksEstate || space.blocksEstate)
+    )
+    .reduce((sum, b) => sum + b.partySize, 0);
+}
+
+/** Can this sitting still take `partySize` more covers? */
+export function serviceHasRoom(
+  space: SpaceRules,
+  blocks: BookingBlock[],
+  date: ISODate,
+  service: Service,
+  partySize = 1
+): boolean {
+  if (conflictingCoversElsewhere(space, blocks, date, service) > 0) return false;
+  return bookedCovers(space, blocks, date, service) + partySize <= space.capacityCovers;
+}
+
+/** True when the day can still take a booking in at least one sitting. */
+export function dayHasRoom(
+  space: SpaceRules,
+  blocks: BookingBlock[],
+  date: ISODate,
+  partySize = 1
+): boolean {
+  return SERVICES.some((service) =>
+    serviceHasRoom(space, blocks, date, service, partySize)
+  );
+}
+
+/**
+ * Everything a calendar needs to know about one day: closed weekdays and
+ * closure dates first, then per-sitting capacity.
+ */
+export function isDayAvailable(
+  space: SpaceRules,
+  blocks: BookingBlock[],
+  closures: DateRange[],
+  date: ISODate,
+  partySize = 1
+): boolean {
+  if (!isOpenDay(date)) return false;
+  if (isDateBlocked(date, closures)) return false;
+  return dayHasRoom(space, blocks, date, partySize);
+}
+
+/**
+ * The window of bookable days given lead time and horizon. `firstStart` is the
+ * earliest bookable day; `lastEnd` the exclusive far edge of the window.
  */
 export function bookingWindow(
   space: Pick<SpaceRules, "minLeadDays" | "maxHorizonMonths">,
@@ -99,84 +199,71 @@ export function bookingWindow(
   };
 }
 
-export function isDateBlocked(date: ISODate, ranges: DateRange[]): boolean {
-  return ranges.some((r) => date >= r.startDate && date < r.endDate);
-}
-
 export type ValidationResult = { ok: true } | { ok: false; error: string };
 
 /**
- * Full server-side validation of a booking request. The client enforces the
- * same rules for UX, but this is the authority — it runs again inside the
+ * Full server-side validation of a reservation request. The client enforces
+ * the same rules for UX, but this is the authority — it runs again inside the
  * server action with fresh data before anything is written.
  */
-export function validateRequest(options: {
-  space: SpaceRules;
-  startDate: ISODate;
-  endDate: ISODate;
-  partySize: number;
-  today: ISODate;
-  bookings: BookingBlock[];
-  blackouts: BlackoutBlock[];
-}): ValidationResult {
-  const { space, startDate, endDate, partySize, today } = options;
-  const noun = space.isEvent ? "day" : "night";
+export function validateRequest(
+  space: SpaceRules,
+  request: BookingRequest,
+  today: ISODate,
+  blocks: BookingBlock[],
+  blackouts: BlackoutBlock[]
+): ValidationResult {
+  const { date, service, partySize } = request;
 
-  if (!isValidISODate(startDate) || !isValidISODate(endDate)) {
-    return { ok: false, error: "Please pick valid dates." };
+  if (!isValidISODate(date)) {
+    return { ok: false, error: "Please pick a valid date." };
   }
-  if (endDate <= startDate) {
+  if (!isService(service)) {
+    return { ok: false, error: "Please choose lunch or dinner." };
+  }
+  if (!isOpenDay(date)) {
     return {
       ok: false,
-      error: space.isEvent
-        ? "The last day must be on or after the first day."
-        : "Checkout must be after check-in.",
-    };
-  }
-
-  const nights = diffDays(startDate, endDate);
-  if (nights < space.minNights) {
-    return {
-      ok: false,
-      error: `This space has a ${space.minNights}-${noun} minimum.`,
-    };
-  }
-
-  if (!Number.isInteger(partySize) || partySize < 1) {
-    return { ok: false, error: "Please tell us how many guests are coming." };
-  }
-  if (partySize > space.maxGuests) {
-    return {
-      ok: false,
-      error: `This space hosts up to ${space.maxGuests} guests.`,
+      error: "We're open Thursday to Sunday — please pick another day.",
     };
   }
 
   const window = bookingWindow(space, today);
-  if (startDate < window.firstStart) {
+  if (date < window.firstStart || date >= window.lastEnd) {
     return {
       ok: false,
-      error: `Requests need at least ${space.minLeadDays} days' notice — call us for last-minute dates.`,
-    };
-  }
-  if (endDate > window.lastEnd) {
-    return {
-      ok: false,
-      error: `We're taking requests up to ${space.maxHorizonMonths} months out for now.`,
+      error: `Reservations are open up to ${space.maxHorizonMonths} months ahead for now.`,
     };
   }
 
-  const blocked = blockedRanges(space, options.bookings, options.blackouts);
-  const conflict = blocked.some((r) =>
-    rangesOverlap(startDate, endDate, r.startDate, r.endDate)
-  );
-  if (conflict) {
+  if (!Number.isInteger(partySize) || partySize < 1) {
+    return { ok: false, error: "Please tell us how many people are coming." };
+  }
+  if (partySize > space.maxGuests) {
     return {
       ok: false,
-      error:
-        "Some of those dates are no longer available — please pick different dates.",
+      error: `For groups larger than ${space.maxGuests}, call us or send an enquiry — we'll sort something out.`,
+    };
+  }
+
+  if (isDateBlocked(date, blockedRanges(space, blackouts))) {
+    return {
+      ok: false,
+      error: "We're closed that day — please pick another date.",
+    };
+  }
+
+  if (!serviceHasRoom(space, blocks, date, service, partySize)) {
+    return {
+      ok: false,
+      error: "That sitting is fully booked — try the other sitting or another day.",
     };
   }
 
   return { ok: true };
+}
+
+/** The exclusive end date stored for a single-day reservation. */
+export function reservationEndDate(date: ISODate): ISODate {
+  return addDays(date, 1);
 }

@@ -92,17 +92,14 @@ export type AvailabilityData = {
 };
 
 /**
- * Everything that can block dates in [from, to): approved bookings across all
- * spaces (estate-blocking rules are cross-space, so callers always need the
- * full picture) and all blackouts. The query window is padded so bookings
- * just outside it still contribute their turnover buffer inside it.
+ * Everything that can take covers in [from, to): approved bookings across all
+ * spaces (full-venue hire is cross-space, so callers always need the full
+ * picture) and all closures.
  */
 export async function getAvailabilityData(
   from: ISODate,
   to: ISODate
 ): Promise<AvailabilityData> {
-  const paddedFrom = addDays(from, -31);
-  const paddedTo = addDays(to, 31);
   const [bookingRows, blackoutRows] = await Promise.all([
     db
       .select({
@@ -110,13 +107,15 @@ export async function getAvailabilityData(
         startDate: bookings.startDate,
         endDate: bookings.endDate,
         blocksEstate: bookings.blocksEstate,
+        service: bookings.service,
+        partySize: bookings.partySize,
       })
       .from(bookings)
       .where(
         and(
           eq(bookings.status, "approved"),
-          lt(bookings.startDate, paddedTo),
-          gt(bookings.endDate, paddedFrom)
+          lt(bookings.startDate, to),
+          gt(bookings.endDate, from)
         )
       ),
     db
@@ -126,7 +125,7 @@ export async function getAvailabilityData(
         endDate: blackouts.endDate,
       })
       .from(blackouts)
-      .where(and(lt(blackouts.startDate, paddedTo), gt(blackouts.endDate, paddedFrom))),
+      .where(and(lt(blackouts.startDate, to), gt(blackouts.endDate, from))),
   ]);
   return { bookings: bookingRows, blackouts: blackoutRows };
 }
@@ -244,7 +243,7 @@ export type CalendarData = {
   blackouts: Array<{ blackout: Blackout; spaceName: string | null }>;
 };
 
-/** Approved bookings and blackouts overlapping [from, to) for the calendar. */
+/** Approved reservations and closures overlapping [from, to) for the calendar. */
 export async function getCalendarData(from: ISODate, to: ISODate): Promise<CalendarData> {
   const [bookingRows, blackoutRows] = await Promise.all([
     db
@@ -283,6 +282,7 @@ export async function listUpcomingBlackouts(today: ISODate) {
 export type DashboardData = {
   pendingCount: number;
   newEnquiryCount: number;
+  /** Approved reservations in the next 14 days. */
   arrivalsSoon: BookingWithRelations[];
   pendingRequests: BookingWithRelations[];
   monthRevenueCents: number;

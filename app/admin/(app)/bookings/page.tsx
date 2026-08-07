@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/field";
 import { listBookingsForAdmin, type BookingTab } from "@/lib/db/queries";
-import { formatDayMonth, todayAtEstate } from "@/lib/booking/dates";
+import { formatDayMonth, todayAtRestaurant } from "@/lib/booking/dates";
 import { formatMoney } from "@/lib/booking/pricing";
 import { PageHeader, EmptyState } from "../components/page-shell";
 import { AlertBadge, BookingStatusBadge, PaymentStatusBadge } from "../components/badges";
@@ -30,7 +30,7 @@ export default async function BookingsPage({ searchParams }: Props) {
       ? "all"
       : "pending";
   const q = params.q?.trim() || undefined;
-  const today = todayAtEstate();
+  const today = todayAtRestaurant();
   const rows = await listBookingsForAdmin({ tab, q, today });
 
   return (

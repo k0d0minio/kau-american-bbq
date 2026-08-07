@@ -34,14 +34,14 @@ import {
   type NewGuest,
   type Space,
 } from "../lib/db/schema";
-import { addDays, todayAtEstate, type ISODate } from "../lib/booking/dates";
+import { addDays, todayAtRestaurant, type ISODate } from "../lib/booking/dates";
 import { computeQuote } from "../lib/booking/pricing";
 import { makeManageToken, makeReference } from "../lib/booking/tokens";
 
 // Everything demo is tagged so a reset can find and remove exactly what this
 // script created — and nothing else.
 const DEMO_EMAIL_DOMAIN = "demo.kaubarbecue.dev";
-const today = todayAtEstate();
+const today = todayAtRestaurant();
 
 // A stable millisecond clock for created/decided timestamps, anchored to the
 // start of today at the estate so repeat runs land on tidy round times.

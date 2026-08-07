@@ -2,12 +2,14 @@
 //
 // Conventions used throughout:
 //   - Money is stored as integer cents (never floats).
-//   - Date ranges are half-open [startDate, endDate): endDate is the checkout
-//     day for stays and the day after the last event day for events. Two
-//     bookings that share a boundary date do not overlap.
+//   - Every reservation spans exactly one day: `end_date = start_date + 1`.
+//     Ranges stay half-open [startDate, endDate) so two bookings that share a
+//     boundary date do not overlap, and `service` says which sitting (lunch or
+//     dinner) the party is coming for.
 //   - Dates are plain calendar dates (Postgres `date`, read as "YYYY-MM-DD"
-//     strings) in the estate's local time — never timestamps, so there is no
-//     timezone drift between the form, the calendar and the database.
+//     strings) in the restaurant's local time (Europe/Lisbon) — never
+//     timestamps, so there is no timezone drift between the form, the calendar
+//     and the database.
 import { sql } from "drizzle-orm";
 import {
   boolean,
@@ -42,9 +44,10 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
 // ---------------------------------------------------------------------------
-// Spaces — the bookable units (farmhouse, carriage house, barn, whole estate).
-// The database is the source of truth for the public site; rows are seeded
-// from the original lib/site.ts content and edited in the admin.
+// Spaces — the bookable dining areas (table service, the Texan counter and
+// full-venue private hire). The database is the source of truth for the public
+// site; rows are seeded from the original lib/site.ts content and edited in
+// the admin.
 // ---------------------------------------------------------------------------
 
 export const spaces = pgTable(
@@ -53,42 +56,47 @@ export const spaces = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     slug: text("slug").notNull().unique(),
     name: text("name").notNull(),
-    /** Short positioning line, e.g. "Weekly & weekend stays". */
+    /** Short positioning line, e.g. "Classic table service". */
     kind: text("kind").notNull(),
-    /** Heritage note shown on cards, e.g. "Built c. 1850". */
+    /** Short badge line shown on cards, e.g. "Smoked on Godzilla". */
     age: text("age").notNull(),
     /** Card-length summary. */
     blurb: text("blurb").notNull(),
     /** Long-form copy for the space's detail page. */
     description: text("description").notNull(),
-    /** Path under /public, e.g. "/img/house.jpg". */
+    /** Path under /public, e.g. "/img/dining-room.jpg". */
     image: text("image").notNull(),
     features: text("features")
       .array()
       .notNull()
       .default(sql`'{}'::text[]`),
 
-    /** Event spaces price per day and speak of "event days", not "nights". */
+    /** Event spaces (private hire) are priced per day rather than free to book. */
     isEvent: boolean("is_event").notNull().default(false),
     /**
-     * When true, an approved booking of this space blocks the whole estate by
-     * default, and this space is only available when every space is free
-     * (weddings and estate hires take over the property). Overridable per
-     * booking at approval time.
+     * When true, an approved booking of this space closes the whole restaurant
+     * (full-venue private hire), and this space is only available when nothing
+     * else is booked for that sitting. Overridable per booking at approval
+     * time.
      */
     blocksEstate: boolean("blocks_estate").notNull().default(false),
 
-    /** Per night for stays; per event day when `isEvent`. */
+    /** 0 for reservation spaces; per event day when `isEvent` (0 = on request). */
     nightlyRateCents: integer("nightly_rate_cents").notNull(),
-    /** Optional discounted rate applied per full 7-night block. */
+    /** Unused in the restaurant model — NULL everywhere. */
     weeklyRateCents: integer("weekly_rate_cents"),
+    /** Unused in the restaurant model — 0 everywhere. */
     cleaningFeeCents: integer("cleaning_fee_cents").notNull().default(0),
 
+    /** Always 1 — every reservation is a single day. */
     minNights: integer("min_nights").notNull().default(1),
+    /** Largest party a single online booking may request. */
     maxGuests: integer("max_guests").notNull(),
-    /** Days kept free between bookings of this space for turnover. */
+    /** Total covers this space seats per sitting. */
+    capacityCovers: integer("capacity_covers").notNull().default(0),
+    /** Unused in the restaurant model — 0 everywhere. */
     bufferDays: integer("buffer_days").notNull().default(1),
-    /** Requests must arrive at least this many days before arrival. */
+    /** Shortest notice accepted; 0 allows same-day booking. */
     minLeadDays: integer("min_lead_days").notNull().default(2),
     /** ...and no further out than this many months. */
     maxHorizonMonths: integer("max_horizon_months").notNull().default(18),
@@ -127,7 +135,7 @@ export const guests = pgTable("guests", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   phone: text("phone"),
-  /** Private admin notes ("prefers the lake room", "repeat wedding client"). */
+  /** Private admin notes ("prefers the counter", "regular — always orders the beef rib"). */
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
@@ -142,8 +150,8 @@ export type Guest = typeof guests.$inferSelect;
 export type NewGuest = typeof guests.$inferInsert;
 
 // ---------------------------------------------------------------------------
-// Bookings — request-to-book: rows arrive as `pending` and only block the
-// calendar once an admin approves them.
+// Bookings — request-to-book: rows arrive as `pending` and only consume a
+// sitting's covers once an admin approves them.
 // ---------------------------------------------------------------------------
 
 export const bookingStatus = pgEnum("booking_status", [
@@ -159,6 +167,9 @@ export const paymentStatus = pgEnum("payment_status", [
   "paid",
   "refunded",
 ]);
+
+/** Which sitting the party is booked for. */
+export const bookingService = pgEnum("booking_service", ["lunch", "dinner"]);
 
 export const bookingSource = pgEnum("booking_source", [
   "website",
@@ -181,24 +192,29 @@ export const bookings = pgTable(
       .references(() => guests.id),
     status: bookingStatus("status").notNull().default("pending"),
 
-    /** Check-in day (first event day for event spaces). */
+    /** The day of the reservation (first day for private-hire events). */
     startDate: date("start_date", { mode: "string" }).notNull(),
-    /** Checkout day, exclusive (day after the last event day). */
+    /** Exclusive end — always the day after `startDate` for reservations. */
     endDate: date("end_date", { mode: "string" }).notNull(),
+    /**
+     * Lunch or dinner. Nullable in the database (older rows predate it and
+     * private hire can span both), but required by app validation.
+     */
+    service: bookingService("service"),
     partySize: integer("party_size").notNull(),
-    /** For event spaces: "Wedding", "Reunion", ... */
+    /** The occasion, e.g. "Birthday", "Business lunch or dinner". */
     eventType: text("event_type"),
     /** The guest's message from the booking form. */
     guestMessage: text("guest_message"),
 
-    /** Auto-computed estimate shown to the guest at request time. */
+    /** 0 for reservations; the auto-computed event quote for private hire. */
     quotedTotalCents: integer("quoted_total_cents").notNull(),
     /** Owner-adjusted price, set at approval. Falls back to the quote. */
     finalTotalCents: integer("final_total_cents"),
     depositCents: integer("deposit_cents"),
     paymentStatus: paymentStatus("payment_status").notNull().default("unpaid"),
 
-    /** Whether this booking blocks every space (weddings, estate hire). */
+    /** Whether this booking closes the whole restaurant (private hire). */
     blocksEstate: boolean("blocks_estate").notNull().default(false),
     source: bookingSource("source").notNull().default("website"),
 
@@ -233,16 +249,16 @@ export type Booking = typeof bookings.$inferSelect;
 export type NewBooking = typeof bookings.$inferInsert;
 
 // ---------------------------------------------------------------------------
-// Blackouts — the owner-managed side of availability. Spaces are open by
-// default; a blackout closes a date range for one space (or the whole estate
-// when spaceId is null) with an optional reason.
+// Blackouts — closure days. Spaces are open by default; a blackout closes a
+// date range for one space (or the whole restaurant when spaceId is null) with
+// an optional reason.
 // ---------------------------------------------------------------------------
 
 export const blackouts = pgTable(
   "blackouts",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    /** Null = every space (e.g. "estate winterized"). */
+    /** Null = whole restaurant (e.g. closed for a private event). */
     spaceId: uuid("space_id").references(() => spaces.id, {
       onDelete: "cascade",
     }),
@@ -304,7 +320,7 @@ export type Enquiry = typeof enquiries.$inferSelect;
 export type NewEnquiry = typeof enquiries.$inferInsert;
 
 // ---------------------------------------------------------------------------
-// Settings — small key/value store for estate-wide knobs edited in the admin
+// Settings — small key/value store for restaurant-wide knobs edited in the admin
 // (notification email, cancellation policy text, ...).
 // ---------------------------------------------------------------------------
 

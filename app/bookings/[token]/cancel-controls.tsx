@@ -31,7 +31,7 @@ export function CancelControls({
   mode,
 }: {
   token: string;
-  /** "withdraw" cancels a pending request; "request" flags an approved booking. */
+  /** "withdraw" cancels a pending request; "request" flags a confirmed reservation. */
   mode: "withdraw" | "request";
 }) {
   const [confirming, setConfirming] = useState(false);
@@ -57,8 +57,8 @@ export function CancelControls({
       <input type="hidden" name="token" value={token} />
       <p className="text-sm text-ink-soft">
         {mode === "withdraw"
-          ? "Withdraw your request? Your dates will be released straight away."
-          : "Ask us to cancel this booking? We'll review it against the cancellation policy and confirm by email."}
+          ? "Withdraw your request? The table goes back on sale straight away."
+          : "Ask us to cancel this reservation? We'll review it against the cancellation policy and confirm by email."}
       </p>
       <div className="flex flex-wrap gap-3">
         <ConfirmButton
@@ -69,7 +69,7 @@ export function CancelControls({
           onClick={() => setConfirming(false)}
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
         >
-          Keep my booking
+          Keep my reservation
         </button>
       </div>
       <FormError message={state.error} />

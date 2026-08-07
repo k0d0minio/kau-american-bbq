@@ -13,7 +13,7 @@ import {
 } from "@/lib/db/queries";
 import { getCancellationPolicy } from "@/lib/settings";
 import { blockedRanges, bookingWindow } from "@/lib/booking/availability";
-import { todayAtEstate } from "@/lib/booking/dates";
+import { todayAtRestaurant } from "@/lib/booking/dates";
 import { formatMoney } from "@/lib/booking/pricing";
 import { BookingPanel, type PanelSpace } from "./booking-panel";
 
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   } catch {
     // fall through to the default
   }
-  return { title: "Our spaces" };
+  return { title: "Ways to eat" };
 }
 
 export default async function SpacePage({ params }: Params) {
@@ -44,14 +44,14 @@ export default async function SpacePage({ params }: Params) {
   const space = await getSpaceBySlug(slug);
   if (!space || !space.active) notFound();
 
-  const today = todayAtEstate();
+  const today = todayAtRestaurant();
   const window = bookingWindow(space, today);
   const [availability, policy, allSpaces] = await Promise.all([
     getAvailabilityData(today, window.lastEnd),
     getCancellationPolicy(),
     getActiveSpaces(),
   ]);
-  const blocked = blockedRanges(space, availability.bookings, availability.blackouts);
+  const closures = blockedRanges(space, availability.blackouts);
 
   const panelSpace: PanelSpace = {
     id: space.id,
@@ -59,30 +59,14 @@ export default async function SpacePage({ params }: Params) {
     name: space.name,
     isEvent: space.isEvent,
     blocksEstate: space.blocksEstate,
-    minNights: space.minNights,
     maxGuests: space.maxGuests,
-    bufferDays: space.bufferDays,
+    capacityCovers: space.capacityCovers,
     minLeadDays: space.minLeadDays,
     maxHorizonMonths: space.maxHorizonMonths,
-    nightlyRateCents: space.nightlyRateCents,
-    weeklyRateCents: space.weeklyRateCents,
-    cleaningFeeCents: space.cleaningFeeCents,
   };
 
-  const unit = space.isEvent ? "day" : "night";
   const paragraphs = space.description.split(/\n\n+/).filter(Boolean);
   const otherSpaces = allSpaces.filter((s) => s.id !== space.id);
-
-  const rateRows: Array<[string, string]> = [
-    [`Per ${unit}`, formatMoney(space.nightlyRateCents)],
-    ...(space.weeklyRateCents
-      ? ([["Per week (7+ nights)", formatMoney(space.weeklyRateCents)]] as Array<[string, string]>)
-      : []),
-    ...(space.cleaningFeeCents > 0
-      ? ([["Cleaning & turnover", formatMoney(space.cleaningFeeCents)]] as Array<[string, string]>)
-      : []),
-    ["Minimum", `${space.minNights} ${unit}${space.minNights === 1 ? "" : "s"}`],
-  ];
 
   return (
     <>
@@ -106,7 +90,7 @@ export default async function SpacePage({ params }: Params) {
               className="inline-flex items-center gap-1.5 text-sm font-medium text-cream/80 transition-colors hover:text-cream"
             >
               <ArrowLeft className="size-4" />
-              All spaces
+              All ways to eat
             </Link>
             <p className="mt-6 eyebrow text-amber-soft">{space.kind}</p>
             <h1 className="mt-3 font-display text-4xl font-light leading-[1.05] text-cream sm:text-6xl">
@@ -116,11 +100,9 @@ export default async function SpacePage({ params }: Params) {
               <span>{space.age}</span>
               <span className="inline-flex items-center gap-1.5">
                 <Users className="size-4" />
-                Up to {space.maxGuests} guests
+                Tables up to {space.maxGuests}
               </span>
-              <span className="font-medium text-cream">
-                From {formatMoney(space.nightlyRateCents)} / {unit}
-              </span>
+              <span className="font-medium text-cream">Thu–Sun · lunch &amp; dinner</span>
             </p>
           </div>
         </section>
@@ -148,20 +130,26 @@ export default async function SpacePage({ params }: Params) {
                 ))}
               </ul>
 
-              <h2 className="mt-12 font-display text-2xl text-pine-900">Rates</h2>
-              <dl className="mt-5 max-w-md divide-y divide-pine-100 rounded-2xl border border-pine-100 bg-cream-100 px-5">
-                {rateRows.map(([label, value]) => (
-                  <div key={label} className="flex items-center justify-between py-3">
-                    <dt className="text-sm text-stone">{label}</dt>
-                    <dd className="text-sm font-medium text-ink">{value}</dd>
-                  </div>
-                ))}
-              </dl>
+              {space.isEvent ? (
+                <>
+                  <h2 className="mt-12 font-display text-2xl text-pine-900">Private hire</h2>
+                  <dl className="mt-5 max-w-md divide-y divide-pine-100 rounded-2xl border border-pine-100 bg-cream-100 px-5">
+                    <div className="flex items-center justify-between py-3">
+                      <dt className="text-sm text-stone">Per event day</dt>
+                      <dd className="text-sm font-medium text-ink">
+                        {space.nightlyRateCents > 0
+                          ? formatMoney(space.nightlyRateCents)
+                          : "Price on request"}
+                      </dd>
+                    </div>
+                  </dl>
+                </>
+              ) : null}
               {space.blocksEstate ? (
                 <p className="mt-4 flex max-w-md items-start gap-2 text-sm text-stone">
                   <ShieldCheck className="mt-0.5 size-4 shrink-0 text-lake" />
-                  Confirmed bookings reserve the whole estate, so your party has the grounds
-                  entirely to itself.
+                  Private hire closes the whole restaurant to other guests — the room, the
+                  counter and Godzilla are all yours.
                 </p>
               ) : null}
 
@@ -194,7 +182,8 @@ export default async function SpacePage({ params }: Params) {
             <div className="lg:sticky lg:top-24 lg:self-start">
               <BookingPanel
                 space={panelSpace}
-                blocked={blocked}
+                blocks={availability.bookings}
+                closures={closures}
                 today={today}
               />
             </div>
@@ -205,7 +194,7 @@ export default async function SpacePage({ params }: Params) {
         {otherSpaces.length > 0 ? (
           <section className="border-t border-pine-100 bg-parchment/60 py-12">
             <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-5 sm:px-8">
-              <span className="eyebrow text-stone">Also on the estate</span>
+              <span className="eyebrow text-stone">Also at KAU</span>
               {otherSpaces.map((s) => (
                 <Link
                   key={s.id}
