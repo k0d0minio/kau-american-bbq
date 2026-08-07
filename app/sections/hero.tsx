@@ -81,10 +81,10 @@ export function Hero() {
           transition={{ duration: 0.9, delay: 1.3 }}
           className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
         >
-          <a href="#spaces" className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
+          <Link href="/book" className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
             Book a table
             <ArrowRight className="size-4" />
-          </a>
+          </Link>
           <Link href="/enquire" className={cn(buttonVariants({ variant: "light", size: "lg" }))}>
             Plan a private feast
           </Link>

@@ -290,8 +290,8 @@ export function HistoryToday() {
             </Reveal>
             <Reveal delay={0.15}>
               <a
-                href="/#spaces"
-                className={cn(buttonVariants({ variant: "primary", size: "md" }), "mt-8")}
+                href="/book"
+                className={cn(buttonVariants({ variant: "ember", size: "md" }), "mt-8")}
               >
                 Book a table
                 <ArrowRight className="size-4" />

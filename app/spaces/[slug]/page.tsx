@@ -179,7 +179,9 @@ export default async function SpacePage({ params }: Params) {
               </p>
             </div>
 
-            <div className="lg:sticky lg:top-24 lg:self-start">
+            {/* Booking first on small screens — guests arriving from a "Book a
+                table" CTA should see the form, not scroll past the copy. */}
+            <div id="reserve" className="order-first scroll-mt-24 lg:order-none lg:sticky lg:top-24 lg:self-start">
               <BookingPanel
                 space={panelSpace}
                 blocks={availability.bookings}
