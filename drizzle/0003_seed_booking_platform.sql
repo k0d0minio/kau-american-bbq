@@ -1,10 +1,14 @@
--- Seed the booking platform: the three historic spaces (ported from the
--- original hardcoded lib/site.ts content), the whole-estate package, and the
--- default estate settings.
+-- Seed the booking platform: KAU's single bookable space and the default
+-- restaurant settings.
 --
--- Rates are sensible placeholders in cents — the owner adjusts them from
--- /admin/spaces. Idempotent: ON CONFLICT keeps re-runs safe and never
--- clobbers values that have since been edited through the app.
+-- KAU is one dining room in Malveira. Table service and the Texan counter are
+-- two ways of being served in that room, not separate spaces, so they live as
+-- a preference on the booking (see 0005) rather than as extra rows here.
+--
+-- TODO(jamie): confirm the real cover capacity and party-size cap with KAU.
+-- The numbers below are sensible defaults, editable from /admin/spaces.
+-- Idempotent: ON CONFLICT keeps re-runs safe and never clobbers values that
+-- have since been edited through the app.
 
 INSERT INTO "spaces" (
   "slug", "name", "kind", "age", "blurb", "description", "image", "features",
@@ -14,60 +18,18 @@ INSERT INTO "spaces" (
   "sort_order"
 ) VALUES
 (
-  'farmhouse',
-  'The Farmhouse',
-  'Weekly & weekend stays',
-  'Built c. 1850',
-  'A stately Greek Revival farmhouse with wraparound porch, wide lawns and views out toward the lake. Sleeps a gathering of family or friends in classic country comfort.',
-  E'The heart of the estate, The Farmhouse is a stately Greek Revival home that has watched over these vineyards since the 1850s. Behind its columned wraparound porch you''ll find a full country kitchen, generous gathering rooms and beds for eight or more — comfortable, characterful and made for slow weeks by the lake.\n\nMornings start with coffee on the porch above the vines; evenings end around the fire pit under a Lake Erie sunset. Weekly stays are the Vine Cliff classic, and long weekends are lovely in every season.',
-  '/img/house.jpg',
-  ARRAY['Wraparound porch', 'Sleeps 8+', 'Full country kitchen', 'Fire pit & lawn games'],
+  'kau-barbecue',
+  'KAU Barbecue',
+  'Table service or the Texan counter',
+  'Est. 2026',
+  'One dining room, two ways to eat: sit down and let the meat come to you, or step up to the counter and watch it cut and weighed in the moment.',
+  E'KAU is the mother house of Rui and Vera Matias'' barbecue — a Malveira smokehouse built around Godzilla, the custom smoker that runs from before sunrise. Brisket and beef rib Black Angus, St. Louis pork ribs, pulled pork and smoked turkey breast come off the smoke and are cut fresh, sold by weight, and served with sides worth the trip on their own.\n\nChoose how you eat when you book. Table service brings the tray to you; at the Texan counter you watch your meats cut and weighed in front of you and carry the tray yourself. Same smoke either way. We serve Thursday to Sunday, lunch and dinner, and reservations are free — the room fills fast.',
+  '/img/dining-room.jpg',
+  ARRAY['Full table service or the counter', 'All meats cut and sold by weight', 'Sides, sauces & desserts', 'Thursday to Sunday, lunch & dinner'],
   false, false,
-  45000, 275000, 15000,
-  2, 10, 1, 2, 18,
+  0, NULL, 0,
+  1, 8, 0, 0, 3,
   1
-),
-(
-  'carriage-house',
-  'The Carriage House',
-  'Intimate retreats',
-  'Built c. 1850',
-  'A charming, light-filled retreat tucked among the pines — perfect for couples and small parties who want quiet, character and a porch made for slow mornings.',
-  E'Tucked among the pines a short stroll from the cliff edge, The Carriage House is the quiet corner of the estate. Light-filled rooms, a private porch and space for two to four make it a natural fit for couples'' escapes, writing retreats and small family stays.\n\nYou''re steps from the water and a short drive from Chautauqua, Fredonia and the wineries of the Lake Erie grape belt — close to everything, disturbed by nothing.',
-  '/img/front-porch.jpg',
-  ARRAY['Private porch', 'Cozy for 2–4', 'Wooded setting', 'Steps from the cliffs'],
-  false, false,
-  25000, 150000, 10000,
-  2, 4, 1, 2, 18,
-  2
-),
-(
-  'barn',
-  'The Barn',
-  'Weddings & events',
-  'Built c. 1850',
-  'A 170-year-old barn and sweeping grounds that host weddings, reunions and celebrations against a backdrop of vineyards and Lake Erie sunsets.',
-  E'Our 170-year-old barn and the open lawns around it host weddings, reunions and celebrations for up to 150 guests, with the vineyards and Lake Erie sunsets as your backdrop. Exchange vows at golden hour, dine under the rafters and dance until the fireflies come out.\n\nEvent bookings cover the barn and surrounding grounds across your setup, celebration and teardown days. As a rule we reserve the whole estate around confirmed events, so your party has the place entirely to itself.',
-  '/img/full-view.jpg',
-  ARRAY['Weddings & receptions', 'Open lawns', 'Vineyard backdrop', 'Golden-hour ceremonies'],
-  true, true,
-  250000, NULL, 50000,
-  1, 150, 1, 14, 18,
-  3
-),
-(
-  'estate',
-  'The Whole Estate',
-  'Exclusive hire',
-  'Est. 1850',
-  'Take every key on the property — farmhouse, carriage house, barn and grounds — for weddings, reunions and retreats that deserve the entire cliff top to themselves.',
-  E'For gatherings that want all of Vine Cliff, the estate package puts the farmhouse, carriage house, barn and grounds in your hands at once. House the wedding party in the farmhouse, tuck the newlyweds into the carriage house, celebrate in the barn — with no other guests anywhere on the property.\n\nTell us about your plans in the booking request and we''ll shape the days around them, from setup to farewell brunch.',
-  '/img/aerial-shot.jpg',
-  ARRAY['All three buildings', 'Sleeps 12+ overnight', 'Events up to 150', 'Total privacy'],
-  true, true,
-  350000, 2000000, 100000,
-  2, 150, 1, 14, 18,
-  4
 )
 ON CONFLICT ("slug") DO NOTHING;
 --> statement-breakpoint

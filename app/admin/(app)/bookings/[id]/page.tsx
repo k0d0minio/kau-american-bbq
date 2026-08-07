@@ -9,6 +9,7 @@ import {
   isService,
   blockedRanges,
 } from "@/lib/booking/availability";
+import { DINING_FORMAT_LABELS, isDiningFormat } from "@/lib/booking/dining-formats";
 import { formatDate, todayAtRestaurant } from "@/lib/booking/dates";
 import { formatMoney } from "@/lib/booking/pricing";
 import { siteBaseUrl } from "@/lib/email";
@@ -64,6 +65,9 @@ export default async function BookingDetailPage({ params }: Props) {
     ["Date", formatDate(booking.startDate)],
     ...(isService(booking.service)
       ? ([["Sitting", SERVICE_LABELS[booking.service]]] as Array<[string, string]>)
+      : []),
+    ...(isDiningFormat(booking.diningFormat)
+      ? ([["Served", DINING_FORMAT_LABELS[booking.diningFormat]]] as Array<[string, string]>)
       : []),
     ["Party size", String(booking.partySize)],
     ...(booking.eventType

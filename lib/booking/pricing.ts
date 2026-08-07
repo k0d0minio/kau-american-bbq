@@ -1,11 +1,11 @@
 // Quote calculation. Money is integer cents throughout; formatting happens at
-// the edge. Reservations are free — only private-hire event days carry a
-// price, charged per day.
+// the edge. Reservations are free — only event-priced spaces carry a price,
+// charged per day.
 import { diffDays, type ISODate } from "./dates";
 
 export type SpacePricing = {
   isEvent: boolean;
-  /** Per event day for private hire; 0 for reservation spaces. */
+  /** Per event day for event spaces; 0 for reservation spaces. */
   nightlyRateCents: number;
   weeklyRateCents: number | null;
   cleaningFeeCents: number;

@@ -44,10 +44,11 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
 // ---------------------------------------------------------------------------
-// Spaces — the bookable dining areas (table service, the Texan counter and
-// full-venue private hire). The database is the source of truth for the public
-// site; rows are seeded from the original lib/site.ts content and edited in
-// the admin.
+// Spaces — the bookable rooms. KAU has exactly one: the Malveira dining room.
+// The table stays plural because the admin edits spaces generically and the
+// booking model is per-space, but table service and the counter are ways of
+// being served in that one room, not separate rows. The database is the source
+// of truth for the public site; the row is seeded and edited in the admin.
 // ---------------------------------------------------------------------------
 
 export const spaces = pgTable(
@@ -71,13 +72,13 @@ export const spaces = pgTable(
       .notNull()
       .default(sql`'{}'::text[]`),
 
-    /** Event spaces (private hire) are priced per day rather than free to book. */
+    /** Event spaces are priced per day rather than free to book. */
     isEvent: boolean("is_event").notNull().default(false),
     /**
      * When true, an approved booking of this space closes the whole restaurant
-     * (full-venue private hire), and this space is only available when nothing
-     * else is booked for that sitting. Overridable per booking at approval
-     * time.
+     * and the space is only available when nothing else is booked for that
+     * sitting. Unused while KAU has a single room; kept for whole-venue
+     * bookings. Overridable per booking at approval time.
      */
     blocksEstate: boolean("blocks_estate").notNull().default(false),
 
@@ -171,6 +172,9 @@ export const paymentStatus = pgEnum("payment_status", [
 /** Which sitting the party is booked for. */
 export const bookingService = pgEnum("booking_service", ["lunch", "dinner"]);
 
+/** How the party wants to be served — a preference, never a capacity rule. */
+export const bookingDiningFormat = pgEnum("dining_format", ["table", "counter"]);
+
 export const bookingSource = pgEnum("booking_source", [
   "website",
   "phone",
@@ -192,7 +196,7 @@ export const bookings = pgTable(
       .references(() => guests.id),
     status: bookingStatus("status").notNull().default("pending"),
 
-    /** The day of the reservation (first day for private-hire events). */
+    /** The day of the reservation (first day for multi-day event bookings). */
     startDate: date("start_date", { mode: "string" }).notNull(),
     /** Exclusive end — always the day after `startDate` for reservations. */
     endDate: date("end_date", { mode: "string" }).notNull(),
@@ -201,13 +205,18 @@ export const bookings = pgTable(
      * private hire can span both), but required by app validation.
      */
     service: bookingService("service"),
+    /**
+     * Table service or the Texan counter. Nullable in the database; required
+     * by app validation on the public form.
+     */
+    diningFormat: bookingDiningFormat("dining_format"),
     partySize: integer("party_size").notNull(),
     /** The occasion, e.g. "Birthday", "Business lunch or dinner". */
     eventType: text("event_type"),
     /** The guest's message from the booking form. */
     guestMessage: text("guest_message"),
 
-    /** 0 for reservations; the auto-computed event quote for private hire. */
+    /** 0 for reservations; the auto-computed quote for event spaces. */
     quotedTotalCents: integer("quoted_total_cents").notNull(),
     /** Owner-adjusted price, set at approval. Falls back to the quote. */
     finalTotalCents: integer("final_total_cents"),

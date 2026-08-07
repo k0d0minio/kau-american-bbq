@@ -13,6 +13,7 @@ import {
 } from "@/lib/booking/availability";
 import { computeQuote } from "@/lib/booking/pricing";
 import { makeManageToken, makeReference } from "@/lib/booking/tokens";
+import { isDiningFormat } from "@/lib/booking/dining-formats";
 import { EVENT_TYPES } from "@/lib/booking/event-types";
 import { getCancellationPolicy, getNotifyEmail } from "@/lib/settings";
 import {
@@ -40,6 +41,7 @@ export async function requestBooking(
   const slug = cleanText(formData.get("space"), 100);
   const date = cleanText(formData.get("date"), 10);
   const serviceRaw = cleanText(formData.get("service"), 10);
+  const diningFormatRaw = cleanText(formData.get("diningFormat"), 10);
   const firstName = cleanText(formData.get("firstName"), 80);
   const lastName = cleanText(formData.get("lastName"), 80);
   const email = cleanText(formData.get("email"), 200).toLowerCase();
@@ -67,6 +69,10 @@ export async function requestBooking(
     const eventType =
       (EVENT_TYPES as readonly string[]).find((t) => t === eventTypeRaw) ?? null;
     const service = isService(serviceRaw) ? serviceRaw : null;
+    const diningFormat = isDiningFormat(diningFormatRaw) ? diningFormatRaw : null;
+    if (!diningFormat) {
+      return { error: "Please choose table service or the counter." };
+    }
 
     // Authoritative availability check against fresh data.
     const today = todayAtRestaurant();
@@ -83,7 +89,7 @@ export async function requestBooking(
 
     const startDate = date;
     const endDate = reservationEndDate(date);
-    // Reservations are free; only private-hire event days carry a quote.
+    // Reservations are free; only event-priced spaces carry a quote.
     const quote = computeQuote(space, startDate, endDate);
 
     // Guests are deduplicated by email; details refresh to the latest request
@@ -118,6 +124,7 @@ export async function requestBooking(
             startDate,
             endDate,
             service,
+            diningFormat,
             partySize,
             eventType,
             guestMessage: message || null,

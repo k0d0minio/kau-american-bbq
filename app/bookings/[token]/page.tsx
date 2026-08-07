@@ -19,6 +19,7 @@ import { getBookingByManageToken } from "@/lib/db/queries";
 import { getCancellationPolicy } from "@/lib/settings";
 import { formatDate, todayAtRestaurant } from "@/lib/booking/dates";
 import { SERVICE_LABELS, isService } from "@/lib/booking/availability";
+import { DINING_FORMAT_LABELS, isDiningFormat } from "@/lib/booking/dining-formats";
 import { formatMoney } from "@/lib/booking/pricing";
 import { CancelControls } from "./cancel-controls";
 
@@ -105,6 +106,9 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
     ["Date", formatDate(booking.startDate)],
     ...(isService(booking.service)
       ? ([["Sitting", SERVICE_LABELS[booking.service]]] as Array<[string, string]>)
+      : []),
+    ...(isDiningFormat(booking.diningFormat)
+      ? ([["Served", DINING_FORMAT_LABELS[booking.diningFormat]]] as Array<[string, string]>)
       : []),
     ["Party size", String(booking.partySize)],
     ...(booking.eventType ? ([["Occasion", booking.eventType]] as Array<[string, string]>) : []),

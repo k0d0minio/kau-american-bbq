@@ -31,53 +31,50 @@ export type Space = {
   features: string[];
 };
 
+// KAU is one room in Malveira. This mirrors the seeded space row so the
+// landing page still renders when the database is unreachable.
 export const spaces: Space[] = [
   {
-    id: "table-service",
-    name: "The Dining Room",
-    kind: "Classic table service",
+    id: "kau-barbecue",
+    name: "KAU Barbecue",
+    kind: "Table service or the Texan counter",
     age: "Est. 2026",
     image: "/img/dining-room.jpg",
     blurb:
-      "Sit down, order from the table and let the meat come to you — brisket, ribs and all the fixings, straight off Godzilla and carved to order.",
+      "One dining room, two ways to eat: sit down and let the meat come to you, or step up to the counter and watch it cut and weighed in the moment.",
     features: [
-      "Full table service",
-      "Tables for 2–8",
-      "All meats by weight",
+      "Full table service or the counter",
+      "All meats cut and sold by weight",
       "Sides, sauces & desserts",
-    ],
-  },
-  {
-    id: "texan-counter",
-    name: "The Texan Counter",
-    kind: "Tray service, Texas-style",
-    age: "Smoked on Godzilla",
-    image: "/img/counter.jpg",
-    blurb:
-      "The real-deal Texas experience: step up to the counter, watch your meats cut and weighed in the moment, and carry your tray to the table.",
-    features: [
-      "Cut & weighed in front of you",
-      "Fastest way to the meat",
-      "Counter & communal seating",
-      "Same smoke, no waiting",
-    ],
-  },
-  {
-    id: "private-hire",
-    name: "Full House — Private Hire",
-    kind: "Events & buyouts",
-    age: "The whole smokehouse",
-    image: "/img/smoker.jpg",
-    blurb:
-      "Take over the whole smokehouse — the dining room, the counter and Godzilla at full smoke — for birthdays, company feasts and celebrations that need serious meat.",
-    features: [
-      "Up to 120 guests",
-      "Whole-venue exclusivity",
-      "Custom feast menus",
-      "Godzilla at full smoke",
+      "Thursday to Sunday, lunch & dinner",
     ],
   },
 ];
+
+/**
+ * The two ways of being served in that room. Presentational only — guests pick
+ * one on the reservation form, and both share the same covers.
+ */
+export const diningFormats = [
+  {
+    id: "table",
+    name: "Table service",
+    kind: "Sit down, we'll bring it",
+    image: "/img/dining-room.jpg",
+    blurb:
+      "Sit down, order from the table and let the meat come to you — brisket, ribs and all the fixings, straight off Godzilla and carved to order.",
+    features: ["Full table service", "Tables for 2–8", "Sides, sauces & desserts"],
+  },
+  {
+    id: "counter",
+    name: "The Texan counter",
+    kind: "Tray service, Texas-style",
+    image: "/img/counter.jpg",
+    blurb:
+      "The real-deal Texas experience: step up to the counter, watch your meats cut and weighed in the moment, and carry your tray to the table.",
+    features: ["Cut & weighed in front of you", "Fastest way to the meat", "Same smoke, no waiting"],
+  },
+] as const;
 
 export const gallery = [
   {
