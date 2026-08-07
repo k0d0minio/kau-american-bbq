@@ -6,21 +6,21 @@ import {
   HistoryLede,
   HistoryTimeline,
   HistoryFigures,
-  HistoryVineyards,
+  HistoryScale,
   HistoryToday,
   HistorySources,
 } from "./sections";
 
 export const metadata: Metadata = {
-  title: "History of the Estate",
+  title: "Our Story",
   description:
-    "The history of Vine Cliff, Brocton NY — once “Salem-on-Erie,” the utopian vineyard colony of Thomas Lake Harris and the Brotherhood of the New Life, home to Laurence Oliphant and the Satsuma vintner Kanaye Nagasawa.",
+    "How a bite of brisket in Paris became KAU Barbecue — Rui and Vera Matias' Texas-style smokehouse in Malveira, built around a smoker called Godzilla.",
   alternates: { canonical: "/history" },
   openGraph: {
     type: "article",
-    title: "History of the Estate · Vine Cliff",
+    title: "Our Story · KAU Barbecue",
     description:
-      "Once “Salem-on-Erie,” the 2,000-acre vineyard colony of Thomas Lake Harris and the Brotherhood of the New Life on the shores of Lake Erie.",
+      "From a bite of brisket in Paris to pop-ups, festivals and a permanent smokehouse in Malveira — the story of KAU Barbecue.",
   },
 };
 
@@ -33,7 +33,7 @@ export default function HistoryPage() {
         <HistoryLede />
         <HistoryTimeline />
         <HistoryFigures />
-        <HistoryVineyards />
+        <HistoryScale />
         <HistoryToday />
         <HistorySources />
       </main>

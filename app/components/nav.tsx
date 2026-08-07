@@ -12,8 +12,8 @@ import { buttonVariants } from "./ui/button";
 // Section anchors live on the home page. `hash` is prefixed with "/" when the
 // nav is rendered on a sub-page so the links jump back to the landing page.
 const sectionLinks = [
-  { hash: "#spaces", label: "The Spaces" },
-  { hash: "#estate", label: "The Estate" },
+  { hash: "#spaces", label: "Book a Table" },
+  { hash: "#estate", label: "The Smokehouse" },
   { hash: "#gallery", label: "Gallery" },
   { hash: "#location", label: "Location" },
 ];
@@ -27,7 +27,7 @@ export function Nav() {
   const sectionHref = (hash: string) => (onHome ? hash : `/${hash}`);
   const links = [
     ...sectionLinks.map((l) => ({ href: sectionHref(l.hash), label: l.label })),
-    { href: "/history", label: "History" },
+    { href: "/history", label: "Our Story" },
   ];
   const homeHref = onHome ? "#top" : "/";
 
@@ -68,14 +68,14 @@ export function Nav() {
               scrolled ? "text-pine-900" : "text-cream"
             )}
           >
-            Vine&nbsp;Cliff
+            KAU
             <span
               className={cn(
                 "ml-2 hidden align-middle text-[0.6rem] uppercase tracking-[0.28em] sm:inline",
                 scrolled ? "text-stone" : "text-cream/70"
               )}
             >
-              Est. 1850
+              American Barbecue
             </span>
           </a>
 
@@ -127,7 +127,7 @@ export function Nav() {
             className="fixed inset-0 z-50 bg-pine-900/98 backdrop-blur-sm md:hidden"
           >
             <div className="flex h-16 items-center justify-between px-5 sm:h-20">
-              <span className="font-display text-xl text-cream">Vine Cliff</span>
+              <span className="font-display text-xl text-cream">KAU Barbecue</span>
               <button aria-label="Close menu" onClick={() => setOpen(false)} className="text-cream">
                 <X className="size-6" />
               </button>

@@ -12,13 +12,13 @@ export const metadata: Metadata = {
   },
   description: site.description,
   keywords: [
-    "Vine Cliff",
-    "Lake Erie holiday rental",
-    "Brocton NY vacation rental",
-    "farmhouse rental New York",
-    "wedding venue Lake Erie",
-    "event space Chautauqua",
-    "New York wine country stay",
+    "KAU Barbecue",
+    "American barbecue Portugal",
+    "Texas BBQ Lisboa",
+    "brisket Portugal",
+    "barbecue Malveira",
+    "restaurante Malveira",
+    "smoked meat Portugal",
   ],
   authors: [{ name: site.fullName }],
   creator: site.fullName,
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#294032",
+  themeColor: "#1c1917",
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
@@ -58,24 +58,35 @@ export const viewport: Viewport = {
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "LodgingBusiness",
+  "@type": "Restaurant",
   name: site.fullName,
   description: site.description,
   telephone: site.phone,
   url: site.url,
+  servesCuisine: "American barbecue",
+  priceRange: "€€",
   address: {
     "@type": "PostalAddress",
     streetAddress: site.address.line1,
     addressLocality: site.address.city,
-    addressRegion: site.address.region,
     postalCode: site.address.postalCode,
-    addressCountry: "US",
+    addressCountry: "PT",
   },
-  amenityFeature: [
-    { "@type": "LocationFeatureSpecification", name: "Event space" },
-    { "@type": "LocationFeatureSpecification", name: "Lake Erie waterfront" },
-    { "@type": "LocationFeatureSpecification", name: "Vineyard grounds" },
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Thursday", "Friday", "Saturday", "Sunday"],
+      opens: "12:00",
+      closes: "15:00",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Thursday", "Friday", "Saturday", "Sunday"],
+      opens: "19:00",
+      closes: "22:00",
+    },
   ],
+  acceptsReservations: "True",
 };
 
 export default function RootLayout({

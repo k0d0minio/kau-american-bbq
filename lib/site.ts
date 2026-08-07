@@ -79,16 +79,25 @@ export const diningFormats = [
 export const gallery = [
   {
     src: "/img/hero-smokehouse.jpg",
-    alt: "Smoke rising from Godzilla, KAU's custom smoker, outside the Malveira smokehouse",
+    alt: "Godzilla, KAU's custom smoker, open with briskets resting in the smoke",
     span: "wide",
   },
-  { src: "/img/brisket.jpg", alt: "Sliced Black Angus brisket on a KAU tray" },
-  { src: "/img/dining-room.jpg", alt: "Inside the KAU smokehouse dining room in Malveira" },
-  { src: "/img/counter.jpg", alt: "Brisket being sliced at the Texan counter" },
-  { src: "/img/smoker.jpg", alt: "Godzilla, the custom smoker, at work" },
+  { src: "/img/brisket.jpg", alt: "Slicing a smoked brisket to order at the board" },
+  {
+    src: "/img/dining-room.jpg",
+    alt: "The KAU dining room in Malveira under its black pendant lamps",
+  },
   {
     src: "/img/trays.jpg",
-    alt: "Trays of smoked meats, sides and sauces ready to carry to the table",
+    alt: "Brisket sandwiches, coleslaw and crisps served on paper",
+  },
+  {
+    src: "/img/ribs.jpg",
+    alt: "Smoked pork ribs with KAU sauces, potato salad and pickles",
+  },
+  {
+    src: "/img/smoker.jpg",
+    alt: "Cooking over the offset smoker at a KAU pop-up",
     span: "wide",
   },
 ] as const;

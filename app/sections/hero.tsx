@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
@@ -25,8 +26,8 @@ export function Hero() {
     <section ref={ref} id="top" className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
       <motion.div style={{ y, scale }} className="absolute inset-0 will-change-transform">
         <Image
-          src="/img/aerial-shot.jpg"
-          alt="Aerial view of the Vine Cliff estate on the cliffs above the turquoise waters of Lake Erie"
+          src="/img/hero-smokehouse.jpg"
+          alt="Lifting the lid on Godzilla, KAU's custom smoker, with briskets inside"
           fill
           priority
           quality={90}
@@ -52,14 +53,14 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="eyebrow text-cream/85"
         >
-          On the shores of Lake Erie · New York
+          Texas-style barbecue · Malveira, Portugal
         </motion.p>
 
         <h1 className="mt-5 max-w-3xl font-display text-[2.75rem] font-light leading-[1.02] text-cream text-balance sm:text-6xl lg:text-7xl">
-          <AnimatedWords text="A country estate" delay={0.4} />{" "}
+          <AnimatedWords text="Low and slow," delay={0.4} />{" "}
           <br className="hidden sm:block" />
           <span className="italic text-amber-soft">
-            <AnimatedWords text="made for gathering" delay={0.7} />
+            <AnimatedWords text="worth the wait" delay={0.7} />
           </span>
         </h1>
 
@@ -69,8 +70,9 @@ export function Hero() {
           transition={{ duration: 0.9, delay: 1.1 }}
           className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-cream/85 sm:text-lg"
         >
-          Weekly, weekend and event stays across a farmhouse, carriage house and barn — each
-          over 170 years old — set amid vineyards and cliff-top sunsets.
+          Brisket, beef ribs and pulled pork smoked for hours on Godzilla, our custom smoker —
+          cut fresh, sold by weight, and served the way Texas intended. Thursday to Sunday,
+          lunch and dinner.
         </motion.p>
 
         <motion.div
@@ -80,12 +82,12 @@ export function Hero() {
           className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
         >
           <a href="#spaces" className={cn(buttonVariants({ variant: "amber", size: "lg" }))}>
-            Explore the spaces
+            Book a table
             <ArrowRight className="size-4" />
           </a>
-          <a href="#location" className={cn(buttonVariants({ variant: "light", size: "lg" }))}>
-            Plan an event
-          </a>
+          <Link href="/enquire" className={cn(buttonVariants({ variant: "light", size: "lg" }))}>
+            Plan a private feast
+          </Link>
         </motion.div>
       </motion.div>
 
