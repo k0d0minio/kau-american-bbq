@@ -83,32 +83,32 @@ export default async function SpacePage({ params }: Params) {
             sizes="100vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-pine-900/55 via-pine-900/20 to-pine-900/75" />
+          <div className="absolute inset-0 bg-gradient-to-b from-char-900/55 via-char-900/20 to-char-900/75" />
           <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-12 pt-40 sm:px-8 sm:pb-16">
             <Link
               href="/#spaces"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-cream/80 transition-colors hover:text-cream"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-bone/80 transition-colors hover:text-bone"
             >
               <ArrowLeft className="size-4" />
               All ways to eat
             </Link>
-            <p className="mt-6 eyebrow text-amber-soft">{space.kind}</p>
-            <h1 className="mt-3 font-display text-4xl font-light leading-[1.05] text-cream sm:text-6xl">
+            <p className="mt-6 eyebrow text-ember-soft">{space.kind}</p>
+            <h1 className="mt-3 font-display text-4xl font-light leading-[1.05] text-bone sm:text-6xl">
               {space.name}
             </h1>
-            <p className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-cream/80">
+            <p className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-bone/80">
               <span>{space.age}</span>
               <span className="inline-flex items-center gap-1.5">
                 <Users className="size-4" />
                 Tables up to {space.maxGuests}
               </span>
-              <span className="font-medium text-cream">Thu–Sun · lunch &amp; dinner</span>
+              <span className="font-medium text-bone">Thu–Sun · lunch &amp; dinner</span>
             </p>
           </div>
         </section>
 
         {/* Body */}
-        <section className="bg-cream py-16 sm:py-20">
+        <section className="bg-bone py-16 sm:py-20">
           <div className="mx-auto grid max-w-6xl gap-12 px-5 sm:px-8 lg:grid-cols-[1fr_26.5rem] lg:gap-16">
             <div>
               {paragraphs.map((para, i) => (
@@ -120,11 +120,11 @@ export default async function SpacePage({ params }: Params) {
                 </p>
               ))}
 
-              <h2 className="mt-12 font-display text-2xl text-pine-900">What you&apos;ll find</h2>
+              <h2 className="mt-12 font-display text-2xl text-char-900">What you&apos;ll find</h2>
               <ul className="mt-5 grid max-w-2xl grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
                 {space.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2.5 text-sm text-ink-soft">
-                    <Check className="size-4 shrink-0 text-lake" />
+                    <Check className="size-4 shrink-0 text-rust" />
                     {feature}
                   </li>
                 ))}
@@ -132,8 +132,8 @@ export default async function SpacePage({ params }: Params) {
 
               {space.isEvent ? (
                 <>
-                  <h2 className="mt-12 font-display text-2xl text-pine-900">Private hire</h2>
-                  <dl className="mt-5 max-w-md divide-y divide-pine-100 rounded-2xl border border-pine-100 bg-cream-100 px-5">
+                  <h2 className="mt-12 font-display text-2xl text-char-900">Private hire</h2>
+                  <dl className="mt-5 max-w-md divide-y divide-char-100 rounded-2xl border border-char-100 bg-bone-100 px-5">
                     <div className="flex items-center justify-between py-3">
                       <dt className="text-sm text-stone">Per event day</dt>
                       <dd className="text-sm font-medium text-ink">
@@ -147,7 +147,7 @@ export default async function SpacePage({ params }: Params) {
               ) : null}
               {space.blocksEstate ? (
                 <p className="mt-4 flex max-w-md items-start gap-2 text-sm text-stone">
-                  <ShieldCheck className="mt-0.5 size-4 shrink-0 text-lake" />
+                  <ShieldCheck className="mt-0.5 size-4 shrink-0 text-rust" />
                   Private hire closes the whole restaurant to other guests — the room, the
                   counter and Godzilla are all yours.
                 </p>
@@ -155,7 +155,7 @@ export default async function SpacePage({ params }: Params) {
 
               {policy ? (
                 <>
-                  <h2 className="mt-12 font-display text-2xl text-pine-900">Good to know</h2>
+                  <h2 className="mt-12 font-display text-2xl text-char-900">Good to know</h2>
                   <p className="mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-stone">
                     {policy}
                   </p>
@@ -166,13 +166,13 @@ export default async function SpacePage({ params }: Params) {
                 Questions before you book?{" "}
                 <a
                   href={site.phoneHref}
-                  className="inline-flex items-center gap-1.5 font-medium text-pine-700 hover:text-amber"
+                  className="inline-flex items-center gap-1.5 font-medium text-char-700 hover:text-ember"
                 >
                   <Phone className="size-3.5" />
                   {site.phone}
                 </a>{" "}
                 or{" "}
-                <Link href="/enquire" className="font-medium text-pine-700 hover:text-amber">
+                <Link href="/enquire" className="font-medium text-char-700 hover:text-ember">
                   send an enquiry
                 </Link>
                 .
@@ -192,14 +192,14 @@ export default async function SpacePage({ params }: Params) {
 
         {/* Other spaces */}
         {otherSpaces.length > 0 ? (
-          <section className="border-t border-pine-100 bg-parchment/60 py-12">
+          <section className="border-t border-char-100 bg-parchment/60 py-12">
             <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-5 sm:px-8">
               <span className="eyebrow text-stone">Also at KAU</span>
               {otherSpaces.map((s) => (
                 <Link
                   key={s.id}
                   href={`/spaces/${s.slug}`}
-                  className="font-display text-lg text-pine-700 transition-colors hover:text-amber"
+                  className="font-display text-lg text-char-700 transition-colors hover:text-ember"
                 >
                   {s.name}
                 </Link>

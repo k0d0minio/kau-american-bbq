@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export function Location() {
   return (
-    <section id="location" className="relative bg-cream py-24 sm:py-32">
+    <section id="location" className="relative bg-bone py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           <Reveal className="relative order-2 lg:order-1">
@@ -24,26 +24,26 @@ export function Location() {
                 href={site.mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="absolute bottom-5 left-5 right-5 flex items-center gap-3 rounded-2xl bg-cream-100/95 p-4 backdrop-blur transition-transform duration-300 hover:-translate-y-1"
+                className="absolute bottom-5 left-5 right-5 flex items-center gap-3 rounded-2xl bg-bone-100/95 p-4 backdrop-blur transition-transform duration-300 hover:-translate-y-1"
               >
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-pine-700 text-cream">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-char-700 text-bone">
                   <MapPin className="size-5" />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-sm font-medium text-pine-900">{site.address.line1}</span>
+                  <span className="block text-sm font-medium text-char-900">{site.address.line1}</span>
                   <span className="block truncate text-xs text-stone">
                     {site.address.postalCode} {site.address.city}, {site.address.country}
                   </span>
                 </span>
-                <Navigation className="ml-auto size-4 shrink-0 text-amber" />
+                <Navigation className="ml-auto size-4 shrink-0 text-ember" />
               </a>
             </div>
           </Reveal>
 
           <div className="order-1 lg:order-2">
             <Reveal>
-              <p className="eyebrow text-amber">Find Us</p>
-              <h2 className="mt-4 font-display text-4xl font-light leading-tight text-pine-900 text-balance sm:text-5xl">
+              <p className="eyebrow text-ember">Find Us</p>
+              <h2 className="mt-4 font-display text-4xl font-light leading-tight text-char-900 text-balance sm:text-5xl">
                 In the heart of Malveira
               </h2>
               <p className="mt-5 text-pretty text-base leading-relaxed text-ink-soft sm:text-lg">
@@ -55,10 +55,10 @@ export function Location() {
             <Stagger className="mt-10 space-y-3">
               {nearby.map((n) => (
                 <StaggerItem key={n.name}>
-                  <div className="group flex items-start gap-4 rounded-2xl border border-pine-900/8 bg-cream-100 p-5 transition-all duration-300 hover:border-pine-700/25 hover:shadow-soft">
-                    <span className="mt-1 size-2 shrink-0 rounded-full bg-amber transition-transform duration-300 group-hover:scale-150" />
+                  <div className="group flex items-start gap-4 rounded-2xl border border-char-900/8 bg-bone-100 p-5 transition-all duration-300 hover:border-char-700/25 hover:shadow-soft">
+                    <span className="mt-1 size-2 shrink-0 rounded-full bg-ember transition-transform duration-300 group-hover:scale-150" />
                     <div>
-                      <h3 className="font-display text-lg text-pine-900">{n.name}</h3>
+                      <h3 className="font-display text-lg text-char-900">{n.name}</h3>
                       <p className="text-sm text-stone">{n.note}</p>
                     </div>
                   </div>

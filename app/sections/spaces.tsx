@@ -25,8 +25,8 @@ export function Spaces({ spaces }: { spaces: SpaceCardData[] }) {
     <section id="spaces" className="relative bg-parchment/60 py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <Reveal className="max-w-2xl">
-          <p className="eyebrow text-amber">Book a Table</p>
-          <h2 className="mt-4 font-display text-4xl font-light leading-tight text-pine-900 text-balance sm:text-5xl">
+          <p className="eyebrow text-ember">Book a Table</p>
+          <h2 className="mt-4 font-display text-4xl font-light leading-tight text-char-900 text-balance sm:text-5xl">
             Two ways to eat, one big smoker
           </h2>
           <p className="mt-5 text-pretty text-base leading-relaxed text-ink-soft sm:text-lg">
@@ -44,7 +44,7 @@ export function Spaces({ spaces }: { spaces: SpaceCardData[] }) {
               initial={reduce ? { opacity: 0 } : { opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.8, ease: EASE, delay: i * 0.12 }}
-              className="group relative flex flex-col overflow-hidden rounded-3xl bg-cream-100 shadow-soft transition-all duration-500 hover:shadow-lift hover:-translate-y-1.5"
+              className="group relative flex flex-col overflow-hidden rounded-3xl bg-bone-100 shadow-soft transition-all duration-500 hover:shadow-lift hover:-translate-y-1.5"
             >
               <div className="relative block aspect-4/3 overflow-hidden">
                 <Image
@@ -55,12 +55,12 @@ export function Spaces({ spaces }: { spaces: SpaceCardData[] }) {
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover transition-transform duration-[1.4s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-pine-900/50 to-transparent opacity-70" />
+                <div className="absolute inset-0 bg-gradient-to-t from-char-900/50 to-transparent opacity-70" />
                 <div className="absolute bottom-4 left-5 right-5">
-                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-cream/80">
+                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-bone/80">
                     {format.kind}
                   </p>
-                  <h3 className="font-display text-2xl text-cream">{format.name}</h3>
+                  <h3 className="font-display text-2xl text-bone">{format.name}</h3>
                 </div>
               </div>
 
@@ -69,7 +69,7 @@ export function Spaces({ spaces }: { spaces: SpaceCardData[] }) {
                 <ul className="mt-5 grid gap-x-3 gap-y-2 sm:grid-cols-2">
                   {format.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-xs text-stone">
-                      <Check className="size-3.5 shrink-0 text-lake" />
+                      <Check className="size-3.5 shrink-0 text-rust" />
                       {f}
                     </li>
                   ))}
@@ -94,18 +94,18 @@ export function Spaces({ spaces }: { spaces: SpaceCardData[] }) {
                   sizes="(max-width: 1152px) 100vw, 1152px"
                   className="object-cover transition-transform duration-[1.4s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-pine-900/65" />
-                <div className="absolute inset-0 bg-gradient-to-r from-pine-900/60 to-transparent" />
+                <div className="absolute inset-0 bg-char-900/65" />
+                <div className="absolute inset-0 bg-gradient-to-r from-char-900/60 to-transparent" />
                 <div className="relative z-10 flex flex-col gap-5 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
                   <div className="max-w-2xl">
-                    <p className="inline-flex items-center gap-2 eyebrow text-amber-soft">
+                    <p className="inline-flex items-center gap-2 eyebrow text-ember-soft">
                       <Flame className="size-3.5" />
                       {space.kind}
                     </p>
-                    <h3 className="mt-3 font-display text-3xl font-light text-cream sm:text-4xl">
+                    <h3 className="mt-3 font-display text-3xl font-light text-bone sm:text-4xl">
                       Get your seat at the smoker
                     </h3>
-                    <p className="mt-3 text-pretty text-sm leading-relaxed text-cream/85 sm:text-base">
+                    <p className="mt-3 text-pretty text-sm leading-relaxed text-bone/85 sm:text-base">
                       Pick your day, lunch or dinner, and how you&apos;d like to be served — we
                       confirm by email.
                     </p>

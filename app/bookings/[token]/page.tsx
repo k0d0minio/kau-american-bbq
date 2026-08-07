@@ -98,7 +98,7 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
       <Link
         key="space"
         href={`/spaces/${space.slug}`}
-        className="font-medium text-pine-700 hover:text-amber"
+        className="font-medium text-char-700 hover:text-ember"
       >
         {space.name}
       </Link>,
@@ -118,17 +118,17 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
   return (
     <>
       <Nav />
-      <main className="bg-cream">
+      <main className="bg-bone">
         {/* Dark header band (keeps the fixed nav legible). */}
-        <section className="bg-pine-900 px-5 pb-16 pt-32 text-center sm:pb-20 sm:pt-40">
+        <section className="bg-char-900 px-5 pb-16 pt-32 text-center sm:pb-20 sm:pt-40">
           <div className="mx-auto max-w-2xl">
-            <span className="inline-flex size-14 items-center justify-center rounded-full bg-cream/10 text-amber-soft">
+            <span className="inline-flex size-14 items-center justify-center rounded-full bg-bone/10 text-ember-soft">
               <StatusIcon className="size-7" />
             </span>
-            <h1 className="mt-5 font-display text-3xl font-light text-cream sm:text-5xl">
+            <h1 className="mt-5 font-display text-3xl font-light text-bone sm:text-5xl">
               {status.title}
             </h1>
-            <p className="mx-auto mt-4 max-w-lg text-pretty text-sm leading-relaxed text-cream/80 sm:text-base">
+            <p className="mx-auto mt-4 max-w-lg text-pretty text-sm leading-relaxed text-bone/80 sm:text-base">
               {status.body}
             </p>
           </div>
@@ -136,7 +136,7 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
 
         <section className="mx-auto w-full max-w-2xl space-y-6 px-5 py-12 sm:px-8 sm:py-16">
           {submitted ? (
-            <p className="flex items-start gap-2.5 rounded-2xl bg-pine-50 px-5 py-4 text-sm leading-relaxed text-pine-700">
+            <p className="flex items-start gap-2.5 rounded-2xl bg-char-50 px-5 py-4 text-sm leading-relaxed text-char-700">
               <MailCheck className="mt-0.5 size-4 shrink-0" />
               Your request is on its way — a confirmation email is heading to {guest.email}.
               Bookmark this page to check your status any time.
@@ -144,15 +144,15 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
           ) : null}
 
           {booking.status === "approved" && booking.cancelRequestedAt ? (
-            <p className="flex items-start gap-2.5 rounded-2xl bg-amber/10 px-5 py-4 text-sm leading-relaxed text-[#9a5a12]">
+            <p className="flex items-start gap-2.5 rounded-2xl bg-ember/10 px-5 py-4 text-sm leading-relaxed text-[#7c2d12]">
               <Clock className="mt-0.5 size-4 shrink-0" />
               Cancellation requested — we&apos;re reviewing it and will confirm by email shortly.
             </p>
           ) : null}
 
-          <div className="rounded-3xl border border-pine-100 bg-cream-100 p-6 shadow-soft sm:p-7">
-            <h2 className="font-display text-xl text-pine-900">Reservation details</h2>
-            <dl className="mt-4 divide-y divide-pine-100">
+          <div className="rounded-3xl border border-char-100 bg-bone-100 p-6 shadow-soft sm:p-7">
+            <h2 className="font-display text-xl text-char-900">Reservation details</h2>
+            <dl className="mt-4 divide-y divide-char-100">
               {detailRows.map(([label, value]) => (
                 <div key={label} className="flex items-center justify-between gap-4 py-3">
                   <dt className="text-sm text-stone">{label}</dt>
@@ -177,15 +177,15 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
               </p>
             ) : null}
             {total > 0 && paymentLine ? (
-              <p className="mt-3 rounded-xl bg-cream px-4 py-3 text-sm text-ink-soft">
+              <p className="mt-3 rounded-xl bg-bone px-4 py-3 text-sm text-ink-soft">
                 {paymentLine}
               </p>
             ) : null}
           </div>
 
           {booking.status === "pending" ? (
-            <div className="rounded-3xl border border-pine-100 bg-cream-100 p-6 sm:p-7">
-              <h2 className="font-display text-xl text-pine-900">Change of plans?</h2>
+            <div className="rounded-3xl border border-char-100 bg-bone-100 p-6 sm:p-7">
+              <h2 className="font-display text-xl text-char-900">Change of plans?</h2>
               <p className="mb-4 mt-2 text-sm leading-relaxed text-ink-soft">
                 You can withdraw a pending request at any time — no questions asked.
               </p>
@@ -196,8 +196,8 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
           {booking.status === "approved" &&
           !isCompleted &&
           !booking.cancelRequestedAt ? (
-            <div className="rounded-3xl border border-pine-100 bg-cream-100 p-6 sm:p-7">
-              <h2 className="font-display text-xl text-pine-900">Change of plans?</h2>
+            <div className="rounded-3xl border border-char-100 bg-bone-100 p-6 sm:p-7">
+              <h2 className="font-display text-xl text-char-900">Change of plans?</h2>
               <p className="mb-4 mt-2 text-sm leading-relaxed text-ink-soft">
                 Need to move or cancel? Send a cancellation request and we&apos;ll take it from
                 there — moving to another day is often easier than you&apos;d think.
@@ -207,22 +207,22 @@ export default async function BookingStatusPage({ params, searchParams }: Props)
           ) : null}
 
           {policy ? (
-            <div className="rounded-3xl border border-pine-100 bg-cream-100 p-6 sm:p-7">
-              <h2 className="font-display text-xl text-pine-900">Cancellation policy</h2>
+            <div className="rounded-3xl border border-char-100 bg-bone-100 p-6 sm:p-7">
+              <h2 className="font-display text-xl text-char-900">Cancellation policy</h2>
               <p className="mt-2 text-sm leading-relaxed text-stone">{policy}</p>
             </div>
           ) : null}
 
           <p className="text-center text-sm text-ink-soft">
             Questions? Call{" "}
-            <a href={site.phoneHref} className="inline-flex items-center gap-1 font-medium text-pine-700 hover:text-amber">
+            <a href={site.phoneHref} className="inline-flex items-center gap-1 font-medium text-char-700 hover:text-ember">
               <Phone className="size-3.5" />
               {site.phone}
             </a>{" "}
             or email{" "}
             <a
               href={`mailto:${site.email}?subject=Reservation ${booking.reference}`}
-              className="inline-flex items-center gap-1 font-medium text-pine-700 hover:text-amber"
+              className="inline-flex items-center gap-1 font-medium text-char-700 hover:text-ember"
             >
               <Mail className="size-3.5" />
               {site.email}

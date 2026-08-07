@@ -75,27 +75,27 @@ export function escapeHtml(value: string): string {
 // ---------------------------------------------------------------------------
 
 const palette = {
-  pine: "#294032",
-  pineDark: "#1a2a20",
-  cream: "#f7f2e7",
-  creamLight: "#fbf8f0",
-  ink: "#23271d",
-  inkSoft: "#3c4235",
-  stone: "#8a8472",
-  amber: "#c8812f",
-  border: "#e4dcc9",
+  char: "#292524",
+  charDark: "#171412",
+  bone: "#f5f1ea",
+  boneLight: "#faf7f2",
+  ink: "#1c1917",
+  inkSoft: "#44403c",
+  stone: "#8a8177",
+  ember: "#c2410c",
+  border: "#e2dbd0",
 };
 
 function layout(heading: string, bodyHtml: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
-<body style="margin:0;padding:0;background-color:${palette.cream};">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${palette.cream};padding:24px 12px;">
+<body style="margin:0;padding:0;background-color:${palette.bone};">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${palette.bone};padding:24px 12px;">
     <tr><td align="center">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:${palette.creamLight};border-radius:16px;overflow:hidden;border:1px solid ${palette.border};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:${palette.boneLight};border-radius:16px;overflow:hidden;border:1px solid ${palette.border};">
         <tr>
-          <td style="background-color:${palette.pineDark};padding:28px 32px;text-align:center;">
-            <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:26px;color:${palette.cream};letter-spacing:0.02em;">Vine&nbsp;Cliff</p>
+          <td style="background-color:${palette.charDark};padding:28px 32px;text-align:center;">
+            <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:26px;color:${palette.bone};letter-spacing:0.02em;">Vine&nbsp;Cliff</p>
             <p style="margin:6px 0 0;font-family:Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.28em;text-transform:uppercase;color:#dda657;">Vineyards · Est. 1850</p>
           </td>
         </tr>
@@ -126,8 +126,8 @@ function paragraph(html: string): string {
 }
 
 function button(href: string, label: string): string {
-  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 20px;"><tr><td style="border-radius:999px;background-color:${palette.pine};">
-    <a href="${href}" style="display:inline-block;padding:12px 28px;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:bold;color:${palette.cream};text-decoration:none;">${label}</a>
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 20px;"><tr><td style="border-radius:999px;background-color:${palette.char};">
+    <a href="${href}" style="display:inline-block;padding:12px 28px;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:bold;color:${palette.bone};text-decoration:none;">${label}</a>
   </td></tr></table>`;
 }
 
@@ -140,7 +140,7 @@ function detailRows(rows: Array<[string, string]>): string {
       </tr>`
     )
     .join(`<tr><td colspan="2" style="border-top:1px solid ${palette.border};font-size:0;line-height:0;">&nbsp;</td></tr>`);
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 20px;background-color:${palette.cream};border-radius:12px;padding:8px 20px;"><tbody>${body}</tbody></table>`;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 20px;background-color:${palette.bone};border-radius:12px;padding:8px 20px;"><tbody>${body}</tbody></table>`;
 }
 
 function quoteRows(quote: Quote, label = "Estimated total"): Array<[string, string]> {
@@ -251,7 +251,7 @@ export function bookingDeclinedEmail(data: BookingEmailData) {
         data.note ? paragraph(`<em>“${escapeHtml(data.note)}”</em>`) : "",
         detailRows(stayRows(data)),
         paragraph(
-          `Different dates often work beautifully — reply to this email or call us on <a href="tel:${site.phone.replace(/[^+\d]/g, "")}" style="color:${palette.pine};">${site.phone}</a> and we'll find them together.`
+          `Different dates often work beautifully — reply to this email or call us on <a href="tel:${site.phone.replace(/[^+\d]/g, "")}" style="color:${palette.char};">${site.phone}</a> and we'll find them together.`
         ),
       ].join("")
     ),
@@ -297,7 +297,7 @@ export function ownerNewRequestEmail(data: OwnerBookingEmailData) {
   if (data.eventType) rows.splice(2, 0, ["Occasion", escapeHtml(data.eventType)]);
   rows.push(
     ["Guest", escapeHtml(data.guestFullName)],
-    ["Email", `<a href="mailto:${escapeHtml(data.guestEmail)}" style="color:${palette.pine};">${escapeHtml(data.guestEmail)}</a>`]
+    ["Email", `<a href="mailto:${escapeHtml(data.guestEmail)}" style="color:${palette.char};">${escapeHtml(data.guestEmail)}</a>`]
   );
   if (data.guestPhone) rows.push(["Phone", escapeHtml(data.guestPhone)]);
   if (data.quote) rows.push(...quoteRows(data.quote));
@@ -360,7 +360,7 @@ export type EnquiryEmailData = {
 export function ownerNewEnquiryEmail(data: EnquiryEmailData) {
   const rows: Array<[string, string]> = [
     ["From", escapeHtml(data.name)],
-    ["Email", `<a href="mailto:${escapeHtml(data.email)}" style="color:${palette.pine};">${escapeHtml(data.email)}</a>`],
+    ["Email", `<a href="mailto:${escapeHtml(data.email)}" style="color:${palette.char};">${escapeHtml(data.email)}</a>`],
   ];
   if (data.phone) rows.push(["Phone", escapeHtml(data.phone)]);
   if (data.spaceName) rows.push(["About", escapeHtml(data.spaceName)]);

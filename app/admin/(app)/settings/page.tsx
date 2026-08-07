@@ -42,7 +42,7 @@ export default async function SettingsPage() {
 
       <Card>
         <h2 className="font-display text-lg text-ink">Business details</h2>
-        <dl className="mt-4 divide-y divide-pine-100">
+        <dl className="mt-4 divide-y divide-char-100">
           {details.map((row) => (
             <div
               key={row.label}
@@ -59,7 +59,7 @@ export default async function SettingsPage() {
 
       <Card>
         <div className="flex items-start gap-3">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-pine-50 text-pine-600">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-char-50 text-char-600">
             <ShieldCheck className="size-5" />
           </div>
           <div>

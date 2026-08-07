@@ -3,19 +3,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-600 focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-char-600 focus-visible:ring-offset-2 focus-visible:ring-offset-bone disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         primary:
-          "bg-pine-700 text-cream shadow-soft hover:bg-pine-900 hover:shadow-lift hover:-translate-y-0.5",
-        amber:
-          "bg-amber text-cream-100 shadow-soft hover:bg-[#b3721f] hover:shadow-lift hover:-translate-y-0.5",
+          "bg-char-700 text-bone shadow-soft hover:bg-char-900 hover:shadow-lift hover:-translate-y-0.5",
+        ember:
+          "bg-ember text-bone-100 shadow-soft hover:bg-[#9a3410] hover:shadow-lift hover:-translate-y-0.5",
         outline:
-          "border border-pine-700/30 text-pine-700 hover:border-pine-700 hover:bg-pine-700 hover:text-cream",
-        ghost: "text-ink-soft hover:bg-pine-50 hover:text-pine-700",
+          "border border-char-700/30 text-char-700 hover:border-char-700 hover:bg-char-700 hover:text-bone",
+        ghost: "text-ink-soft hover:bg-char-50 hover:text-char-700",
         light:
-          "bg-cream-100/90 text-pine-900 backdrop-blur hover:bg-cream-100 hover:-translate-y-0.5 shadow-soft",
+          "bg-bone-100/90 text-char-900 backdrop-blur hover:bg-bone-100 hover:-translate-y-0.5 shadow-soft",
       },
       size: {
         sm: "h-9 px-4 text-sm",

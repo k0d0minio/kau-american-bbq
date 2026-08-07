@@ -6,11 +6,11 @@ const chip =
   "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap";
 
 const BOOKING_STYLES: Record<string, string> = {
-  pending: "bg-amber/15 text-[#9a5a12]",
-  approved: "bg-pine-50 text-pine-700",
+  pending: "bg-ember/15 text-[#7c2d12]",
+  approved: "bg-char-50 text-char-700",
   declined: "bg-parchment text-stone",
   cancelled: "bg-parchment text-stone line-through decoration-stone/50",
-  completed: "bg-lake/10 text-lake",
+  completed: "bg-rust/10 text-rust",
 };
 
 export function BookingStatusBadge({
@@ -33,9 +33,9 @@ const PAYMENT_LABELS: Record<Booking["paymentStatus"], string> = {
 
 const PAYMENT_STYLES: Record<Booking["paymentStatus"], string> = {
   unpaid: "bg-parchment text-stone",
-  deposit_paid: "bg-amber/15 text-[#9a5a12]",
-  paid: "bg-pine-50 text-pine-700",
-  refunded: "bg-lake/10 text-lake",
+  deposit_paid: "bg-ember/15 text-[#7c2d12]",
+  paid: "bg-char-50 text-char-700",
+  refunded: "bg-rust/10 text-rust",
 };
 
 export function PaymentStatusBadge({ status }: { status: Booking["paymentStatus"] }) {
@@ -43,9 +43,9 @@ export function PaymentStatusBadge({ status }: { status: Booking["paymentStatus"
 }
 
 const ENQUIRY_STYLES: Record<Enquiry["status"], string> = {
-  new: "bg-amber/15 text-[#9a5a12]",
-  replied: "bg-pine-50 text-pine-700",
-  converted: "bg-lake/10 text-lake",
+  new: "bg-ember/15 text-[#7c2d12]",
+  replied: "bg-char-50 text-char-700",
+  converted: "bg-rust/10 text-rust",
   archived: "bg-parchment text-stone",
 };
 
@@ -55,5 +55,5 @@ export function EnquiryStatusBadge({ status }: { status: Enquiry["status"] }) {
 
 /** Small alert chip, e.g. "cancellation requested". */
 export function AlertBadge({ children }: { children: React.ReactNode }) {
-  return <span className={cn(chip, "bg-amber/15 text-[#9a5a12]")}>{children}</span>;
+  return <span className={cn(chip, "bg-ember/15 text-[#7c2d12]")}>{children}</span>;
 }

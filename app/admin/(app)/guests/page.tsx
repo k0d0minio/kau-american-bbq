@@ -41,7 +41,7 @@ export default async function GuestsPage({ searchParams }: Props) {
             <li key={guest.id}>
               <Link
                 href={`/admin/guests/${guest.id}`}
-                className="flex flex-wrap items-center gap-x-6 gap-y-1.5 rounded-2xl border border-pine-100 bg-cream-100 p-4 transition-colors hover:border-pine-400 sm:px-5"
+                className="flex flex-wrap items-center gap-x-6 gap-y-1.5 rounded-2xl border border-char-100 bg-bone-100 p-4 transition-colors hover:border-char-400 sm:px-5"
               >
                 <div className="min-w-44">
                   <p className="font-medium text-ink">

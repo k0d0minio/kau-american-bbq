@@ -45,7 +45,7 @@ export default async function SpaceEditPage({ params }: Props) {
     <div className="space-y-6">
       <Link
         href="/admin/spaces"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-pine-700 hover:text-amber"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-char-700 hover:text-ember"
       >
         <ArrowLeft className="size-4" />
         All spaces
@@ -59,7 +59,7 @@ export default async function SpaceEditPage({ params }: Props) {
             href={`${siteBaseUrl()}/spaces/${space.slug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-pine-700 hover:text-amber"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-char-700 hover:text-ember"
           >
             View live <ExternalLink className="size-3.5" />
           </a>
@@ -72,7 +72,7 @@ export default async function SpaceEditPage({ params }: Props) {
 
       <Card>
         <h2 className="flex items-center gap-2 font-display text-lg text-ink">
-          <CalendarPlus className="size-5 text-pine-600" />
+          <CalendarPlus className="size-5 text-char-600" />
           Calendar feed (iCal)
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">
@@ -80,7 +80,7 @@ export default async function SpaceEditPage({ params }: Props) {
           the URL into Airbnb/VRBO so external listings block dates booked here. Treat it like
           a password — anyone with the link can see when the space is unavailable.
         </p>
-        <code className="mt-3 block overflow-x-auto rounded-xl bg-cream px-4 py-3 text-xs text-pine-700">
+        <code className="mt-3 block overflow-x-auto rounded-xl bg-bone px-4 py-3 text-xs text-char-700">
           {icalUrl}
         </code>
       </Card>

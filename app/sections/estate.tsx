@@ -9,13 +9,13 @@ const stats = [
 
 export function Estate() {
   return (
-    <section id="estate" className="relative bg-cream py-24 sm:py-32">
+    <section id="estate" className="relative bg-bone py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div>
             <Reveal>
-              <p className="eyebrow text-amber">The Smokehouse</p>
-              <h2 className="mt-4 font-display text-4xl font-light leading-tight text-pine-900 text-balance sm:text-5xl">
+              <p className="eyebrow text-ember">The Smokehouse</p>
+              <h2 className="mt-4 font-display text-4xl font-light leading-tight text-char-900 text-balance sm:text-5xl">
                 Real fire, real smoke, real patience
               </h2>
             </Reveal>
@@ -34,10 +34,10 @@ export function Estate() {
               </div>
             </Reveal>
 
-            <Stagger className="mt-12 grid grid-cols-3 gap-6 border-t border-pine-900/10 pt-8">
+            <Stagger className="mt-12 grid grid-cols-3 gap-6 border-t border-char-900/10 pt-8">
               {stats.map((s) => (
                 <StaggerItem key={s.label}>
-                  <p className="font-display text-3xl text-pine-700 sm:text-4xl">{s.value}</p>
+                  <p className="font-display text-3xl text-char-700 sm:text-4xl">{s.value}</p>
                   <p className="mt-1 text-xs leading-snug text-stone sm:text-sm">{s.label}</p>
                 </StaggerItem>
               ))}
@@ -56,8 +56,8 @@ export function Estate() {
               />
             </div>
             {/* floating accent card */}
-            <div className="absolute -bottom-6 -left-4 max-w-[15rem] rounded-2xl bg-cream-100 p-5 shadow-lift sm:-left-8">
-              <p className="font-display text-lg italic text-pine-700">
+            <div className="absolute -bottom-6 -left-4 max-w-[15rem] rounded-2xl bg-bone-100 p-5 shadow-lift sm:-left-8">
+              <p className="font-display text-lg italic text-char-700">
                 &ldquo;These guys really understand what American BBQ is.&rdquo;
               </p>
               <p className="mt-2 eyebrow text-stone">Guest review · Google</p>

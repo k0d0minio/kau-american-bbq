@@ -64,7 +64,7 @@ export function SettingsForm({
       <div className="flex items-center gap-3">
         <SubmitButton />
         {state.ok ? (
-          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-pine-700">
+          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-char-700">
             <Check className="size-4" />
             Saved
           </p>

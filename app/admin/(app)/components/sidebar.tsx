@@ -26,8 +26,8 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
             className={cn(
               "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
               isActive
-                ? "bg-pine-700 text-cream"
-                : "text-cream/70 hover:bg-cream/10 hover:text-cream"
+                ? "bg-char-700 text-bone"
+                : "text-bone/70 hover:bg-bone/10 hover:text-bone"
             )}
           >
             <Icon className="size-4.5 shrink-0" />
@@ -48,8 +48,8 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
           onClick={onNavigate}
           className="block px-3"
         >
-          <span className="font-display text-2xl text-cream">Vine Cliff</span>
-          <span className="mt-0.5 block eyebrow text-amber-soft">
+          <span className="font-display text-2xl text-bone">Vine Cliff</span>
+          <span className="mt-0.5 block eyebrow text-ember-soft">
             Estate Admin
           </span>
         </Link>
@@ -59,11 +59,11 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
         <NavLinks onNavigate={onNavigate} />
       </div>
 
-      <div className="mt-auto space-y-1 border-t border-cream/10 px-3 py-4">
+      <div className="mt-auto space-y-1 border-t border-bone/10 px-3 py-4">
         <Link
           href="/"
           target="_blank"
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cream/70 transition-colors hover:bg-cream/10 hover:text-cream"
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-bone/70 transition-colors hover:bg-bone/10 hover:text-bone"
         >
           <ExternalLink className="size-4.5 shrink-0" />
           View website
@@ -71,7 +71,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
         <form action={logout}>
           <button
             type="submit"
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cream/70 transition-colors hover:bg-cream/10 hover:text-cream"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-bone/70 transition-colors hover:bg-bone/10 hover:text-bone"
           >
             <LogOut className="size-4.5 shrink-0" />
             Sign out
@@ -91,21 +91,21 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-pine-100 bg-cream/90 px-4 backdrop-blur-md lg:hidden">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-char-100 bg-bone/90 px-4 backdrop-blur-md lg:hidden">
         <button
           type="button"
           aria-label="Open navigation"
           onClick={() => setOpen(true)}
-          className="flex size-9 items-center justify-center rounded-xl text-pine-900 transition-colors hover:bg-pine-50"
+          className="flex size-9 items-center justify-center rounded-xl text-char-900 transition-colors hover:bg-char-50"
         >
           <Menu className="size-5" />
         </button>
-        <span className="font-display text-lg text-pine-900">
+        <span className="font-display text-lg text-char-900">
           {active?.label ?? "Admin"}
         </span>
         <Link
           href="/admin"
-          className="font-display text-lg text-pine-900"
+          className="font-display text-lg text-char-900"
           aria-label="Vine Cliff admin home"
         >
           VC
@@ -113,7 +113,7 @@ export function Sidebar() {
       </header>
 
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 hidden w-64 bg-pine-900 lg:block">
+      <aside className="fixed inset-y-0 left-0 hidden w-64 bg-char-900 lg:block">
         <SidebarBody />
       </aside>
 
@@ -124,14 +124,14 @@ export function Sidebar() {
             type="button"
             aria-label="Close navigation"
             onClick={close}
-            className="absolute inset-0 bg-pine-900/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-char-900/60 backdrop-blur-sm"
           />
-          <div className="absolute inset-y-0 left-0 flex w-[17rem] max-w-[82%] flex-col bg-pine-900 shadow-lift">
+          <div className="absolute inset-y-0 left-0 flex w-[17rem] max-w-[82%] flex-col bg-char-900 shadow-lift">
             <button
               type="button"
               aria-label="Close navigation"
               onClick={close}
-              className="absolute right-3 top-5 flex size-9 items-center justify-center rounded-xl text-cream/70 transition-colors hover:bg-cream/10 hover:text-cream"
+              className="absolute right-3 top-5 flex size-9 items-center justify-center rounded-xl text-bone/70 transition-colors hover:bg-bone/10 hover:text-bone"
             >
               <X className="size-5" />
             </button>

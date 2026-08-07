@@ -168,16 +168,16 @@ export function SpaceForm({ space }: { space: SpaceFormData }) {
         </p>
         <div className="space-y-2.5">
           <label className="flex items-start gap-2.5 text-sm text-ink-soft">
-            <input type="checkbox" name="isEvent" defaultChecked={space.isEvent} className="mt-0.5 size-4 accent-pine-700" />
+            <input type="checkbox" name="isEvent" defaultChecked={space.isEvent} className="mt-0.5 size-4 accent-char-700" />
             Event space — priced per day, forms speak of “days” not “nights”
           </label>
           <label className="flex items-start gap-2.5 text-sm text-ink-soft">
-            <input type="checkbox" name="blocksEstate" defaultChecked={space.blocksEstate} className="mt-0.5 size-4 accent-pine-700" />
+            <input type="checkbox" name="blocksEstate" defaultChecked={space.blocksEstate} className="mt-0.5 size-4 accent-char-700" />
             Takes the whole estate — bookings here block every space, and it's only available
             when everything is free
           </label>
           <label className="flex items-start gap-2.5 text-sm text-ink-soft">
-            <input type="checkbox" name="active" defaultChecked={space.active} className="mt-0.5 size-4 accent-pine-700" />
+            <input type="checkbox" name="active" defaultChecked={space.active} className="mt-0.5 size-4 accent-char-700" />
             Active — shown on the website and open for requests
           </label>
         </div>
@@ -187,10 +187,10 @@ export function SpaceForm({ space }: { space: SpaceFormData }) {
         </div>
       </section>
 
-      <div className="flex items-center gap-3 border-t border-pine-100 pt-5">
+      <div className="flex items-center gap-3 border-t border-char-100 pt-5">
         <SubmitButton />
         {state.ok ? (
-          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-pine-700">
+          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-char-700">
             <Check className="size-4" />
             Saved
           </p>

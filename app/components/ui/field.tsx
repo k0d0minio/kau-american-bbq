@@ -1,11 +1,11 @@
-// Small form primitives matching the estate's design language. Server-safe
+// Small form primitives matching KAU's design language. Server-safe
 // (no hooks) so they render in both server and client components.
 import * as React from "react";
 import { AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const baseFieldClass =
-  "w-full rounded-2xl border border-pine-100 bg-cream-100 px-4 text-sm text-ink outline-none transition-colors placeholder:text-stone/70 focus:border-pine-400 focus:ring-2 focus:ring-pine-600/20 disabled:opacity-60";
+  "w-full rounded-2xl border border-char-100 bg-bone-100 px-4 text-sm text-ink outline-none transition-colors placeholder:text-stone/70 focus:border-char-400 focus:ring-2 focus:ring-char-600/20 disabled:opacity-60";
 
 export function Label({
   className,
@@ -56,7 +56,7 @@ export function FormError({ message }: { message?: string }) {
   return (
     <p
       role="alert"
-      className="flex items-start gap-2 rounded-2xl bg-amber/10 px-4 py-3 text-sm text-[#9a5a12]"
+      className="flex items-start gap-2 rounded-2xl bg-ember/10 px-4 py-3 text-sm text-[#7c2d12]"
     >
       <AlertCircle className="mt-0.5 size-4 shrink-0" />
       <span>{message}</span>

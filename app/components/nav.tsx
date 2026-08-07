@@ -56,7 +56,7 @@ export function Nav() {
         className={cn(
           "transition-all duration-500",
           scrolled
-            ? "bg-cream/85 backdrop-blur-md shadow-[0_1px_0_rgba(35,39,29,0.08)]"
+            ? "bg-bone/85 backdrop-blur-md shadow-[0_1px_0_rgba(28,25,23,0.08)]"
             : "bg-transparent"
         )}
       >
@@ -65,14 +65,14 @@ export function Nav() {
             href={homeHref}
             className={cn(
               "font-display text-xl font-medium tracking-tight transition-colors sm:text-2xl",
-              scrolled ? "text-pine-900" : "text-cream"
+              scrolled ? "text-char-900" : "text-bone"
             )}
           >
             KAU
             <span
               className={cn(
                 "ml-2 hidden align-middle text-[0.6rem] uppercase tracking-[0.28em] sm:inline",
-                scrolled ? "text-stone" : "text-cream/70"
+                scrolled ? "text-stone" : "text-bone/70"
               )}
             >
               American Barbecue
@@ -86,7 +86,7 @@ export function Nav() {
                 href={l.href}
                 className={cn(
                   "group relative text-sm font-medium transition-colors",
-                  scrolled ? "text-ink-soft hover:text-pine-700" : "text-cream/85 hover:text-cream"
+                  scrolled ? "text-ink-soft hover:text-char-700" : "text-bone/85 hover:text-bone"
                 )}
               >
                 {l.label}
@@ -109,7 +109,7 @@ export function Nav() {
             onClick={() => setOpen(true)}
             className={cn(
               "md:hidden",
-              scrolled ? "text-pine-900" : "text-cream"
+              scrolled ? "text-char-900" : "text-bone"
             )}
           >
             <Menu className="size-6" />
@@ -124,11 +124,11 @@ export function Nav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-pine-900/98 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-50 bg-char-900/98 backdrop-blur-sm md:hidden"
           >
             <div className="flex h-16 items-center justify-between px-5 sm:h-20">
-              <span className="font-display text-xl text-cream">KAU Barbecue</span>
-              <button aria-label="Close menu" onClick={() => setOpen(false)} className="text-cream">
+              <span className="font-display text-xl text-bone">KAU Barbecue</span>
+              <button aria-label="Close menu" onClick={() => setOpen(false)} className="text-bone">
                 <X className="size-6" />
               </button>
             </div>
@@ -149,7 +149,7 @@ export function Nav() {
                   <a
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="block border-b border-cream/10 py-4 font-display text-3xl text-cream"
+                    className="block border-b border-bone/10 py-4 font-display text-3xl text-bone"
                   >
                     {l.label}
                   </a>
@@ -160,7 +160,7 @@ export function Nav() {
               <Link
                 href="/enquire"
                 onClick={() => setOpen(false)}
-                className={cn(buttonVariants({ variant: "amber", size: "lg" }), "w-full")}
+                className={cn(buttonVariants({ variant: "ember", size: "lg" }), "w-full")}
               >
                 <Send className="size-4" />
                 Send an enquiry

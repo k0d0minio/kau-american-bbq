@@ -30,7 +30,7 @@ export default async function GuestDetailPage({ params }: Props) {
     <div className="space-y-6">
       <Link
         href="/admin/guests"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-pine-700 hover:text-amber"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-char-700 hover:text-ember"
       >
         <ArrowLeft className="size-4" />
         All guests
@@ -48,13 +48,13 @@ export default async function GuestDetailPage({ params }: Props) {
             <div className="mt-3 space-y-2 text-sm text-ink-soft">
               <a
                 href={`mailto:${guest.email}`}
-                className="flex items-center gap-2 hover:text-pine-700"
+                className="flex items-center gap-2 hover:text-char-700"
               >
                 <Mail className="size-4 text-stone" />
                 {guest.email}
               </a>
               {guest.phone ? (
-                <a href={`tel:${guest.phone}`} className="flex items-center gap-2 hover:text-pine-700">
+                <a href={`tel:${guest.phone}`} className="flex items-center gap-2 hover:text-char-700">
                   <Phone className="size-4 text-stone" />
                   {guest.phone}
                 </a>
@@ -77,12 +77,12 @@ export default async function GuestDetailPage({ params }: Props) {
           {bookings.length === 0 ? (
             <p className="mt-3 text-sm text-stone">No bookings yet.</p>
           ) : (
-            <ul className="mt-3 divide-y divide-pine-100">
+            <ul className="mt-3 divide-y divide-char-100">
               {bookings.map(({ booking, space }) => (
                 <li key={booking.id}>
                   <Link
                     href={`/admin/bookings/${booking.id}`}
-                    className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 transition-colors hover:text-pine-700"
+                    className="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 transition-colors hover:text-char-700"
                   >
                     <CalendarDays className="size-4 text-stone" />
                     <span className="text-sm font-medium text-ink">{booking.reference}</span>

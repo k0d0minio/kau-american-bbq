@@ -41,12 +41,12 @@ export function GuestNotesForm({
         name="notes"
         defaultValue={defaultNotes}
         className="min-h-24"
-        placeholder="Prefers the lake-facing room · repeat wedding client · allergic to feather pillows…"
+        placeholder="Prefers the Texan counter · regular since the pop-up days · no pork"
       />
       <div className="flex items-center gap-3">
         <SubmitButton />
         {state.ok ? (
-          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-pine-700">
+          <p className="inline-flex items-center gap-1.5 text-sm font-medium text-char-700">
             <Check className="size-4" />
             Saved
           </p>

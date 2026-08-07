@@ -169,7 +169,7 @@ export function NewBookingForm({
             name="blocksEstate"
             key={`blocks-${space?.id}`}
             defaultChecked={space?.blocksEstate ?? false}
-            className="mt-0.5 size-4 accent-pine-700"
+            className="mt-0.5 size-4 accent-char-700"
           />
           Reserve the whole estate for these dates (blocks every space)
         </label>
@@ -178,7 +178,7 @@ export function NewBookingForm({
             type="checkbox"
             name="notify"
             defaultChecked
-            className="mt-0.5 size-4 accent-pine-700"
+            className="mt-0.5 size-4 accent-char-700"
           />
           Email the guest a confirmation (confirmed bookings only)
         </label>

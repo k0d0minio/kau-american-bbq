@@ -57,7 +57,7 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
     <button
       type="submit"
       disabled={disabled || pending}
-      className={cn(buttonVariants({ variant: "amber", size: "lg" }), "w-full")}
+      className={cn(buttonVariants({ variant: "ember", size: "lg" }), "w-full")}
     >
       {pending ? (
         <>
@@ -130,23 +130,23 @@ export function BookingPanel({
   const dayLabels = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
   return (
-    <div className="rounded-3xl border border-pine-100 bg-cream-100 p-6 shadow-soft sm:p-7">
-      <p className="eyebrow text-amber">Reserve a table</p>
-      <h2 className="mt-2 font-display text-2xl text-pine-900">Pick your day</h2>
+    <div className="rounded-3xl border border-char-100 bg-bone-100 p-6 shadow-soft sm:p-7">
+      <p className="eyebrow text-ember">Reserve a table</p>
+      <h2 className="mt-2 font-display text-2xl text-char-900">Pick your day</h2>
       <p className="mt-2 text-sm leading-relaxed text-stone">
         We&apos;re open Thursday to Sunday for lunch and dinner. Choose a day and a
         sitting — we review every request personally.
       </p>
 
       {/* Calendar */}
-      <div className="mt-5 rounded-2xl border border-pine-100 bg-cream p-4">
+      <div className="mt-5 rounded-2xl border border-char-100 bg-bone p-4">
         <div className="flex items-center justify-between">
           <button
             type="button"
             aria-label="Previous month"
             onClick={() => canPrev && setMonth(addMonths(month, -1))}
             disabled={!canPrev}
-            className="flex size-8 items-center justify-center rounded-full text-pine-700 transition-colors hover:bg-pine-50 disabled:opacity-30"
+            className="flex size-8 items-center justify-center rounded-full text-char-700 transition-colors hover:bg-char-50 disabled:opacity-30"
           >
             <ChevronLeft className="size-4" />
           </button>
@@ -156,7 +156,7 @@ export function BookingPanel({
             aria-label="Next month"
             onClick={() => canNext && setMonth(addMonths(month, 1))}
             disabled={!canNext}
-            className="flex size-8 items-center justify-center rounded-full text-pine-700 transition-colors hover:bg-pine-50 disabled:opacity-30"
+            className="flex size-8 items-center justify-center rounded-full text-char-700 transition-colors hover:bg-char-50 disabled:opacity-30"
           >
             <ChevronRight className="size-4" />
           </button>
@@ -186,9 +186,9 @@ export function BookingPanel({
                 className={cn(
                   "mx-auto flex size-9 items-center justify-center rounded-full text-sm transition-colors",
                   selected
-                    ? "bg-pine-700 font-medium text-cream"
+                    ? "bg-char-700 font-medium text-bone"
                     : selectable
-                      ? "cursor-pointer text-ink hover:bg-pine-100"
+                      ? "cursor-pointer text-ink hover:bg-char-100"
                       : closed
                         ? "text-stone/40 line-through decoration-stone/40"
                         : "text-stone/35"
@@ -199,7 +199,7 @@ export function BookingPanel({
             );
           })}
         </div>
-        <div className="mt-3 flex items-center justify-between border-t border-pine-100 pt-3">
+        <div className="mt-3 flex items-center justify-between border-t border-char-100 pt-3">
           <p className="text-xs text-stone">
             Thursday to Sunday · tables up to {space.maxGuests}
           </p>
@@ -207,7 +207,7 @@ export function BookingPanel({
             <button
               type="button"
               onClick={clearDate}
-              className="inline-flex items-center gap-1 text-xs font-medium text-pine-700 hover:text-amber"
+              className="inline-flex items-center gap-1 text-xs font-medium text-char-700 hover:text-ember"
             >
               <Undo2 className="size-3" />
               Clear
@@ -218,8 +218,8 @@ export function BookingPanel({
 
       {/* Sitting */}
       {date ? (
-        <div className="mt-5 rounded-2xl bg-pine-50 p-4">
-          <p className="text-sm font-medium text-pine-900">{formatDate(date)}</p>
+        <div className="mt-5 rounded-2xl bg-char-50 p-4">
+          <p className="text-sm font-medium text-char-900">{formatDate(date)}</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {SERVICES.map((option) => {
               const room = serviceHasRoom(space, blocks, date, option, partySize);
@@ -233,10 +233,10 @@ export function BookingPanel({
                   className={cn(
                     "rounded-xl border px-3 py-2.5 text-sm transition-colors",
                     service === option
-                      ? "border-pine-700 bg-pine-700 font-medium text-cream"
+                      ? "border-char-700 bg-char-700 font-medium text-bone"
                       : room
-                        ? "cursor-pointer border-pine-100 bg-cream text-ink hover:border-pine-400"
-                        : "border-pine-100 bg-cream/50 text-stone/50 line-through"
+                        ? "cursor-pointer border-char-100 bg-bone text-ink hover:border-char-400"
+                        : "border-char-100 bg-bone/50 text-stone/50 line-through"
                   )}
                 >
                   {SERVICE_LABELS[option]}
@@ -254,7 +254,7 @@ export function BookingPanel({
 
       {/* How you'd like to be served — same room, same covers, same smoke. */}
       <fieldset className="mt-5">
-        <legend className="text-sm font-medium text-pine-900">How would you like to eat?</legend>
+        <legend className="text-sm font-medium text-char-900">How would you like to eat?</legend>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {DINING_FORMATS.map((option) => (
             <button
@@ -265,15 +265,15 @@ export function BookingPanel({
               className={cn(
                 "rounded-xl border px-3 py-2.5 text-left text-sm transition-colors",
                 format === option
-                  ? "border-pine-700 bg-pine-700 text-cream"
-                  : "cursor-pointer border-pine-100 bg-cream text-ink hover:border-pine-400"
+                  ? "border-char-700 bg-char-700 text-bone"
+                  : "cursor-pointer border-char-100 bg-bone text-ink hover:border-char-400"
               )}
             >
               <span className="block font-medium">{DINING_FORMAT_LABELS[option]}</span>
               <span
                 className={cn(
                   "mt-0.5 block text-xs leading-relaxed",
-                  format === option ? "text-cream/80" : "text-stone"
+                  format === option ? "text-bone/80" : "text-stone"
                 )}
               >
                 {DINING_FORMAT_NOTES[option]}

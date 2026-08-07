@@ -61,8 +61,8 @@ export default async function AdminDashboardPage() {
           const Icon = stat.icon;
           return (
             <Link key={stat.label} href={stat.href}>
-              <Card className="flex h-full items-center gap-4 transition-colors hover:border-pine-400">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-pine-50 text-pine-600">
+              <Card className="flex h-full items-center gap-4 transition-colors hover:border-char-400">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-char-50 text-char-600">
                   <Icon className="size-5" />
                 </div>
                 <div>
@@ -81,7 +81,7 @@ export default async function AdminDashboardPage() {
             <h2 className="font-display text-lg text-ink">Waiting on you</h2>
             <Link
               href="/admin/bookings?tab=pending"
-              className="text-sm font-medium text-pine-700 hover:text-amber"
+              className="text-sm font-medium text-char-700 hover:text-ember"
             >
               All pending →
             </Link>
@@ -91,12 +91,12 @@ export default async function AdminDashboardPage() {
               No pending requests — new ones land here the moment guests submit them.
             </p>
           ) : (
-            <ul className="mt-3 divide-y divide-pine-100">
+            <ul className="mt-3 divide-y divide-char-100">
               {data.pendingRequests.map(({ booking, space, guest }) => (
                 <li key={booking.id}>
                   <Link
                     href={`/admin/bookings/${booking.id}`}
-                    className="flex items-center gap-3 py-2.5 text-sm transition-colors hover:text-pine-700"
+                    className="flex items-center gap-3 py-2.5 text-sm transition-colors hover:text-char-700"
                   >
                     <span className="font-medium text-ink">
                       {guest.firstName} {guest.lastName}
@@ -120,7 +120,7 @@ export default async function AdminDashboardPage() {
             <h2 className="font-display text-lg text-ink">Next arrivals</h2>
             <Link
               href="/admin/calendar"
-              className="text-sm font-medium text-pine-700 hover:text-amber"
+              className="text-sm font-medium text-char-700 hover:text-ember"
             >
               Calendar →
             </Link>
@@ -128,14 +128,14 @@ export default async function AdminDashboardPage() {
           {data.arrivalsSoon.length === 0 ? (
             <p className="mt-3 text-sm text-stone">Nothing arriving in the next two weeks.</p>
           ) : (
-            <ul className="mt-3 divide-y divide-pine-100">
+            <ul className="mt-3 divide-y divide-char-100">
               {data.arrivalsSoon.map(({ booking, space, guest }) => (
                 <li key={booking.id}>
                   <Link
                     href={`/admin/bookings/${booking.id}`}
-                    className="flex items-center gap-3 py-2.5 text-sm transition-colors hover:text-pine-700"
+                    className="flex items-center gap-3 py-2.5 text-sm transition-colors hover:text-char-700"
                   >
-                    <span className="w-14 shrink-0 font-medium text-pine-700">
+                    <span className="w-14 shrink-0 font-medium text-char-700">
                       {formatDayMonth(booking.startDate)}
                     </span>
                     <span className="font-medium text-ink">
@@ -162,15 +162,15 @@ export default async function AdminDashboardPage() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="group flex items-start gap-4 rounded-2xl border border-pine-100 bg-cream-100 p-5 transition-colors hover:border-pine-400"
+                className="group flex items-start gap-4 rounded-2xl border border-char-100 bg-bone-100 p-5 transition-colors hover:border-char-400"
               >
-                <div className="flex size-10 items-center justify-center rounded-xl bg-pine-50 text-pine-600">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-char-50 text-char-600">
                   <Icon className="size-5" />
                 </div>
                 <div className="flex-1">
                   <p className="flex items-center gap-1 font-medium text-ink">
                     {item.label}
-                    <ArrowUpRight className="size-4 text-stone transition-colors group-hover:text-pine-600" />
+                    <ArrowUpRight className="size-4 text-stone transition-colors group-hover:text-char-600" />
                   </p>
                   <p className="mt-0.5 text-sm text-ink-soft">{item.description}</p>
                 </div>
