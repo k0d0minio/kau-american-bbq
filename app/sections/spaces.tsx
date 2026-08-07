@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Check, KeyRound } from "lucide-react";
+import { ArrowUpRight, Check, Flame } from "lucide-react";
 import type { SpaceCardData } from "@/lib/spaces";
+import { diningFormats } from "@/lib/site";
 import { buttonVariants } from "@/app/components/ui/button";
 import { Reveal } from "@/app/components/motion";
 import { useInViewOnce } from "@/app/components/use-in-view";
@@ -16,96 +17,78 @@ export function Spaces({ spaces }: { spaces: SpaceCardData[] }) {
   const reduce = useReducedMotion();
   const { ref, inView } = useInViewOnce();
 
-  const cards = spaces.filter((s) => !s.isEstate);
-  const estate = spaces.find((s) => s.isEstate);
+  // KAU is one room; the two formats are ways of being served in it, so they
+  // present as cards and every booking link points at the same space.
+  const space = spaces[0];
 
   return (
     <section id="spaces" className="relative bg-parchment/60 py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <Reveal className="max-w-2xl">
-          <p className="eyebrow text-amber">Stay & Celebrate</p>
+          <p className="eyebrow text-amber">Book a Table</p>
           <h2 className="mt-4 font-display text-4xl font-light leading-tight text-pine-900 text-balance sm:text-5xl">
-            Three spaces, one storied estate
+            Two ways to eat, one big smoker
           </h2>
           <p className="mt-5 text-pretty text-base leading-relaxed text-ink-soft sm:text-lg">
-            Each building carries its own character. Check live availability and request your
-            dates online — or take the whole grounds for a wedding, reunion or retreat.
+            Sit down for classic table service, or go full Texas at the counter — trays built
+            in the moment, meats cut and weighed in front of you. Choose when you book; the
+            smoke is the same either way. Online reservation required; sittings sell out fast.
           </p>
         </Reveal>
 
-        <div ref={ref} className="mt-14 grid gap-6 md:grid-cols-3">
-          {cards.map((space, i) => (
+        <div ref={ref} className="mt-14 grid gap-6 md:grid-cols-2">
+          {diningFormats.map((format, i) => (
             <motion.article
-              key={space.slug}
-              id={space.slug}
+              key={format.id}
+              id={format.id}
               initial={reduce ? { opacity: 0 } : { opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : undefined}
               transition={{ duration: 0.8, ease: EASE, delay: i * 0.12 }}
               className="group relative flex flex-col overflow-hidden rounded-3xl bg-cream-100 shadow-soft transition-all duration-500 hover:shadow-lift hover:-translate-y-1.5"
             >
-              <Link
-                href={`/spaces/${space.slug}`}
-                className="relative block aspect-4/3 overflow-hidden"
-              >
+              <div className="relative block aspect-4/3 overflow-hidden">
                 <Image
-                  src={space.image}
-                  alt={space.name}
+                  src={format.image}
+                  alt={format.name}
                   fill
                   quality={82}
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover transition-transform duration-[1.4s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-pine-900/50 to-transparent opacity-70" />
-                <span className="absolute left-4 top-4 rounded-full bg-cream-100/90 px-3 py-1 text-[0.68rem] font-medium uppercase tracking-wider text-pine-700 backdrop-blur">
-                  {space.age}
-                </span>
                 <div className="absolute bottom-4 left-5 right-5">
                   <p className="text-xs font-medium uppercase tracking-[0.2em] text-cream/80">
-                    {space.kind}
+                    {format.kind}
                   </p>
-                  <h3 className="font-display text-2xl text-cream">{space.name}</h3>
+                  <h3 className="font-display text-2xl text-cream">{format.name}</h3>
                 </div>
-              </Link>
+              </div>
 
               <div className="flex flex-1 flex-col p-6">
-                <p className="text-pretty text-sm leading-relaxed text-ink-soft">{space.blurb}</p>
-                <ul className="mt-5 grid grid-cols-2 gap-x-3 gap-y-2">
-                  {space.features.map((f) => (
+                <p className="text-pretty text-sm leading-relaxed text-ink-soft">{format.blurb}</p>
+                <ul className="mt-5 grid gap-x-3 gap-y-2 sm:grid-cols-2">
+                  {format.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-xs text-stone">
                       <Check className="size-3.5 shrink-0 text-lake" />
                       {f}
                     </li>
                   ))}
                 </ul>
-                <div className="mt-6 flex flex-1 items-end justify-between gap-3">
-                  {space.fromLabel ? (
-                    <p className="text-sm font-medium text-pine-700">{space.fromLabel}</p>
-                  ) : (
-                    <span />
-                  )}
-                  <Link
-                    href={`/spaces/${space.slug}`}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-pine-700 transition-colors hover:text-amber"
-                  >
-                    View & book
-                    <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </Link>
-                </div>
               </div>
             </motion.article>
           ))}
         </div>
 
-        {estate ? (
+        {space ? (
           <Reveal className="mt-6">
             <Link
-              href={`/spaces/${estate.slug}`}
+              href={`/spaces/${space.slug}`}
               className="group relative block overflow-hidden rounded-3xl shadow-soft transition-all duration-500 hover:shadow-lift hover:-translate-y-1"
             >
               <div className="relative min-h-64">
                 <Image
-                  src={estate.image}
-                  alt={estate.name}
+                  src={space.image}
+                  alt={space.name}
                   fill
                   quality={82}
                   sizes="(max-width: 1152px) 100vw, 1152px"
@@ -116,14 +99,15 @@ export function Spaces({ spaces }: { spaces: SpaceCardData[] }) {
                 <div className="relative z-10 flex flex-col gap-5 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
                   <div className="max-w-2xl">
                     <p className="inline-flex items-center gap-2 eyebrow text-amber-soft">
-                      <KeyRound className="size-3.5" />
-                      {estate.kind}
+                      <Flame className="size-3.5" />
+                      {space.kind}
                     </p>
                     <h3 className="mt-3 font-display text-3xl font-light text-cream sm:text-4xl">
-                      Take the whole estate
+                      Get your seat at the smoker
                     </h3>
                     <p className="mt-3 text-pretty text-sm leading-relaxed text-cream/85 sm:text-base">
-                      {estate.blurb}
+                      Pick your day, lunch or dinner, and how you&apos;d like to be served — we
+                      confirm by email.
                     </p>
                   </div>
                   <span
@@ -132,7 +116,7 @@ export function Spaces({ spaces }: { spaces: SpaceCardData[] }) {
                       "shrink-0 self-start lg:self-center"
                     )}
                   >
-                    {estate.fromLabel ? `${estate.fromLabel} · ` : ""}View & book
+                    {space.fromLabel}
                     <ArrowUpRight className="size-4" />
                   </span>
                 </div>

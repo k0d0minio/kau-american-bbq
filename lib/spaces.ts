@@ -1,7 +1,7 @@
-// Display shapes for spaces on the public site, plus a static fallback so the
-// marketing landing page still renders if the database is unreachable (or at
-// build time before DATABASE_URL exists). The fallback mirrors the seeded
-// content minus live pricing.
+// Display shapes for the bookable space on the public site, plus a static
+// fallback so the marketing landing page still renders if the database is
+// unreachable (or at build time before DATABASE_URL exists). The fallback
+// mirrors the seeded content.
 import type { Space } from "@/lib/db/schema";
 import { formatMoney } from "@/lib/booking/pricing";
 import { spaces as staticSpaces } from "@/lib/site";
@@ -14,11 +14,16 @@ export type SpaceCardData = {
   image: string;
   blurb: string;
   features: string[];
-  /** e.g. "From $450 / night" — null when pricing isn't available. */
-  fromLabel: string | null;
-  /** The whole-estate package renders as a banner, not a card. */
-  isEstate: boolean;
+  /** How booking is priced, e.g. "Free to book · reserve online". */
+  fromLabel: string;
 };
+
+function fromLabelFor(space: Pick<Space, "isEvent" | "nightlyRateCents">): string {
+  if (!space.isEvent) return "Free to book · reserve online";
+  return space.nightlyRateCents > 0
+    ? `From ${formatMoney(space.nightlyRateCents)} / day`
+    : "Price on request";
+}
 
 export function toSpaceCard(space: Space): SpaceCardData {
   return {
@@ -29,8 +34,7 @@ export function toSpaceCard(space: Space): SpaceCardData {
     image: space.image,
     blurb: space.blurb,
     features: space.features,
-    fromLabel: `From ${formatMoney(space.nightlyRateCents)} / ${space.isEvent ? "day" : "night"}`,
-    isEstate: space.slug === "estate",
+    fromLabel: fromLabelFor(space),
   };
 }
 
@@ -42,6 +46,5 @@ export const fallbackSpaceCards: SpaceCardData[] = staticSpaces.map((s) => ({
   image: s.image,
   blurb: s.blurb,
   features: [...s.features],
-  fromLabel: null,
-  isEstate: false,
+  fromLabel: "Free to book · reserve online",
 }));

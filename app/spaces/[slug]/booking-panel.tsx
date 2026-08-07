@@ -23,6 +23,12 @@ import {
   type DateRange,
   type Service,
 } from "@/lib/booking/availability";
+import {
+  DINING_FORMATS,
+  DINING_FORMAT_LABELS,
+  DINING_FORMAT_NOTES,
+  type DiningFormat,
+} from "@/lib/booking/dining-formats";
 import { EVENT_TYPES } from "@/lib/booking/event-types";
 import { buttonVariants } from "@/app/components/ui/button";
 import { FormError, Input, Label, Select, Textarea } from "@/app/components/ui/field";
@@ -85,6 +91,7 @@ export function BookingPanel({
   const [month, setMonth] = useState<ISODate>(firstOfMonth(window.firstStart));
   const [date, setDate] = useState<ISODate | null>(null);
   const [service, setService] = useState<Service | null>(null);
+  const [format, setFormat] = useState<DiningFormat>("table");
   const [partySize, setPartySize] = useState(2);
   const [state, formAction] = useActionState<BookingFormState, FormData>(
     requestBooking,
@@ -245,11 +252,43 @@ export function BookingPanel({
         </div>
       ) : null}
 
+      {/* How you'd like to be served — same room, same covers, same smoke. */}
+      <fieldset className="mt-5">
+        <legend className="text-sm font-medium text-pine-900">How would you like to eat?</legend>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {DINING_FORMATS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={format === option}
+              onClick={() => setFormat(option)}
+              className={cn(
+                "rounded-xl border px-3 py-2.5 text-left text-sm transition-colors",
+                format === option
+                  ? "border-pine-700 bg-pine-700 text-cream"
+                  : "cursor-pointer border-pine-100 bg-cream text-ink hover:border-pine-400"
+              )}
+            >
+              <span className="block font-medium">{DINING_FORMAT_LABELS[option]}</span>
+              <span
+                className={cn(
+                  "mt-0.5 block text-xs leading-relaxed",
+                  format === option ? "text-cream/80" : "text-stone"
+                )}
+              >
+                {DINING_FORMAT_NOTES[option]}
+              </span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
       {/* Details form */}
       <form action={formAction} className="mt-6 space-y-4">
         <input type="hidden" name="space" value={space.slug} />
         <input type="hidden" name="date" value={date ?? ""} />
         <input type="hidden" name="service" value={service ?? ""} />
+        <input type="hidden" name="diningFormat" value={format} />
         {/* Honeypot — humans never see or fill this. */}
         <div aria-hidden="true" className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden">
           <label>

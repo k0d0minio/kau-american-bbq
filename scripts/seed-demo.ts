@@ -212,10 +212,10 @@ async function clearDemoData(): Promise<void> {
 }
 
 async function seed(): Promise<void> {
-  // Space lookup by slug — the four spaces come from migration 0003.
+  // Space lookup by slug — the bookable space comes from migration 0003.
   const spaceRows = await db.select().from(spaces);
   const bySlug = new Map(spaceRows.map((s) => [s.slug, s]));
-  const need = ["farmhouse", "carriage-house", "barn", "estate"];
+  const need = ["kau-barbecue"];
   const missing = need.filter((slug) => !bySlug.has(slug));
   if (missing.length) {
     throw new Error(
