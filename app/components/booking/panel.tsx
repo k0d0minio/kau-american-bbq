@@ -10,7 +10,6 @@ import {
   formatDate,
   formatMonth,
   parseISO,
-  weekdayInitials,
   type ISODate,
 } from "@/lib/booking/dates";
 import {
@@ -137,7 +136,7 @@ export function BookingPanel({
     return { count, lead };
   }, [month]);
 
-  const dayLabels = useMemo(() => weekdayInitials(locale), [locale]);
+  const dayLabels = t.weekdays;
 
   return (
     <div className="rounded-3xl border border-char-100 bg-bone-100 p-6 shadow-soft sm:p-7">

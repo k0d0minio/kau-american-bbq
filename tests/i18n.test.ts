@@ -104,6 +104,16 @@ describe("dictionaries", () => {
     }
   });
 
+  it("gives every language seven distinct weekday headings", () => {
+    // Truncated Portuguese collides — "qu" for both quarta and quinta — so the
+    // calendar headings are written per language rather than derived.
+    for (const locale of locales) {
+      const days = getDictionary(locale).bookingForm.weekdays;
+      assert.equal(days.length, 7);
+      assert.equal(new Set(days).size, 7, `${locale} has duplicate weekday headings`);
+    }
+  });
+
   it("keeps the {max} placeholder in the messages that quote a limit", () => {
     for (const locale of locales) {
       const errors = getDictionary(locale).booking.errors;

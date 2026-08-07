@@ -221,6 +221,12 @@ const en = {
       "We're open Thursday to Sunday for lunch and dinner. Choose a day and a sitting — we review every request personally.",
     prevMonth: "Previous month",
     nextMonth: "Next month",
+    /**
+     * Monday-first calendar headings. Not derived from Intl: its `short`
+     * weekday for pt-PT is the full name, and `narrow` collapses quarta and
+     * quinta (and segunda and sexta) to the same letter.
+     */
+    weekdays: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
     /** {max} is the largest party the room takes. */
     calendarNote: "Thursday to Sunday · tables up to {max}",
     clear: "Clear",
@@ -546,6 +552,7 @@ const pt: Dictionary = {
       "Abrimos de quinta a domingo, para almoço e jantar. Escolha o dia e o serviço — vemos todos os pedidos pessoalmente.",
     prevMonth: "Mês anterior",
     nextMonth: "Mês seguinte",
+    weekdays: ["seg", "ter", "qua", "qui", "sex", "sáb", "dom"],
     calendarNote: "De quinta a domingo · mesas até {max} pessoas",
     clear: "Limpar",
     pickSitting: "Escolha almoço ou jantar para concluir o pedido.",

@@ -110,16 +110,3 @@ export function formatMonth(date: ISODate, locale?: Locale): string {
 export function formatRange(startDate: ISODate, endDate: ISODate, locale?: Locale): string {
   return `${formatDate(startDate, locale)} → ${formatDate(endDate, locale)}`;
 }
-
-/**
- * Monday-first weekday initials for the booking calendar, in the visitor's
- * language. Derived from Intl rather than hardcoded so a new locale needs no
- * extra translation.
- */
-export function weekdayInitials(locale?: Locale): string[] {
-  const fmt = new Intl.DateTimeFormat(intl(locale), { weekday: "short", timeZone: "UTC" });
-  // 2026-06-01 is a Monday, so seven days from it cover the week in order.
-  return Array.from({ length: 7 }, (_, i) =>
-    fmt.format(parseISO(addDays("2026-06-01", i))).replace(/\.$/, "").slice(0, 2)
-  );
-}
