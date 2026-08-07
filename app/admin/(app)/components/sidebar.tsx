@@ -48,9 +48,9 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
           onClick={onNavigate}
           className="block px-3"
         >
-          <span className="font-display text-2xl text-bone">Vine Cliff</span>
+          <span className="font-display text-2xl text-bone">KAU</span>
           <span className="mt-0.5 block eyebrow text-ember-soft">
-            Estate Admin
+            Smokehouse Admin
           </span>
         </Link>
       </div>
@@ -106,9 +106,9 @@ export function Sidebar() {
         <Link
           href="/admin"
           className="font-display text-lg text-char-900"
-          aria-label="Vine Cliff admin home"
+          aria-label="KAU admin home"
         >
-          VC
+          KAU
         </Link>
       </header>
 

@@ -15,14 +15,14 @@ export default async function SpacesAdminPage() {
     <div className="space-y-6">
       <PageHeader
         title="Spaces"
-        description="Everything guests see about each space — copy, photos, rates and booking rules. Changes go live within a few minutes."
+        description="Everything guests see about each space — copy, photos and booking rules. Changes go live within a few minutes."
       />
 
       {spaces.length === 0 ? (
         <EmptyState
           icon={Home}
           title="No spaces found"
-          description="Run the database migrations to seed the farmhouse, carriage house, barn and estate package."
+          description="Run the database migrations to seed the dining room, counter and private hire."
         />
       ) : (
         <ul className="space-y-3">
@@ -40,10 +40,9 @@ export default async function SpacesAdminPage() {
                   <p className="text-xs text-stone">{space.kind}</p>
                 </div>
                 <div className="text-sm text-ink-soft">
-                  {formatMoney(space.nightlyRateCents)} / {space.isEvent ? "day" : "night"}
-                  {space.weeklyRateCents ? (
-                    <span className="text-stone"> · {formatMoney(space.weeklyRateCents)} / week</span>
-                  ) : null}
+                  {space.nightlyRateCents > 0
+                    ? `${formatMoney(space.nightlyRateCents)} / day`
+                    : "Free to book"}
                 </div>
                 <div className="ml-auto flex items-center gap-3">
                   {!space.active ? (
@@ -53,7 +52,7 @@ export default async function SpacesAdminPage() {
                   ) : null}
                   {space.blocksEstate ? (
                     <span className="rounded-full bg-char-50 px-2.5 py-0.5 text-xs font-medium text-char-700">
-                      whole estate
+                      full venue
                     </span>
                   ) : null}
                   <Pencil className="size-4 text-stone" />

@@ -20,14 +20,14 @@ export default async function AdminLoginPage({
     <main className="flex min-h-dvh flex-col items-center justify-center bg-char-900 px-5 py-16">
       <div className="w-full max-w-sm">
         <div className="text-center">
-          <p className="font-display text-3xl text-bone">Vine Cliff</p>
-          <p className="mt-1 eyebrow text-ember-soft">Estate Admin</p>
+          <p className="font-display text-3xl text-bone">KAU</p>
+          <p className="mt-1 eyebrow text-ember-soft">Smokehouse Admin</p>
         </div>
 
         <div className="mt-8 rounded-3xl bg-bone p-7 shadow-lift sm:p-8">
           <h1 className="font-display text-2xl text-ink">Sign in</h1>
           <p className="mt-1 text-sm text-ink-soft">
-            This area is private to the estate owners.
+            This area is private to the KAU team.
           </p>
           <div className="mt-6">
             <LoginForm from={safeFrom} />

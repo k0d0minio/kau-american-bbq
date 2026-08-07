@@ -29,11 +29,8 @@ export default async function SpaceEditPage({ params }: Props) {
     blocksEstate: space.blocksEstate,
     active: space.active,
     nightlyRateCents: space.nightlyRateCents,
-    weeklyRateCents: space.weeklyRateCents,
-    cleaningFeeCents: space.cleaningFeeCents,
-    minNights: space.minNights,
+    capacityCovers: space.capacityCovers,
     maxGuests: space.maxGuests,
-    bufferDays: space.bufferDays,
     minLeadDays: space.minLeadDays,
     maxHorizonMonths: space.maxHorizonMonths,
     sortOrder: space.sortOrder,
@@ -76,9 +73,9 @@ export default async function SpaceEditPage({ params }: Props) {
           Calendar feed (iCal)
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-          Subscribe to this space&apos;s bookings and blackouts from Google Calendar, or paste
-          the URL into Airbnb/VRBO so external listings block dates booked here. Treat it like
-          a password — anyone with the link can see when the space is unavailable.
+          Subscribe to this space&apos;s reservations and closures from Google Calendar.
+          Treat it like a password — anyone with the link can see when the space is
+          unavailable.
         </p>
         <code className="mt-3 block overflow-x-auto rounded-xl bg-bone px-4 py-3 text-xs text-char-700">
           {icalUrl}

@@ -23,17 +23,14 @@ export type SpaceFormData = {
   blocksEstate: boolean;
   active: boolean;
   nightlyRateCents: number;
-  weeklyRateCents: number | null;
-  cleaningFeeCents: number;
-  minNights: number;
+  capacityCovers: number;
   maxGuests: number;
-  bufferDays: number;
   minLeadDays: number;
   maxHorizonMonths: number;
   sortOrder: number;
 };
 
-function dollars(cents: number | null): string {
+function euros(cents: number | null): string {
   if (cents === null) return "";
   const value = cents / 100;
   return Number.isInteger(value) ? String(value) : value.toFixed(2);
@@ -74,7 +71,7 @@ export function SpaceForm({ space }: { space: SpaceFormData }) {
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="age">Heritage note</Label>
+            <Label htmlFor="age">Badge line</Label>
             <Input id="age" name="age" defaultValue={space.age} required maxLength={120} />
           </div>
           <div className="space-y-1.5">
@@ -118,40 +115,40 @@ export function SpaceForm({ space }: { space: SpaceFormData }) {
         </div>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="font-display text-lg text-ink">Rates</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="nightlyRate">{space.isEvent ? "Per event day ($)" : "Per night ($)"}</Label>
-            <Input id="nightlyRate" name="nightlyRate" inputMode="decimal" defaultValue={dollars(space.nightlyRateCents)} required />
+      {/* Reservations are free, so rates only matter for private hire. */}
+      {space.isEvent ? (
+        <section className="space-y-4">
+          <h2 className="font-display text-lg text-ink">Rates</h2>
+          <div className="w-48 space-y-1.5">
+            <Label htmlFor="nightlyRate">Per event day (€)</Label>
+            <Input
+              id="nightlyRate"
+              name="nightlyRate"
+              inputMode="decimal"
+              defaultValue={euros(space.nightlyRateCents)}
+            />
+            <p className="text-xs text-stone">0 = price on request</p>
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="weeklyRate">
-              Per week ($) <span className="font-normal text-stone">(blank = none)</span>
-            </Label>
-            <Input id="weeklyRate" name="weeklyRate" inputMode="decimal" defaultValue={dollars(space.weeklyRateCents)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="cleaningFee">Cleaning fee ($)</Label>
-            <Input id="cleaningFee" name="cleaningFee" inputMode="decimal" defaultValue={dollars(space.cleaningFeeCents)} />
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section className="space-y-4">
         <h2 className="font-display text-lg text-ink">Booking rules</h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="space-y-1.5">
-            <Label htmlFor="minNights">{space.isEvent ? "Min days" : "Min nights"}</Label>
-            <Input id="minNights" name="minNights" type="number" min={1} max={60} defaultValue={space.minNights} />
+            <Label htmlFor="capacityCovers">Capacity (covers per sitting)</Label>
+            <Input
+              id="capacityCovers"
+              name="capacityCovers"
+              type="number"
+              min={0}
+              max={2000}
+              defaultValue={space.capacityCovers}
+            />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="maxGuests">Max guests</Label>
+            <Label htmlFor="maxGuests">Max party size (online)</Label>
             <Input id="maxGuests" name="maxGuests" type="number" min={1} max={1000} defaultValue={space.maxGuests} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="bufferDays">Buffer days</Label>
-            <Input id="bufferDays" name="bufferDays" type="number" min={0} max={14} defaultValue={space.bufferDays} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="minLeadDays">Lead days</Label>
@@ -163,22 +160,22 @@ export function SpaceForm({ space }: { space: SpaceFormData }) {
           </div>
         </div>
         <p className="text-xs leading-relaxed text-stone">
-          Buffer days stay blocked around each booking for turnover. Lead days is the shortest
-          notice you'll accept; horizon is how far ahead guests can request.
+          Lead days is the shortest notice you&apos;ll accept; horizon is how far ahead guests
+          can book.
         </p>
         <div className="space-y-2.5">
           <label className="flex items-start gap-2.5 text-sm text-ink-soft">
             <input type="checkbox" name="isEvent" defaultChecked={space.isEvent} className="mt-0.5 size-4 accent-char-700" />
-            Event space — priced per day, forms speak of “days” not “nights”
+            Event space — priced per day
           </label>
           <label className="flex items-start gap-2.5 text-sm text-ink-soft">
             <input type="checkbox" name="blocksEstate" defaultChecked={space.blocksEstate} className="mt-0.5 size-4 accent-char-700" />
-            Takes the whole estate — bookings here block every space, and it's only available
-            when everything is free
+            Closes the whole restaurant — bookings here block every space, and it&apos;s only
+            available when everything is free
           </label>
           <label className="flex items-start gap-2.5 text-sm text-ink-soft">
             <input type="checkbox" name="active" defaultChecked={space.active} className="mt-0.5 size-4 accent-char-700" />
-            Active — shown on the website and open for requests
+            Active — shown on the website and open for reservations
           </label>
         </div>
         <div className="w-32 space-y-1.5">

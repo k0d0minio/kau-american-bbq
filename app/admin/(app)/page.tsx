@@ -9,6 +9,7 @@ import {
 import { adminNav } from "@/lib/admin";
 import { getDashboardData } from "@/lib/db/queries";
 import { formatDayMonth, formatMonth, todayAtRestaurant } from "@/lib/booking/dates";
+import { SERVICE_SHORT_LABELS, isService } from "@/lib/booking/availability";
 import { formatMoney } from "@/lib/booking/pricing";
 import { PageHeader, Card } from "./components/page-shell";
 
@@ -30,13 +31,13 @@ export default async function AdminDashboardPage() {
       href: "/admin/bookings?tab=pending",
     },
     {
-      label: "Arriving in the next 14 days",
+      label: "Reservations in the next 14 days",
       value: String(data.arrivalsSoon.length),
       icon: CalendarDays,
       href: "/admin/bookings?tab=upcoming",
     },
     {
-      label: `Booked for ${formatMonth(data.monthLabel)}`,
+      label: `Booked value for ${formatMonth(data.monthLabel)}`,
       value: formatMoney(data.monthRevenueCents),
       icon: Landmark,
       href: "/admin/bookings?tab=upcoming",
@@ -53,7 +54,7 @@ export default async function AdminDashboardPage() {
     <div className="space-y-8">
       <PageHeader
         title="Welcome back"
-        description="A home base for managing bookings, enquiries and everything guests see on the Vine Cliff website."
+        description="A home base for managing reservations, enquiries and everything guests see on the KAU website."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -88,7 +89,7 @@ export default async function AdminDashboardPage() {
           </div>
           {data.pendingRequests.length === 0 ? (
             <p className="mt-3 text-sm text-stone">
-              No pending requests — new ones land here the moment guests submit them.
+              No pending requests — new ones land here the moment guests book online.
             </p>
           ) : (
             <ul className="mt-3 divide-y divide-char-100">
@@ -103,7 +104,10 @@ export default async function AdminDashboardPage() {
                     </span>
                     <span className="text-ink-soft">{space.name}</span>
                     <span className="ml-auto text-xs text-stone">
-                      {formatDayMonth(booking.startDate)} → {formatDayMonth(booking.endDate)}
+                      {formatDayMonth(booking.startDate)}
+                      {isService(booking.service)
+                        ? ` · ${SERVICE_SHORT_LABELS[booking.service]}`
+                        : ""}
                     </span>
                     <span className="w-16 text-right font-medium text-ink">
                       {formatMoney(booking.quotedTotalCents)}
@@ -126,7 +130,7 @@ export default async function AdminDashboardPage() {
             </Link>
           </div>
           {data.arrivalsSoon.length === 0 ? (
-            <p className="mt-3 text-sm text-stone">Nothing arriving in the next two weeks.</p>
+            <p className="mt-3 text-sm text-stone">No reservations in the next two weeks.</p>
           ) : (
             <ul className="mt-3 divide-y divide-char-100">
               {data.arrivalsSoon.map(({ booking, space, guest }) => (
@@ -143,7 +147,10 @@ export default async function AdminDashboardPage() {
                     </span>
                     <span className="text-ink-soft">{space.name}</span>
                     <span className="ml-auto text-xs text-stone">
-                      {booking.partySize} guests
+                      {isService(booking.service)
+                        ? `${SERVICE_SHORT_LABELS[booking.service]} · `
+                        : ""}
+                      {booking.partySize} covers
                     </span>
                   </Link>
                 </li>

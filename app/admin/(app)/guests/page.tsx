@@ -20,7 +20,7 @@ export default async function GuestsPage({ searchParams }: Props) {
     <div className="space-y-6">
       <PageHeader
         title="Guests"
-        description="Everyone who has booked or requested a stay — with history and your private notes."
+        description="Everyone who has booked or requested a reservation — with history and your private notes."
         actions={
           <form action="/admin/guests" className="relative w-full sm:w-64">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-stone" />

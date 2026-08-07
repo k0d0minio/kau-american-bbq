@@ -28,6 +28,12 @@ export const SERVICE_LABELS: Record<Service, string> = {
   dinner: "Dinner · 19:00–22:00",
 };
 
+/** Bare sitting name, for admin list rows where the times would not fit. */
+export const SERVICE_SHORT_LABELS: Record<Service, string> = {
+  lunch: "Lunch",
+  dinner: "Dinner",
+};
+
 /** Thursday(4) through Sunday(0), matching `getUTCDay()` on a parsed date. */
 export const OPEN_WEEKDAYS = new Set([0, 4, 5, 6]);
 
