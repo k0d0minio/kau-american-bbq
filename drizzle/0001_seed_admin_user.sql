@@ -1,16 +1,24 @@
--- Seed the initial admin account.
+-- Seed the initial admin accounts: KAU's owners, Rui and Vera Matias.
 --
--- The password hash below is scrypt(<password>, random-salt) in the format
--- produced by lib/auth/password.ts (scrypt$<saltHex>$<derivedHex>). The
--- plaintext password is never stored in the repo or the database.
+-- The password hashes below are scrypt(<password>, random-salt) in the format
+-- produced by lib/auth/password.ts (scrypt$<saltHex>$<derivedHex>).
+--
+-- Temporary password "kau2026" — TODO(jamie): change after first login.
 --
 -- Idempotent: ON CONFLICT keeps re-runs safe and never clobbers a password
 -- that has since been changed through the app.
 INSERT INTO "users" ("email", "password_hash", "first_name", "last_name")
-VALUES (
-  'wpcarlson@gmail.com',
-  'scrypt$17eeeb01cdb2ff7993b750c7f8253aea$40d113530d8e7960c9acd79dcccb4010cfb58853ed1a855932bc337a7f979e3cb842eeca84bc3d6faea3ff0ac0d784451b2185b22242bcbed07589f1a5e24392',
-  'Billy',
-  'Carlson'
+VALUES
+(
+  'rui@kaubarbecue.pt',
+  'scrypt$8094fde38cca4e86e9d930036ed68d62$5ffe836483399fe44cef6fb9706fa8e18cf7e4fdda57983b981862468549bf15d5d7afa2aa561ce4f0c4063cbe43f34a3cd4373f6ade7aec97ad651bd5abea81',
+  'Rui',
+  'Matias'
+),
+(
+  'vera@kaubarbecue.pt',
+  'scrypt$58e312c35d5a7468ed327b317f4b5f68$2c662abef717de74b9bc60fceea99963065a7354a407e4af714aa6091654173cc8c09ca7f3add1765388592184b03fbf5601ab47f05de3818ca6cb9062d4bbdd',
+  'Vera',
+  'Matias'
 )
 ON CONFLICT ("email") DO NOTHING;

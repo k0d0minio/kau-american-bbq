@@ -43,6 +43,13 @@
       "when": 1784299702000,
       "tag": "0005_single_space",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784386102000,
+      "tag": "0006_kau_accounts_and_settings",
+      "breakpoints": true
     }
   ]
 }

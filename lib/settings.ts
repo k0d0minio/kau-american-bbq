@@ -1,4 +1,4 @@
-// Estate-wide settings stored as key/value rows and edited in /admin/settings.
+// Restaurant-wide settings stored as key/value rows and edited in /admin/settings.
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
