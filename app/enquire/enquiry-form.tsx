@@ -52,7 +52,7 @@ export function EnquiryForm({
         <h2 className="mt-5 font-display text-2xl text-pine-900">Thank you — it&apos;s on its way</h2>
         <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink-soft">
           We read every enquiry personally and will come back to you within a day or two. If
-          it&apos;s urgent, call us and we&apos;ll pick up from the porch.
+          it&apos;s urgent, call us and we&apos;ll answer between briskets.
         </p>
       </div>
     );
@@ -90,7 +90,7 @@ export function EnquiryForm({
           <div className="space-y-1.5">
             <Label htmlFor="space">I&apos;m interested in</Label>
             <Select id="space" name="space" defaultValue={defaultSpace ?? ""}>
-              <option value="">The estate in general</option>
+              <option value="">Not sure yet</option>
               {spaceOptions.map((s) => (
                 <option key={s.slug} value={s.slug}>
                   {s.name}
@@ -107,14 +107,14 @@ export function EnquiryForm({
             required
             maxLength={4000}
             className="min-h-36"
-            placeholder="A week by the lake in August, a September wedding for 90, a spring retreat…"
+            placeholder="A birthday dinner for 12, a company lunch, a full-venue takeover…"
           />
         </div>
 
         <FormError message={state.error} />
         <SubmitButton />
         <p className="text-center text-xs text-stone">
-          Ready to pick dates? Each space&apos;s page has live availability and a booking form.
+          Ready to pick a date? Reservations are free and confirmed by email.
         </p>
       </div>
     </form>

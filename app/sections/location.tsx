@@ -13,8 +13,8 @@ export function Location() {
           <Reveal className="relative order-2 lg:order-1">
             <div className="relative aspect-square overflow-hidden rounded-3xl shadow-lift sm:aspect-4/3 lg:aspect-square">
               <Image
-                src="/img/sunset.jpg"
-                alt="Sunset breaking through the trees over the estate grounds and driveway"
+                src="/img/exterior.jpg"
+                alt="Rui and Vera Matias outside KAU Barbecue in Malveira"
                 fill
                 quality={85}
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -32,7 +32,7 @@ export function Location() {
                 <span className="min-w-0">
                   <span className="block text-sm font-medium text-pine-900">{site.address.line1}</span>
                   <span className="block truncate text-xs text-stone">
-                    {site.address.city}, {site.address.region} {site.address.postalCode}
+                    {site.address.postalCode} {site.address.city}, {site.address.country}
                   </span>
                 </span>
                 <Navigation className="ml-auto size-4 shrink-0 text-amber" />
@@ -42,13 +42,13 @@ export function Location() {
 
           <div className="order-1 lg:order-2">
             <Reveal>
-              <p className="eyebrow text-amber">The Setting</p>
+              <p className="eyebrow text-amber">Find Us</p>
               <h2 className="mt-4 font-display text-4xl font-light leading-tight text-pine-900 text-balance sm:text-5xl">
-                In the heart of Lake Erie wine country
+                In the heart of Malveira
               </h2>
               <p className="mt-5 text-pretty text-base leading-relaxed text-ink-soft sm:text-lg">
-                Tucked into the cliffs near Brocton, the estate is a short, scenic drive from some of
-                Western New York&apos;s best-loved destinations.
+                Twenty-five minutes from Lisbon and ten from Mafra, KAU sits in the centre of
+                Malveira — easy to reach, hard to leave. Also on Glovo if the sofa wins.
               </p>
             </Reveal>
 

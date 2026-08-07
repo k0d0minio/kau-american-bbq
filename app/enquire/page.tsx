@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Enquire",
   description:
-    "Ask us anything about stays, weddings and events at Vine Cliff — we read every enquiry personally.",
+    "Ask us anything about group meals, private hire and events at KAU — we read every enquiry personally.",
   alternates: { canonical: "/enquire" },
 };
 
@@ -40,8 +40,8 @@ export default async function EnquirePage({ searchParams }: Props) {
               Tell us what you&apos;re dreaming up
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-pretty text-sm leading-relaxed text-cream/80 sm:text-base">
-              Not ready to pick dates, or planning something that doesn&apos;t fit a form? Write
-              to us — a real person on the estate reads every message.
+              Planning a party of twelve, a company feast, or something that doesn&apos;t fit a
+              form? Write to us — a real person at the smokehouse reads every message.
             </p>
           </div>
         </section>

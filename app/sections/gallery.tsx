@@ -18,11 +18,11 @@ export function Gallery() {
         <Reveal className="max-w-2xl">
           <p className="eyebrow text-amber-soft">Gallery</p>
           <h2 className="mt-4 font-display text-4xl font-light leading-tight text-cream text-balance sm:text-5xl">
-            A place that changes with the light
+            From the smoke to the table
           </h2>
           <p className="mt-5 text-pretty text-base leading-relaxed text-cream/70 sm:text-lg">
-            From crisp autumn mornings on the porch to golden hour over the water — a look around the
-            grounds.
+            Brisket at sunrise, trays at noon, and Godzilla breathing smoke all day — a look inside
+            KAU.
           </p>
         </Reveal>
 

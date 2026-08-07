@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail } from "lucide-react";
+import { Instagram, MapPin, Phone, Mail } from "lucide-react";
 import { site } from "@/lib/site";
 import { Reveal } from "./motion";
 
@@ -9,10 +9,10 @@ export function Footer() {
         <Reveal>
           <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
             <div className="lg:col-span-2">
-              <p className="font-display text-3xl text-cream">Vine Cliff</p>
-              <p className="mt-1 eyebrow text-amber-soft">Vineyards · Est. 1850</p>
+              <p className="font-display text-3xl text-cream">KAU</p>
+              <p className="mt-1 eyebrow text-amber-soft">American Barbecue · Malveira</p>
               <p className="mt-6 max-w-sm text-pretty text-sm leading-relaxed text-cream/70">
-                {site.tagline}. A short drive from Chautauqua, SUNY Fredonia and Dunkirk.
+                {site.tagline}. Thursday to Sunday — lunch 12:00–15:00, dinner 19:00–22:00.
               </p>
             </div>
 
@@ -28,7 +28,7 @@ export function Footer() {
                 <span>
                   {site.address.line1}
                   <br />
-                  {site.address.city}, {site.address.region} {site.address.postalCode}
+                  {site.address.postalCode} {site.address.city}
                 </span>
               </a>
             </div>
@@ -50,14 +50,23 @@ export function Footer() {
                   <Mail className="size-4 shrink-0 text-amber-soft" />
                   {site.email}
                 </a>
+                <a
+                  href={site.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 transition-colors hover:text-cream"
+                >
+                  <Instagram className="size-4 shrink-0 text-amber-soft" />
+                  @kau_barbecue
+                </a>
               </div>
             </div>
           </div>
         </Reveal>
 
         <div className="mt-16 flex flex-col gap-4 border-t border-cream/10 pt-8 text-xs text-cream/50 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Vine Cliff Vineyards. All rights reserved.</p>
-          <p className="text-cream/40">On the shores of Lake Erie, New York.</p>
+          <p>© {new Date().getFullYear()} KAU Barbecue. All rights reserved.</p>
+          <p className="text-cream/40">Smoked daily in Malveira, Portugal.</p>
         </div>
       </div>
     </footer>

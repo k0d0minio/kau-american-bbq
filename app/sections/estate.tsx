@@ -2,9 +2,9 @@ import Image from "next/image";
 import { Reveal, Stagger, StaggerItem } from "@/app/components/motion";
 
 const stats = [
-  { value: "170+", label: "Years of history" },
-  { value: "3", label: "Distinct spaces" },
-  { value: "1", label: "Cliff-top on Lake Erie" },
+  { value: "12h+", label: "In the smoke" },
+  { value: "8", label: "Meats by weight" },
+  { value: "1", label: "Godzilla — our smoker" },
 ];
 
 export function Estate() {
@@ -14,22 +14,22 @@ export function Estate() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div>
             <Reveal>
-              <p className="eyebrow text-amber">The Estate</p>
+              <p className="eyebrow text-amber">The Smokehouse</p>
               <h2 className="mt-4 font-display text-4xl font-light leading-tight text-pine-900 text-balance sm:text-5xl">
-                Elegant, unhurried, and steeped in history
+                Real fire, real smoke, real patience
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
               <div className="mt-6 space-y-5 text-pretty text-base leading-relaxed text-ink-soft sm:text-lg">
                 <p>
-                  On the beautiful shores of Lake Erie, Vine Cliff Vineyards offers refined country
-                  rental space — a farmhouse, a carriage house and a barn, each built more than 170
-                  years ago and lovingly kept ever since.
+                  KAU started with a bite of brisket in Paris and a pilgrimage to Texas. Years of
+                  pop-ups, festivals and sold-out events later, Rui and Vera Matias opened the doors
+                  of their mother house in Malveira — one of the largest steakhouses in the country.
                 </p>
                 <p>
-                  Wander the vineyards, take the porch for the afternoon, and watch the sun fall into
-                  the lake. Whether it&apos;s a quiet week away or a celebration to remember, the estate
-                  is yours.
+                  Everything runs through Godzilla, our custom smoker. Meats go in before sunrise and
+                  come out hours later — carved in the moment, weighed at the counter, and served
+                  while the smoke ring is still proud.
                 </p>
               </div>
             </Reveal>
@@ -47,8 +47,8 @@ export function Estate() {
           <Reveal delay={0.15} className="relative">
             <div className="relative aspect-4/5 overflow-hidden rounded-3xl shadow-lift">
               <Image
-                src="/img/full-view.jpg"
-                alt="The historic white farmhouse across open lawns in the golden light of evening"
+                src="/img/seasoning.jpg"
+                alt="Seasoning a brisket with rub before it goes into the smoke"
                 fill
                 quality={85}
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -58,9 +58,9 @@ export function Estate() {
             {/* floating accent card */}
             <div className="absolute -bottom-6 -left-4 max-w-[15rem] rounded-2xl bg-cream-100 p-5 shadow-lift sm:-left-8">
               <p className="font-display text-lg italic text-pine-700">
-                &ldquo;Elegant country rental on the shores of Lake Erie.&rdquo;
+                &ldquo;These guys really understand what American BBQ is.&rdquo;
               </p>
-              <p className="mt-2 eyebrow text-stone">Farmhouse · Carriage House · Barn</p>
+              <p className="mt-2 eyebrow text-stone">Guest review · Google</p>
             </div>
           </Reveal>
         </div>
