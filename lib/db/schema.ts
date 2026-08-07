@@ -171,7 +171,7 @@ export const bookings = pgTable(
   "bookings",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    /** Human-friendly code guests quote on the phone, e.g. "VC-7KMQ4". */
+    /** Human-friendly code guests quote on the phone, e.g. "KAU-7KMQ4". */
     reference: text("reference").notNull().unique(),
     spaceId: uuid("space_id")
       .notNull()

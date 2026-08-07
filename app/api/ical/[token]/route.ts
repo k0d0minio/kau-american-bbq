@@ -1,6 +1,6 @@
 // Private iCal availability feed, one per space, addressed by the space's
-// secret token: /api/ical/<token>. Subscribe from Google Calendar, or paste
-// into Airbnb/VRBO so external listings block dates booked here.
+// secret token: /api/ical/<token>. Subscribe from Google Calendar to see
+// bookings and closures.
 //
 // The feed emits everything that makes the space unavailable: its own
 // approved bookings (padded by the turnover buffer), estate-reserving
@@ -88,10 +88,10 @@ export async function GET(
       summary: `Booked · ${b.reference}`,
     })),
     ...otherBookings.map((b) => ({
-      uid: `estate-${b.id}`,
+      uid: `venue-${b.id}`,
       startDate: b.startDate,
       endDate: b.endDate,
-      summary: "Estate reserved",
+      summary: "Fully booked — private hire",
     })),
     ...blackoutRows
       .filter(
@@ -109,12 +109,12 @@ export async function GET(
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Vine Cliff//Availability//EN",
+    "PRODID:-//KAU Barbecue//Availability//EN",
     "CALSCALE:GREGORIAN",
-    `X-WR-CALNAME:${icsEscape(`Vine Cliff — ${space.name}`)}`,
+    `X-WR-CALNAME:${icsEscape(`KAU Barbecue — ${space.name}`)}`,
     ...events.flatMap((event) => [
       "BEGIN:VEVENT",
-      `UID:${event.uid}@vinecliff`,
+      `UID:${event.uid}@kaubarbecue`,
       `DTSTAMP:${stamp}`,
       `DTSTART;VALUE=DATE:${icsDate(event.startDate)}`,
       `DTEND;VALUE=DATE:${icsDate(event.endDate)}`,
@@ -127,7 +127,7 @@ export async function GET(
   return new Response(lines.join("\r\n") + "\r\n", {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
-      "Content-Disposition": `inline; filename="vinecliff-${space.slug}.ics"`,
+      "Content-Disposition": `inline; filename="kau-${space.slug}.ics"`,
       "Cache-Control": "private, max-age=300",
     },
   });

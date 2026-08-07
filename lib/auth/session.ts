@@ -10,7 +10,7 @@
 // crypto here uses the Web Crypto API so it behaves identically in the Edge
 // runtime and in Node server actions.
 
-export const ADMIN_SESSION_COOKIE = "vc_admin_session";
+export const ADMIN_SESSION_COOKIE = "kau_admin_session";
 
 // One week. The cookie is refreshed on each successful login.
 export const ADMIN_SESSION_MAX_AGE = 60 * 60 * 24 * 7;

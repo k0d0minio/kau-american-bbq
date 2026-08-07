@@ -1,23 +1,24 @@
 export const site = {
-  name: "Vine Cliff",
-  fullName: "Vine Cliff Vineyards",
-  tagline: "An elegant country estate on the shores of Lake Erie",
+  name: "KAU",
+  fullName: "KAU Barbecue",
+  tagline: "American barbecue, smoked low and slow in Malveira",
   description:
-    "Weekly, weekend and event rentals across a farmhouse, carriage house and barn — each over 170 years old — perched on the cliffs above Lake Erie in New York wine country.",
-  phone: "+1 415-200-9142",
-  phoneHref: "tel:+14152009142",
-  email: "hello@vinecliff.com",
+    "Texas-style barbecue in the heart of Malveira — brisket, beef ribs and pulled pork smoked low and slow on our custom smoker, Godzilla, cut fresh and sold by weight. Table service or the authentic Texan counter. Thursday to Sunday, lunch and dinner.",
+  phone: "+351 968 163 165",
+  phoneHref: "tel:+351968163165",
+  email: "reservas@kaubarbecue.pt", // TODO(jamie): confirm email CONFIRMED BY JAMIE
+  instagram: "https://www.instagram.com/kau_barbecue/",
   address: {
-    line1: "6153 Rte. 5",
-    city: "Brocton",
-    region: "NY",
-    postalCode: "14716",
-    country: "United States",
-    full: "6153 Rte. 5, Brocton, NY 14716, United States",
+    line1: "R. Dr. José Eduardo Esteves h1",
+    city: "Malveira",
+    region: "Lisboa",
+    postalCode: "2665-248",
+    country: "Portugal",
+    full: "R. Dr. José Eduardo Esteves h1, 2665-248 Malveira, Portugal",
   },
   mapUrl:
-    "https://www.google.com/maps/search/?api=1&query=6153+Rte.+5+Brocton+NY+14716",
-  url: "https://vinecliff.vercel.app",
+    "https://www.google.com/maps/search/?api=1&query=R.+Dr.+José+Eduardo+Esteves+h1+Malveira",
+  url: "https://kaubarbecue.jamienisbet.com",
 } as const;
 
 export type Space = {
@@ -32,49 +33,72 @@ export type Space = {
 
 export const spaces: Space[] = [
   {
-    id: "farmhouse",
-    name: "The Farmhouse",
-    kind: "Weekly & weekend stays",
-    age: "Built c. 1850",
-    image: "/img/house.jpg",
+    id: "table-service",
+    name: "The Dining Room",
+    kind: "Classic table service",
+    age: "Est. 2026",
+    image: "/img/dining-room.jpg",
     blurb:
-      "A stately Greek Revival farmhouse with wraparound porch, wide lawns and views out toward the lake. Sleeps a gathering of family or friends in classic country comfort.",
-    features: ["Wraparound porch", "Sleeps 8+", "Full country kitchen", "Fire pit & lawn games"],
+      "Sit down, order from the table and let the meat come to you — brisket, ribs and all the fixings, straight off Godzilla and carved to order.",
+    features: [
+      "Full table service",
+      "Tables for 2–8",
+      "All meats by weight",
+      "Sides, sauces & desserts",
+    ],
   },
   {
-    id: "carriage-house",
-    name: "The Carriage House",
-    kind: "Intimate retreats",
-    age: "Built c. 1850",
-    image: "/img/front-porch.jpg",
+    id: "texan-counter",
+    name: "The Texan Counter",
+    kind: "Tray service, Texas-style",
+    age: "Smoked on Godzilla",
+    image: "/img/counter.jpg",
     blurb:
-      "A charming, light-filled retreat tucked among the pines — perfect for couples and small parties who want quiet, character and a porch made for slow mornings.",
-    features: ["Private porch", "Cozy for 2–4", "Wooded setting", "Steps from the cliffs"],
+      "The real-deal Texas experience: step up to the counter, watch your meats cut and weighed in the moment, and carry your tray to the table.",
+    features: [
+      "Cut & weighed in front of you",
+      "Fastest way to the meat",
+      "Counter & communal seating",
+      "Same smoke, no waiting",
+    ],
   },
   {
-    id: "barn",
-    name: "The Barn",
-    kind: "Weddings & events",
-    age: "Built c. 1850",
-    image: "/img/full-view.jpg",
+    id: "private-hire",
+    name: "Full House — Private Hire",
+    kind: "Events & buyouts",
+    age: "The whole smokehouse",
+    image: "/img/smoker.jpg",
     blurb:
-      "A 170-year-old barn and sweeping grounds that host weddings, reunions and celebrations against a backdrop of vineyards and Lake Erie sunsets.",
-    features: ["Weddings & receptions", "Open lawns", "Vineyard backdrop", "Golden-hour ceremonies"],
+      "Take over the whole smokehouse — the dining room, the counter and Godzilla at full smoke — for birthdays, company feasts and celebrations that need serious meat.",
+    features: [
+      "Up to 120 guests",
+      "Whole-venue exclusivity",
+      "Custom feast menus",
+      "Godzilla at full smoke",
+    ],
   },
 ];
 
 export const gallery = [
-  { src: "/img/aerial-shot.jpg", alt: "Aerial view of the estate on the cliffs above Lake Erie", span: "wide" },
-  { src: "/img/sunset.jpg", alt: "Golden sunset through the trees over the estate grounds" },
-  { src: "/img/full-view.jpg", alt: "The farmhouse across open lawns at dusk" },
-  { src: "/img/house.jpg", alt: "The historic white farmhouse and front lawn" },
-  { src: "/img/front-porch.jpg", alt: "The columned front porch of the carriage house" },
-  { src: "/img/vinecliff-sign.jpg", alt: "The Vine Cliff sign at the roadside at sunset", span: "wide" },
+  {
+    src: "/img/hero-smokehouse.jpg",
+    alt: "Smoke rising from Godzilla, KAU's custom smoker, outside the Malveira smokehouse",
+    span: "wide",
+  },
+  { src: "/img/brisket.jpg", alt: "Sliced Black Angus brisket on a KAU tray" },
+  { src: "/img/dining-room.jpg", alt: "Inside the KAU smokehouse dining room in Malveira" },
+  { src: "/img/counter.jpg", alt: "Brisket being sliced at the Texan counter" },
+  { src: "/img/smoker.jpg", alt: "Godzilla, the custom smoker, at work" },
+  {
+    src: "/img/trays.jpg",
+    alt: "Trays of smoked meats, sides and sauces ready to carry to the table",
+    span: "wide",
+  },
 ] as const;
 
 export const nearby = [
-  { name: "Chautauqua Institution", note: "Arts, music & lectures — a short drive south" },
-  { name: "SUNY Fredonia", note: "Campus, performances & town life nearby" },
-  { name: "Dunkirk", note: "Lakeside dining, marina and harbor" },
-  { name: "Lake Erie Wine Country", note: "The largest grape-growing region east of the Rockies" },
+  { name: "Mafra", note: "The Royal Convent and town — 10 minutes away" },
+  { name: "Ericeira", note: "World Surfing Reserve, beaches and seafood" },
+  { name: "Lisbon", note: "The capital, around 35 minutes down the A8" },
+  { name: "Malveira market", note: "One of the region's great traditional markets" },
 ] as const;
