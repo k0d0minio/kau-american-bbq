@@ -9,7 +9,7 @@ import {
   formatDayMonth,
   formatMonth,
   parseISO,
-  todayAtEstate,
+  todayAtRestaurant,
   type ISODate,
 } from "@/lib/booking/dates";
 import { PageHeader, Card } from "../components/page-shell";
@@ -34,7 +34,7 @@ type Props = { searchParams: Promise<{ month?: string }> };
 
 export default async function CalendarPage({ searchParams }: Props) {
   const params = await searchParams;
-  const today = todayAtEstate();
+  const today = todayAtRestaurant();
   const monthFirst: ISODate = /^\d{4}-(0[1-9]|1[0-2])$/.test(params.month ?? "")
     ? `${params.month}-01`
     : `${today.slice(0, 7)}-01`;

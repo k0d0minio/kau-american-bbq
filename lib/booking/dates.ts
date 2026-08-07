@@ -1,12 +1,13 @@
 // Calendar-date helpers for the booking system.
 //
-// All booking dates are plain "YYYY-MM-DD" strings in the estate's local
-// calendar (America/New_York) — never Date objects with timezones attached.
+// All booking dates are plain "YYYY-MM-DD" strings in the restaurant's local
+// calendar (Europe/Lisbon) — never Date objects with timezones attached.
 // Every helper anchors math at UTC midnight so a date is the same date
 // everywhere, and ISO strings compare correctly with plain `<`/`>`.
 //
-// Ranges are half-open [startDate, endDate): endDate is the checkout day, so
-// a stay that ends on the 8th and one that starts on the 8th do not overlap.
+// Ranges are half-open [startDate, endDate): a reservation on the 8th runs
+// [2026-06-08, 2026-06-09), so two bookings sharing a boundary date do not
+// overlap.
 
 export type ISODate = string;
 
@@ -43,7 +44,7 @@ export function addMonths(date: ISODate, months: number): ISODate {
   return toISO(target);
 }
 
-/** Whole days from `a` to `b` — the number of nights in a stay [a, b). */
+/** Whole days from `a` to `b` — the length of the half-open range [a, b). */
 export function diffDays(a: ISODate, b: ISODate): number {
   return Math.round((parseISO(b).getTime() - parseISO(a).getTime()) / DAY_MS);
 }
@@ -58,17 +59,17 @@ export function rangesOverlap(
   return aStart < bEnd && bStart < aEnd;
 }
 
-/** Today as a calendar date at the estate (America/New_York). */
-export function todayAtEstate(): ISODate {
+/** Today as a calendar date at the restaurant (Europe/Lisbon). */
+export function todayAtRestaurant(): ISODate {
   // en-CA formats as YYYY-MM-DD.
   return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/New_York",
+    timeZone: "Europe/Lisbon",
   }).format(new Date());
 }
 
-/** "Fri, Jun 5, 2026" */
+/** "Fri, 5 Jun 2026" */
 export function formatDate(date: ISODate): string {
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("en-GB", {
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -77,9 +78,9 @@ export function formatDate(date: ISODate): string {
   }).format(parseISO(date));
 }
 
-/** "Jun 5" — compact, for calendars and dense lists. */
+/** "5 Jun" — compact, for calendars and dense lists. */
 export function formatDayMonth(date: ISODate): string {
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("en-GB", {
     month: "short",
     day: "numeric",
     timeZone: "UTC",
@@ -88,7 +89,7 @@ export function formatDayMonth(date: ISODate): string {
 
 /** "June 2026" — month headings. */
 export function formatMonth(date: ISODate): string {
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("en-GB", {
     month: "long",
     year: "numeric",
     timeZone: "UTC",
@@ -96,9 +97,8 @@ export function formatMonth(date: ISODate): string {
 }
 
 /**
- * Display a stay range. The half-open endDate is shown as-is because guests
- * read it as their checkout day ("Jun 5 – Jun 8" = arrive the 5th, leave the
- * 8th). For event spaces the last *included* day is endDate − 1.
+ * Display a date range. The half-open endDate is shown as-is; the last
+ * *included* day is endDate − 1.
  */
 export function formatRange(startDate: ISODate, endDate: ISODate): string {
   return `${formatDate(startDate)} → ${formatDate(endDate)}`;

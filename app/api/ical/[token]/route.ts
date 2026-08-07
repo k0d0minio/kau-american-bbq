@@ -9,7 +9,7 @@ import { and, eq, gt, lt, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { blackouts, bookings } from "@/lib/db/schema";
 import { getSpaceByIcalToken } from "@/lib/db/queries";
-import { addDays, addMonths, todayAtEstate, type ISODate } from "@/lib/booking/dates";
+import { addDays, addMonths, todayAtRestaurant, type ISODate } from "@/lib/booking/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +40,7 @@ export async function GET(
   const space = await getSpaceByIcalToken(token);
   if (!space) return new Response("Not found", { status: 404 });
 
-  const today = todayAtEstate();
+  const today = todayAtRestaurant();
   const from = addDays(today, -365);
   const to = addMonths(today, 24);
   const overlapping = and(lt(bookings.startDate, to), gt(bookings.endDate, from));

@@ -2,14 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Mail, Phone } from "lucide-react";
 import { getAvailabilityData, getBookingWithRelations } from "@/lib/db/queries";
-import { blockedRanges } from "@/lib/booking/availability";
 import {
-  formatDate,
-  diffDays,
-  rangesOverlap,
-  todayAtEstate,
-} from "@/lib/booking/dates";
-import { formatMoney, unitLabel } from "@/lib/booking/pricing";
+  SERVICE_LABELS,
+  dayHasRoom,
+  isDateBlocked,
+  isService,
+  blockedRanges,
+} from "@/lib/booking/availability";
+import { formatDate, todayAtRestaurant } from "@/lib/booking/dates";
+import { formatMoney } from "@/lib/booking/pricing";
 import { siteBaseUrl } from "@/lib/email";
 import { PageHeader, Card } from "../../components/page-shell";
 import { AlertBadge, BookingStatusBadge, PaymentStatusBadge } from "../../components/badges";
@@ -31,18 +32,18 @@ export default async function BookingDetailPage({ params }: Props) {
   if (!row) notFound();
   const { booking, space, guest } = row;
 
-  const today = todayAtEstate();
+  const today = todayAtRestaurant();
   const completed = booking.status === "approved" && booking.endDate <= today;
-  const nights = diffDays(booking.startDate, booking.endDate);
 
-  // For pending requests, warn when the dates have since been taken.
+  // For pending requests, warn when the sitting has since filled up or the day
+  // has been closed.
   let conflict = false;
   if (booking.status === "pending") {
     const availability = await getAvailabilityData(booking.startDate, booking.endDate);
-    const blocked = blockedRanges(space, availability.bookings, availability.blackouts);
-    conflict = blocked.some((r) =>
-      rangesOverlap(booking.startDate, booking.endDate, r.startDate, r.endDate)
-    );
+    const closures = blockedRanges(space, availability.blackouts);
+    conflict =
+      isDateBlocked(booking.startDate, closures) ||
+      !dayHasRoom(space, availability.bookings, booking.startDate, booking.partySize);
   }
 
   const actionData: BookingActionData = {
@@ -59,17 +60,18 @@ export default async function BookingDetailPage({ params }: Props) {
   };
 
   const detailRows: Array<[string, React.ReactNode]> = [
-    ["Space", space.name],
-    [space.isEvent ? "First day" : "Check-in", formatDate(booking.startDate)],
-    [space.isEvent ? "Departure day" : "Checkout", formatDate(booking.endDate)],
-    ["Length", `${nights} ${unitLabel(space, nights)}`],
-    ["Guests", String(booking.partySize)],
+    ["Where", space.name],
+    ["Date", formatDate(booking.startDate)],
+    ...(isService(booking.service)
+      ? ([["Sitting", SERVICE_LABELS[booking.service]]] as Array<[string, string]>)
+      : []),
+    ["Party size", String(booking.partySize)],
     ...(booking.eventType
       ? ([["Occasion", booking.eventType]] as Array<[string, string]>)
       : []),
     ["Source", booking.source],
     ["Requested", formatDate(booking.createdAt.toISOString().slice(0, 10))],
-    ["Reserves whole estate", booking.blocksEstate ? "Yes" : "No"],
+    ["Closes whole venue", booking.blocksEstate ? "Yes" : "No"],
   ];
 
   return (

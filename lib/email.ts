@@ -15,6 +15,7 @@
 import { site } from "@/lib/site";
 import { formatDate, type ISODate } from "@/lib/booking/dates";
 import { formatMoney, type Quote } from "@/lib/booking/pricing";
+import type { Service } from "@/lib/booking/availability";
 
 export function siteBaseUrl(): string {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? site.url).replace(/\/+$/, "");
@@ -165,6 +166,8 @@ export type BookingEmailData = {
   isEvent: boolean;
   startDate: ISODate;
   endDate: ISODate;
+  /** Which sitting the party is booked for. */
+  service?: Service | null;
   partySize: number;
   guestFirstName: string;
   manageToken: string;

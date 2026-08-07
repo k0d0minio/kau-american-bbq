@@ -1,10 +1,11 @@
 // Quote calculation. Money is integer cents throughout; formatting happens at
-// the edge. Weekly rates apply per full 7-night block with the remainder at
-// the nightly rate — the standard vacation-rental convention.
+// the edge. Reservations are free — only private-hire event days carry a
+// price, charged per day.
 import { diffDays, type ISODate } from "./dates";
 
 export type SpacePricing = {
   isEvent: boolean;
+  /** Per event day for private hire; 0 for reservation spaces. */
   nightlyRateCents: number;
   weeklyRateCents: number | null;
   cleaningFeeCents: number;
@@ -13,26 +14,25 @@ export type SpacePricing = {
 export type QuoteLine = { label: string; amountCents: number };
 
 export type Quote = {
-  /** Nights for stays; event days for event spaces. */
-  nights: number;
+  /** Event days for private hire; 1 for a single reservation. */
+  days: number;
   lines: QuoteLine[];
   totalCents: number;
 };
 
 export function formatMoney(cents: number): string {
-  const dollars = cents / 100;
-  return new Intl.NumberFormat("en-US", {
+  const euros = cents / 100;
+  return new Intl.NumberFormat("en-IE", {
     style: "currency",
-    currency: "USD",
-    minimumFractionDigits: Number.isInteger(dollars) ? 0 : 2,
+    currency: "EUR",
+    minimumFractionDigits: Number.isInteger(euros) ? 0 : 2,
     maximumFractionDigits: 2,
-  }).format(dollars);
+  }).format(euros);
 }
 
-/** "night" / "nights" for stays, "day" / "days" for event spaces. */
-export function unitLabel(space: { isEvent: boolean }, count: number): string {
-  const unit = space.isEvent ? "day" : "night";
-  return count === 1 ? unit : `${unit}s`;
+/** "day" / "days" — the only unit left now that stays are gone. */
+export function unitLabel(count: number): string {
+  return count === 1 ? "day" : "days";
 }
 
 export function computeQuote(
@@ -40,35 +40,22 @@ export function computeQuote(
   startDate: ISODate,
   endDate: ISODate
 ): Quote {
-  const nights = Math.max(0, diffDays(startDate, endDate));
-  const lines: QuoteLine[] = [];
+  const days = Math.max(0, diffDays(startDate, endDate));
 
-  if (space.weeklyRateCents && nights >= 7) {
-    const weeks = Math.floor(nights / 7);
-    const remainder = nights % 7;
-    lines.push({
-      label: `${weeks} ${weeks === 1 ? "week" : "weeks"} × ${formatMoney(space.weeklyRateCents)}`,
-      amountCents: weeks * space.weeklyRateCents,
-    });
-    if (remainder > 0) {
-      lines.push({
-        label: `${remainder} ${unitLabel(space, remainder)} × ${formatMoney(space.nightlyRateCents)}`,
-        amountCents: remainder * space.nightlyRateCents,
-      });
-    }
-  } else if (nights > 0) {
-    lines.push({
-      label: `${nights} ${unitLabel(space, nights)} × ${formatMoney(space.nightlyRateCents)}`,
-      amountCents: nights * space.nightlyRateCents,
-    });
+  // Reservations cost nothing — the guest never sees a price.
+  if (!space.isEvent || days === 0 || space.nightlyRateCents <= 0) {
+    return { days, lines: [], totalCents: 0 };
   }
 
-  if (nights > 0 && space.cleaningFeeCents > 0) {
-    lines.push({ label: "Cleaning & turnover", amountCents: space.cleaningFeeCents });
-  }
+  const lines: QuoteLine[] = [
+    {
+      label: `${days} ${unitLabel(days)} × ${formatMoney(space.nightlyRateCents)}`,
+      amountCents: days * space.nightlyRateCents,
+    },
+  ];
 
   return {
-    nights,
+    days,
     lines,
     totalCents: lines.reduce((sum, line) => sum + line.amountCents, 0),
   };

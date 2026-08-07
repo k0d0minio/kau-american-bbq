@@ -103,11 +103,11 @@ export default async function EnquiriesPage({ searchParams }: Props) {
                 </p>
                 <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-pine-100 pt-3 text-sm">
                   <span className="text-xs text-stone">
-                    {enquiry.createdAt.toLocaleDateString("en-US", {
+                    {enquiry.createdAt.toLocaleDateString("en-GB", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
-                      timeZone: "America/New_York",
+                      timeZone: "Europe/Lisbon",
                     })}
                   </span>
                   <span className="ml-auto flex flex-wrap gap-2">

@@ -12,8 +12,12 @@ import {
   type BookingWithRelations,
 } from "@/lib/db/queries";
 import { requireAdmin } from "@/lib/auth/require-admin";
-import { isValidISODate, rangesOverlap } from "@/lib/booking/dates";
-import { blockedRanges } from "@/lib/booking/availability";
+import { isValidISODate } from "@/lib/booking/dates";
+import {
+  blockedRanges,
+  dayHasRoom,
+  isDateBlocked,
+} from "@/lib/booking/availability";
 import { computeQuote } from "@/lib/booking/pricing";
 import { makeManageToken, makeReference } from "@/lib/booking/tokens";
 import { getCancellationPolicy } from "@/lib/settings";
@@ -229,10 +233,9 @@ export async function saveAdminNotes(
 }
 
 // ---------------------------------------------------------------------------
-// Manual bookings (phone/email requests entered by the owner). Lead-time and
-// minimum-stay rules don't apply — the owner is the authority — but overlaps
-// with confirmed bookings and blackouts are still rejected to prevent
-// accidental double-booking.
+// Manual bookings (reservations taken over the phone). Lead-time rules don't
+// apply — the owner is the authority — but closures and a full sitting are
+// still rejected to prevent accidental overbooking.
 // ---------------------------------------------------------------------------
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -279,11 +282,12 @@ export async function createManualBooking(
 
     if (status === "approved") {
       const availability = await getAvailabilityData(startDate, endDate);
-      const blocked = blockedRanges(space, availability.bookings, availability.blackouts);
-      if (blocked.some((r) => rangesOverlap(startDate, endDate, r.startDate, r.endDate))) {
+      const closures = blockedRanges(space, availability.blackouts);
+      const full = !dayHasRoom(space, availability.bookings, startDate, partySize);
+      if (isDateBlocked(startDate, closures) || full) {
         return {
           error:
-            "Those dates conflict with an existing booking, buffer day or blackout. Adjust the dates (or clear the blackout) first.",
+            "That sitting doesn't have room for this party (or the day is closed). Adjust the date or clear the closure first.",
         };
       }
     }

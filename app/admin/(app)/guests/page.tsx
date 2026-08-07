@@ -2,7 +2,7 @@ import Link from "next/link";
 import { NotebookPen, Search, Users } from "lucide-react";
 import { Input } from "@/app/components/ui/field";
 import { listGuestsWithStats } from "@/lib/db/queries";
-import { formatDayMonth, todayAtEstate } from "@/lib/booking/dates";
+import { formatDayMonth, todayAtRestaurant } from "@/lib/booking/dates";
 import { PageHeader, EmptyState } from "../components/page-shell";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ export default async function GuestsPage({ searchParams }: Props) {
   const { q } = await searchParams;
   const query = q?.trim() || undefined;
   const rows = await listGuestsWithStats(query);
-  const today = todayAtEstate();
+  const today = todayAtRestaurant();
 
   return (
     <div className="space-y-6">
