@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Nav } from "../components/nav";
-import { Footer } from "../components/footer";
+import { Nav } from "@/app/components/nav";
+import { Footer } from "@/app/components/footer";
 import {
   HistoryHero,
   HistoryLede,

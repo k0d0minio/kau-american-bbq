@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Lock, Mail, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "../../components/ui/button";
+import { buttonVariants } from "@/app/components/ui/button";
 import { login, type LoginState } from "./actions";
 
 function SubmitButton() {

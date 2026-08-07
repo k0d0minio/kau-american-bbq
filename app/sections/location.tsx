@@ -3,9 +3,13 @@ import { MapPin, Navigation } from "lucide-react";
 import { nearby, site } from "@/lib/site";
 import { Reveal, Stagger, StaggerItem } from "@/app/components/motion";
 import { buttonVariants } from "@/app/components/ui/button";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
-export function Location() {
+export function Location({ locale }: { locale: Locale }) {
+  const t = getDictionary(locale).location;
+
   return (
     <section id="location" className="relative bg-bone py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
@@ -14,7 +18,7 @@ export function Location() {
             <div className="relative aspect-square overflow-hidden rounded-3xl shadow-lift sm:aspect-4/3 lg:aspect-square">
               <Image
                 src="/img/exterior.jpg"
-                alt="Rui and Vera Matias outside KAU Barbecue in Malveira"
+                alt={t.imageAlt}
                 fill
                 quality={85}
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -42,24 +46,23 @@ export function Location() {
 
           <div className="order-1 lg:order-2">
             <Reveal>
-              <p className="eyebrow text-ember">Find Us</p>
+              <p className="eyebrow text-ember">{t.eyebrow}</p>
               <h2 className="mt-4 font-display text-4xl font-light leading-tight text-char-900 text-balance sm:text-5xl">
-                In the heart of Malveira
+                {t.heading}
               </h2>
               <p className="mt-5 text-pretty text-base leading-relaxed text-ink-soft sm:text-lg">
-                Twenty-five minutes from Lisbon and ten from Mafra, KAU sits in the centre of
-                Malveira — easy to reach, hard to leave. Also on Glovo if the sofa wins.
+                {t.intro}
               </p>
             </Reveal>
 
             <Stagger className="mt-10 space-y-3">
-              {nearby.map((n) => (
-                <StaggerItem key={n.name}>
+              {nearby.map((id) => (
+                <StaggerItem key={id}>
                   <div className="group flex items-start gap-4 rounded-2xl border border-char-900/8 bg-bone-100 p-5 transition-all duration-300 hover:border-char-700/25 hover:shadow-soft">
                     <span className="mt-1 size-2 shrink-0 rounded-full bg-ember transition-transform duration-300 group-hover:scale-150" />
                     <div>
-                      <h3 className="font-display text-lg text-char-900">{n.name}</h3>
-                      <p className="text-sm text-stone">{n.note}</p>
+                      <h3 className="font-display text-lg text-char-900">{t.nearby[id].name}</h3>
+                      <p className="text-sm text-stone">{t.nearby[id].note}</p>
                     </div>
                   </div>
                 </StaggerItem>
@@ -74,7 +77,7 @@ export function Location() {
                 className={cn(buttonVariants({ variant: "outline", size: "md" }), "mt-8")}
               >
                 <Navigation className="size-4" />
-                Get directions
+                {t.directions}
               </a>
             </Reveal>
           </div>

@@ -90,18 +90,23 @@ and closures.
 
 ```
 app/
-  components/     Nav, Footer, motion primitives, UI primitives, in-view hook
+  components/     Nav, Footer, Landing composition, motion + UI primitives
   sections/       Hero, Smokehouse, Spaces, Gallery, Location, Booking CTA
-  spaces/[slug]/  Space detail pages: availability calendar + booking form
-  bookings/[token]/ Guest reservation status page (private tokenized link)
-  enquire/        General enquiry form
-  api/ical/[token]/ Private iCal availability feed per space
-  admin/          Account-gated admin: dashboard, bookings, calendar,
-                  guests, spaces editor, enquiries, gallery, settings
+  (en)/           English root layout — serves `/` and every sub-page
+    page.tsx        Landing page (English)
+    layout.tsx      lang="en", metadata, SEO, JSON-LD, fonts
+    spaces/[slug]/  Space detail pages: availability calendar + booking form
+    bookings/[token]/ Guest reservation status page (private tokenized link)
+    enquire/        General enquiry form
+    api/ical/[token]/ Private iCal availability feed per space
+    admin/          Account-gated admin: dashboard, bookings, calendar,
+                    guests, spaces editor, enquiries, gallery, settings
+  (pt)/           Portuguese root layout — lang="pt-PT", serves `/pt`
+    pt/page.tsx     Landing page (Portuguese)
   fonts/          Self-hosted variable fonts
-  layout.tsx      Metadata, SEO, JSON-LD, fonts
-  page.tsx        Landing page composition
 lib/
+  i18n/           Locale config + the landing page copy in both languages
+  seo.ts          Per-locale metadata, hreflang alternates and JSON-LD
   site.ts         Business info + static space fallback, gallery & nearby data
   spaces.ts       Space display shapes for the public site
   admin.ts        Admin navigation config
@@ -119,6 +124,26 @@ drizzle/          Generated SQL migrations + seeds
 middleware.ts     Protects /admin routes behind the login cookie
 public/img/       Restaurant photography
 ```
+
+## Languages
+
+The landing page is offered in English at `/` and Portuguese at `/pt`, with an
+EN / PT switch in the nav. Everything else — the booking flow, enquiry form,
+Our Story and the admin — is English only for now.
+
+All landing copy lives in `lib/i18n/dictionaries.ts`. The English object is the
+source of truth: the `Dictionary` type is derived from it, so a translation
+that is missing or has a typo'd key fails `tsc` rather than silently leaving a
+gap on the page. Images, layout and links are shared — `lib/site.ts` holds only
+ids and asset paths, and the prose is looked up by the same id.
+
+Each language has its own root layout (`app/(en)`, `app/(pt)`) so it can serve
+the right `lang` attribute, `og:locale`, title and description. `/` and `/pt`
+cross-reference each other with `hreflang` and carry their own canonical.
+
+To add a language: add it to `locales` and `localeMeta` in `lib/i18n/config.ts`,
+add its dictionary, then create `app/(xx)/layout.tsx` and `app/(xx)/xx/page.tsx`
+mirroring the Portuguese pair.
 
 ## Database (Drizzle + Neon)
 

@@ -7,29 +7,33 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { site } from "@/lib/site";
+import { defaultLocale, localeHome, localeMeta, locales, type Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { buttonVariants } from "./ui/button";
 
-// Section anchors live on the home page. `hash` is prefixed with "/" when the
-// nav is rendered on a sub-page so the links jump back to the landing page.
-const sectionLinks = [
-  { hash: "#spaces", label: "Book a Table" },
-  { hash: "#smokehouse", label: "The Smokehouse" },
-  { hash: "#gallery", label: "Gallery" },
-  { hash: "#location", label: "Location" },
-];
-
-export function Nav() {
+/**
+ * The nav is shared by every public page. Only the landing page is translated,
+ * so pages that are English-only simply leave `locale` at its default.
+ */
+export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
+  const t = getDictionary(locale).nav;
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const onHome = pathname === "/";
+  const home = localeHome(locale);
+  const onHome = pathname === home;
 
-  const sectionHref = (hash: string) => (onHome ? hash : `/${hash}`);
+  // Section anchors live on the landing page. They gain the page path when the
+  // nav is rendered on a sub-page so the links jump back to it first.
+  const sectionHref = (hash: string) => (onHome ? hash : `${home}${hash}`);
   const links = [
-    ...sectionLinks.map((l) => ({ href: sectionHref(l.hash), label: l.label })),
-    { href: "/history", label: "Our Story" },
+    { href: sectionHref("#spaces"), label: t.sections.spaces },
+    { href: sectionHref("#smokehouse"), label: t.sections.smokehouse },
+    { href: sectionHref("#gallery"), label: t.sections.gallery },
+    { href: sectionHref("#location"), label: t.sections.location },
+    { href: "/history", label: t.story },
   ];
-  const homeHref = onHome ? "#top" : "/";
+  const homeHref = onHome ? "#top" : home;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -75,7 +79,7 @@ export function Nav() {
                 scrolled ? "text-stone" : "text-bone/70"
               )}
             >
-              American Barbecue
+              {t.brandLine}
             </span>
           </a>
 
@@ -93,6 +97,7 @@ export function Nav() {
                 <span className="absolute -bottom-1 left-0 h-px w-0 bg-current transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
+            <LanguageSwitch current={locale} label={t.language} scrolled={scrolled} />
             <Link
               href="/enquire"
               className={cn(
@@ -100,12 +105,12 @@ export function Nav() {
               )}
             >
               <Send className="size-3.5" />
-              Enquire
+              {t.enquire}
             </Link>
           </div>
 
           <button
-            aria-label="Open menu"
+            aria-label={t.openMenu}
             onClick={() => setOpen(true)}
             className={cn(
               "md:hidden",
@@ -124,11 +129,11 @@ export function Nav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-char-900/98 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-50 overflow-y-auto bg-char-900/98 backdrop-blur-sm md:hidden"
           >
             <div className="flex h-16 items-center justify-between px-5 sm:h-20">
               <span className="font-display text-xl text-bone">KAU Barbecue</span>
-              <button aria-label="Close menu" onClick={() => setOpen(false)} className="text-bone">
+              <button aria-label={t.closeMenu} onClick={() => setOpen(false)} className="text-bone">
                 <X className="size-6" />
               </button>
             </div>
@@ -156,14 +161,14 @@ export function Nav() {
                 </motion.li>
               ))}
             </motion.ul>
-            <div className="space-y-3 px-6 pt-10">
+            <div className="space-y-3 px-6 pt-10 pb-12">
               <Link
                 href="/enquire"
                 onClick={() => setOpen(false)}
                 className={cn(buttonVariants({ variant: "ember", size: "lg" }), "w-full")}
               >
                 <Send className="size-4" />
-                Send an enquiry
+                {t.sendEnquiry}
               </Link>
               <a
                 href={site.phoneHref}
@@ -171,12 +176,79 @@ export function Nav() {
                 className={cn(buttonVariants({ variant: "light", size: "lg" }), "w-full")}
               >
                 <Phone className="size-4" />
-                Call to enquire
+                {t.callToEnquire}
               </a>
+              <LanguageSwitch
+                current={locale}
+                label={t.language}
+                scrolled={false}
+                className="justify-center pt-4"
+                onNavigate={() => setOpen(false)}
+              />
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </motion.header>
+  );
+}
+
+/**
+ * EN / PT toggle. Each language has its own root layout so these are plain
+ * anchors — the full page load is what swaps the document's `lang`.
+ */
+function LanguageSwitch({
+  current,
+  label,
+  scrolled,
+  className,
+  onNavigate,
+}: {
+  current: Locale;
+  label: string;
+  scrolled: boolean;
+  className?: string;
+  onNavigate?: () => void;
+}) {
+  return (
+    <div
+      aria-label={label}
+      className={cn(
+        "flex items-center gap-1 text-xs font-medium uppercase tracking-[0.18em]",
+        className
+      )}
+    >
+      {locales.map((l, i) => {
+        const active = l === current;
+        return (
+          <span key={l} className="flex items-center gap-1">
+            {i > 0 && (
+              <span className={scrolled ? "text-stone/50" : "text-bone/35"} aria-hidden="true">
+                /
+              </span>
+            )}
+            <a
+              href={localeHome(l)}
+              hrefLang={localeMeta[l].htmlLang}
+              onClick={onNavigate}
+              aria-current={active ? "page" : undefined}
+              title={localeMeta[l].label}
+              className={cn(
+                "transition-colors",
+                active
+                  ? scrolled
+                    ? "text-char-900"
+                    : "text-bone"
+                  : scrolled
+                    ? "text-stone hover:text-char-700"
+                    : "text-bone/55 hover:text-bone"
+              )}
+            >
+              {localeMeta[l].short}
+            </a>
+          </span>
+        );
+      })}
+    </div>
   );
 }

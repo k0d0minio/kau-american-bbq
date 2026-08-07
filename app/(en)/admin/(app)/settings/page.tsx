@@ -2,7 +2,7 @@ import { LogOut, ShieldCheck } from "lucide-react";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { getNotifyEmail, getCancellationPolicy } from "@/lib/settings";
-import { buttonVariants } from "../../../components/ui/button";
+import { buttonVariants } from "@/app/components/ui/button";
 import { PageHeader, Card } from "../components/page-shell";
 import { logout } from "../actions";
 import { SettingsForm } from "./settings-form";
