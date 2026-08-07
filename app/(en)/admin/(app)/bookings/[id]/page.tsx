@@ -3,14 +3,16 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Mail, Phone } from "lucide-react";
 import { getAvailabilityData, getBookingWithRelations } from "@/lib/db/queries";
 import {
-  SERVICE_LABELS,
   dayHasRoom,
   isDateBlocked,
   isService,
   blockedRanges,
 } from "@/lib/booking/availability";
-import { DINING_FORMAT_LABELS, isDiningFormat } from "@/lib/booking/dining-formats";
+import { isDiningFormat } from "@/lib/booking/dining-formats";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { formatDate, todayAtRestaurant } from "@/lib/booking/dates";
+// The admin is English-only; the guest-facing labels live with the site copy.
+const labels = getDictionary("en").booking;
 import { formatMoney } from "@/lib/booking/pricing";
 import { siteBaseUrl } from "@/lib/email";
 import { PageHeader, Card } from "../../components/page-shell";
@@ -64,10 +66,10 @@ export default async function BookingDetailPage({ params }: Props) {
     ["Where", space.name],
     ["Date", formatDate(booking.startDate)],
     ...(isService(booking.service)
-      ? ([["Sitting", SERVICE_LABELS[booking.service]]] as Array<[string, string]>)
+      ? ([["Sitting", labels.services[booking.service]]] as Array<[string, string]>)
       : []),
     ...(isDiningFormat(booking.diningFormat)
-      ? ([["Served", DINING_FORMAT_LABELS[booking.diningFormat]]] as Array<[string, string]>)
+      ? ([["Served", labels.formats[booking.diningFormat].label]] as Array<[string, string]>)
       : []),
     ["Party size", String(booking.partySize)],
     ...(booking.eventType

@@ -6,6 +6,8 @@ import { db } from "@/lib/db";
 import { bookings } from "@/lib/db/schema";
 import { getBookingByManageToken } from "@/lib/db/queries";
 import { getNotifyEmail } from "@/lib/settings";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { defaultLocale, isLocale, localeHref } from "@/lib/i18n/config";
 import {
   bookingCancelledEmail,
   ownerCancelRequestedEmail,
@@ -14,6 +16,12 @@ import {
 } from "@/lib/email";
 
 export type ManageBookingState = { error?: string };
+
+/** The language the page was rendered in, so errors come back matching it. */
+function readLocale(formData: FormData) {
+  const raw = formData.get("locale");
+  return isLocale(raw) ? raw : defaultLocale;
+}
 
 function ownerEmailData(
   row: NonNullable<Awaited<ReturnType<typeof getBookingByManageToken>>>
@@ -39,11 +47,13 @@ export async function withdrawRequest(
   formData: FormData
 ): Promise<ManageBookingState> {
   const token = typeof formData.get("token") === "string" ? (formData.get("token") as string) : "";
+  const locale = readLocale(formData);
+  const t = getDictionary(locale).bookingStatus.manageErrors;
   try {
     const row = await getBookingByManageToken(token);
-    if (!row) return { error: "We couldn't find this booking." };
+    if (!row) return { error: t.notFound };
     if (row.booking.status !== "pending") {
-      return { error: "This request can no longer be withdrawn — please contact us." };
+      return { error: t.notWithdrawable };
     }
 
     await db
@@ -58,9 +68,9 @@ export async function withdrawRequest(
     ]);
   } catch (error) {
     console.error("Withdraw request failed:", error);
-    return { error: "Something went wrong — please try again or call us." };
+    return { error: t.failed };
   }
-  revalidatePath(`/bookings/${token}`);
+  revalidatePath(localeHref(locale, `/bookings/${token}`));
   return {};
 }
 
@@ -73,11 +83,13 @@ export async function requestCancellation(
   formData: FormData
 ): Promise<ManageBookingState> {
   const token = typeof formData.get("token") === "string" ? (formData.get("token") as string) : "";
+  const locale = readLocale(formData);
+  const t = getDictionary(locale).bookingStatus.manageErrors;
   try {
     const row = await getBookingByManageToken(token);
-    if (!row) return { error: "We couldn't find this booking." };
+    if (!row) return { error: t.notFound };
     if (row.booking.status !== "approved") {
-      return { error: "Only confirmed bookings can request cancellation." };
+      return { error: t.notApproved };
     }
     if (row.booking.cancelRequestedAt) return {};
 
@@ -93,8 +105,8 @@ export async function requestCancellation(
     });
   } catch (error) {
     console.error("Cancellation request failed:", error);
-    return { error: "Something went wrong — please try again or call us." };
+    return { error: t.failed };
   }
-  revalidatePath(`/bookings/${token}`);
+  revalidatePath(localeHref(locale, `/bookings/${token}`));
   return {};
 }

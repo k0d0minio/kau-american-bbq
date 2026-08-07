@@ -91,21 +91,24 @@ and closures.
 ```
 app/
   components/     Nav, Footer, Landing composition, motion + UI primitives
+    booking/      The reservation flow, shared by both languages: space page,
+                  panel/form, status page, server actions
   sections/       Hero, Smokehouse, Spaces, Gallery, Location, Booking CTA
   (en)/           English root layout — serves `/` and every sub-page
     page.tsx        Landing page (English)
     layout.tsx      lang="en", metadata, SEO, JSON-LD, fonts
+    book/           Resolves the bookable space and redirects to it
     spaces/[slug]/  Space detail pages: availability calendar + booking form
     bookings/[token]/ Guest reservation status page (private tokenized link)
-    enquire/        General enquiry form
+    enquire/        General enquiry form (English only)
     api/ical/[token]/ Private iCal availability feed per space
     admin/          Account-gated admin: dashboard, bookings, calendar,
                     guests, spaces editor, enquiries, gallery, settings
   (pt)/           Portuguese root layout — lang="pt-PT", serves `/pt`
-    pt/page.tsx     Landing page (Portuguese)
+    pt/            Landing page, /pt/book, /pt/spaces, /pt/bookings
   fonts/          Self-hosted variable fonts
 lib/
-  i18n/           Locale config + the landing page copy in both languages
+  i18n/           Locale config, route rules and all site copy per language
   seo.ts          Per-locale metadata, hreflang alternates and JSON-LD
   site.ts         Business info + static space fallback, gallery & nearby data
   spaces.ts       Space display shapes for the public site
@@ -127,23 +130,45 @@ public/img/       Restaurant photography
 
 ## Languages
 
-The landing page is offered in English at `/` and Portuguese at `/pt`, with an
-EN / PT switch in the nav. Everything else — the booking flow, enquiry form,
-Our Story and the admin — is English only for now.
+English is served from the bare paths it has always had; Portuguese lives under
+`/pt`, and the nav carries an EN / PT switch that swaps the current page in
+place. Translated so far:
 
-All landing copy lives in `lib/i18n/dictionaries.ts`. The English object is the
-source of truth: the `Dictionary` type is derived from it, so a translation
-that is missing or has a typo'd key fails `tsc` rather than silently leaving a
-gap on the page. Images, layout and links are shared — `lib/site.ts` holds only
-ids and asset paths, and the prose is looked up by the same id.
+| | English | Portuguese |
+| --- | --- | --- |
+| Landing page | `/` | `/pt` |
+| Book a table | `/book` | `/pt/book` |
+| Reservation form | `/spaces/[slug]` | `/pt/spaces/[slug]` |
+| Reservation status | `/bookings/[token]` | `/pt/bookings/[token]` |
+
+Still English only: `/enquire`, `/history`, the transactional emails and the
+admin. `localeHref` knows which routes have a translation, so a link to an
+English-only page is never given a `/pt` prefix.
+
+All copy lives in `lib/i18n/dictionaries.ts`. The English object is the source
+of truth: the `Dictionary` type is derived from it, so a translation that is
+missing or has a typo'd key fails `tsc` rather than silently leaving a gap on
+the page. Images, layout and links are shared — `lib/site.ts` holds only ids and
+asset paths, and the prose is looked up by the same id.
+
+The domain layer stays language-free. `validateRequest` returns error *codes*
+(`{ code: "sitting_full" }`), which `validationMessage` turns into prose at the
+edge; sittings, dining formats and occasions are ids whose labels live in the
+dictionary. Occasion *values* stored on a booking are deliberately unchanged, so
+existing rows keep reading correctly in the admin. Dates, months and weekday
+initials come from `Intl` in the visitor's language.
 
 Each language has its own root layout (`app/(en)`, `app/(pt)`) so it can serve
-the right `lang` attribute, `og:locale`, title and description. `/` and `/pt`
-cross-reference each other with `hreflang` and carry their own canonical.
+the right `lang` attribute, `og:locale`, title and description; pages under them
+are thin wrappers around shared components that take a `locale`. Equivalent
+pages cross-reference each other with `hreflang` and carry their own canonical.
+
+`tests/i18n.test.ts` covers the routing rules — which paths get prefixed, what
+the language switch does on an untranslated page, and that both dictionaries
+carry every error code.
 
 To add a language: add it to `locales` and `localeMeta` in `lib/i18n/config.ts`,
-add its dictionary, then create `app/(xx)/layout.tsx` and `app/(xx)/xx/page.tsx`
-mirroring the Portuguese pair.
+add its dictionary, then mirror the `app/(pt)` route wrappers.
 
 ## Database (Drizzle + Neon)
 

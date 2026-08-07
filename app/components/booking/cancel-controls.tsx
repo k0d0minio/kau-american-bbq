@@ -6,11 +6,13 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/app/components/ui/button";
 import { FormError } from "@/app/components/ui/field";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/config";
 import {
   requestCancellation,
   withdrawRequest,
   type ManageBookingState,
-} from "./actions";
+} from "./manage-actions";
 
 function ConfirmButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -29,11 +31,15 @@ function ConfirmButton({ label }: { label: string }) {
 export function CancelControls({
   token,
   mode,
+  locale,
 }: {
   token: string;
   /** "withdraw" cancels a pending request; "request" flags a confirmed reservation. */
   mode: "withdraw" | "request";
+  locale: Locale;
 }) {
+  const dict = getDictionary(locale).bookingStatus;
+  const t = mode === "withdraw" ? dict.withdraw : dict.cancel;
   const [confirming, setConfirming] = useState(false);
   const [state, formAction] = useActionState<ManageBookingState, FormData>(
     mode === "withdraw" ? withdrawRequest : requestCancellation,
@@ -47,7 +53,7 @@ export function CancelControls({
         onClick={() => setConfirming(true)}
         className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
       >
-        {mode === "withdraw" ? "Withdraw this request" : "Request cancellation"}
+        {t.cta}
       </button>
     );
   }
@@ -55,21 +61,16 @@ export function CancelControls({
   return (
     <form action={formAction} className="space-y-3">
       <input type="hidden" name="token" value={token} />
-      <p className="text-sm text-ink-soft">
-        {mode === "withdraw"
-          ? "Withdraw your request? The table goes back on sale straight away."
-          : "Ask us to cancel this reservation? We'll review it against the cancellation policy and confirm by email."}
-      </p>
+      <input type="hidden" name="locale" value={locale} />
+      <p className="text-sm text-ink-soft">{t.confirm}</p>
       <div className="flex flex-wrap gap-3">
-        <ConfirmButton
-          label={mode === "withdraw" ? "Yes — withdraw it" : "Yes — request cancellation"}
-        />
+        <ConfirmButton label={t.yes} />
         <button
           type="button"
           onClick={() => setConfirming(false)}
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
         >
-          Keep my reservation
+          {dict.keep}
         </button>
       </div>
       <FormError message={state.error} />

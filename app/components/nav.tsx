@@ -7,13 +7,21 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone, CalendarHeart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { site } from "@/lib/site";
-import { defaultLocale, localeHome, localeMeta, locales, type Locale } from "@/lib/i18n/config";
+import {
+  alternatePath,
+  defaultLocale,
+  localeHome,
+  localeHref,
+  localeMeta,
+  locales,
+  type Locale,
+} from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { buttonVariants } from "./ui/button";
 
 /**
- * The nav is shared by every public page. Only the landing page is translated,
- * so pages that are English-only simply leave `locale` at its default.
+ * The nav is shared by every public page. Pages that exist in English only —
+ * /enquire, /history, the admin — simply leave `locale` at its default.
  */
 export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
   const t = getDictionary(locale).nav;
@@ -30,8 +38,8 @@ export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
     { href: sectionHref("#smokehouse"), label: t.sections.smokehouse },
     { href: sectionHref("#gallery"), label: t.sections.gallery },
     { href: sectionHref("#location"), label: t.sections.location },
-    { href: "/history", label: t.story },
-    { href: "/enquire", label: t.enquire },
+    { href: localeHref(locale, "/history"), label: t.story },
+    { href: localeHref(locale, "/enquire"), label: t.enquire },
   ];
   const homeHref = onHome ? "#top" : home;
 
@@ -97,9 +105,14 @@ export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
                 <span className="absolute -bottom-1 left-0 h-px w-0 bg-current transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
-            <LanguageSwitch current={locale} label={t.language} scrolled={scrolled} />
+            <LanguageSwitch
+              current={locale}
+              label={t.language}
+              scrolled={scrolled}
+              pathname={pathname}
+            />
             <Link
-              href="/book"
+              href={localeHref(locale, "/book")}
               className={cn(
                 buttonVariants({ variant: scrolled ? "ember" : "light", size: "sm" })
               )}
@@ -163,7 +176,7 @@ export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
             </motion.ul>
             <div className="space-y-3 px-6 pt-10 pb-12">
               <Link
-                href="/book"
+                href={localeHref(locale, "/book")}
                 onClick={() => setOpen(false)}
                 className={cn(buttonVariants({ variant: "ember", size: "lg" }), "w-full")}
               >
@@ -182,6 +195,7 @@ export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
                 current={locale}
                 label={t.language}
                 scrolled={false}
+                pathname={pathname}
                 className="justify-center pt-4"
                 onNavigate={() => setOpen(false)}
               />
@@ -194,19 +208,23 @@ export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
 }
 
 /**
- * EN / PT toggle. Each language has its own root layout so these are plain
- * anchors — the full page load is what swaps the document's `lang`.
+ * EN / PT toggle. Switches the current page in place where a translation
+ * exists, and falls back to that language's home where one does not. Each
+ * language has its own root layout, so these are plain anchors — the full page
+ * load is what swaps the document's `lang`.
  */
 function LanguageSwitch({
   current,
   label,
   scrolled,
+  pathname,
   className,
   onNavigate,
 }: {
   current: Locale;
   label: string;
   scrolled: boolean;
+  pathname: string;
   className?: string;
   onNavigate?: () => void;
 }) {
@@ -228,7 +246,7 @@ function LanguageSwitch({
               </span>
             )}
             <a
-              href={localeHome(l)}
+              href={alternatePath(pathname, l)}
               hrefLang={localeMeta[l].htmlLang}
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}

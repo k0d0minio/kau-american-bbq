@@ -9,7 +9,7 @@ import { site } from "@/lib/site";
 import { buttonVariants } from "@/app/components/ui/button";
 import { Reveal } from "@/app/components/motion";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import type { Locale } from "@/lib/i18n/config";
+import { localeHref, type Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
 export function BookingCta({ locale }: { locale: Locale }) {
@@ -56,11 +56,11 @@ export function BookingCta({ locale }: { locale: Locale }) {
         </Reveal>
         <Reveal delay={0.3}>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
-            <Link href="/book" className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
+            <Link href={localeHref(locale, "/book")} className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
               <CalendarHeart className="size-4" />
               {t.ctaPrimary}
             </Link>
-            <Link href="/enquire" className={cn(buttonVariants({ variant: "light", size: "lg" }))}>
+            <Link href={localeHref(locale, "/enquire")} className={cn(buttonVariants({ variant: "light", size: "lg" }))}>
               {t.ctaSecondary}
             </Link>
           </div>

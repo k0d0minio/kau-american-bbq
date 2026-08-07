@@ -8,7 +8,7 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import { AnimatedWords } from "@/app/components/motion";
 import { buttonVariants } from "@/app/components/ui/button";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import type { Locale } from "@/lib/i18n/config";
+import { localeHref, type Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
 export function Hero({ locale }: { locale: Locale }) {
@@ -82,11 +82,11 @@ export function Hero({ locale }: { locale: Locale }) {
           transition={{ duration: 0.9, delay: 1.3 }}
           className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
         >
-          <Link href="/book" className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
+          <Link href={localeHref(locale, "/book")} className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
             {t.ctaPrimary}
             <ArrowRight className="size-4" />
           </Link>
-          <Link href="/enquire" className={cn(buttonVariants({ variant: "light", size: "lg" }))}>
+          <Link href={localeHref(locale, "/enquire")} className={cn(buttonVariants({ variant: "light", size: "lg" }))}>
             {t.ctaSecondary}
           </Link>
         </motion.div>

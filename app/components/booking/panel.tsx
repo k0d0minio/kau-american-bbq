@@ -10,11 +10,11 @@ import {
   formatDate,
   formatMonth,
   parseISO,
+  weekdayInitials,
   type ISODate,
 } from "@/lib/booking/dates";
 import {
   SERVICES,
-  SERVICE_LABELS,
   bookingWindow,
   isDateBlocked,
   isDayAvailable,
@@ -23,15 +23,13 @@ import {
   type DateRange,
   type Service,
 } from "@/lib/booking/availability";
-import {
-  DINING_FORMATS,
-  DINING_FORMAT_LABELS,
-  DINING_FORMAT_NOTES,
-  type DiningFormat,
-} from "@/lib/booking/dining-formats";
+import { DINING_FORMATS, type DiningFormat } from "@/lib/booking/dining-formats";
 import { EVENT_TYPES } from "@/lib/booking/event-types";
 import { buttonVariants } from "@/app/components/ui/button";
 import { FormError, Input, Label, Select, Textarea } from "@/app/components/ui/field";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { fill } from "@/lib/i18n/format";
+import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 import { requestBooking, type BookingFormState } from "./actions";
 
@@ -51,7 +49,15 @@ function firstOfMonth(date: ISODate): ISODate {
   return `${date.slice(0, 7)}-01`;
 }
 
-function SubmitButton({ disabled }: { disabled: boolean }) {
+function SubmitButton({
+  disabled,
+  idle,
+  busy,
+}: {
+  disabled: boolean;
+  idle: string;
+  busy: string;
+}) {
   const { pending } = useFormStatus();
   return (
     <button
@@ -62,12 +68,12 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
       {pending ? (
         <>
           <Loader2 className="size-4 animate-spin" />
-          Sending your request…
+          {busy}
         </>
       ) : (
         <>
           <Send className="size-4" />
-          Request a table
+          {idle}
         </>
       )}
     </button>
@@ -79,6 +85,7 @@ export function BookingPanel({
   blocks,
   closures,
   today,
+  locale,
 }: {
   space: PanelSpace;
   /** Approved bookings across every space — capacity is cross-space aware. */
@@ -86,7 +93,10 @@ export function BookingPanel({
   /** Closure ranges that apply to this space. */
   closures: DateRange[];
   today: ISODate;
+  locale: Locale;
 }) {
+  const dict = getDictionary(locale);
+  const t = dict.bookingForm;
   const window = useMemo(() => bookingWindow(space, today), [space, today]);
   const [month, setMonth] = useState<ISODate>(firstOfMonth(window.firstStart));
   const [date, setDate] = useState<ISODate | null>(null);
@@ -127,33 +137,30 @@ export function BookingPanel({
     return { count, lead };
   }, [month]);
 
-  const dayLabels = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+  const dayLabels = useMemo(() => weekdayInitials(locale), [locale]);
 
   return (
     <div className="rounded-3xl border border-char-100 bg-bone-100 p-6 shadow-soft sm:p-7">
-      <p className="eyebrow text-ember">Reserve a table</p>
-      <h2 className="mt-2 font-display text-2xl text-char-900">Pick your day</h2>
-      <p className="mt-2 text-sm leading-relaxed text-stone">
-        We&apos;re open Thursday to Sunday for lunch and dinner. Choose a day and a
-        sitting — we review every request personally.
-      </p>
+      <p className="eyebrow text-ember">{t.eyebrow}</p>
+      <h2 className="mt-2 font-display text-2xl text-char-900">{t.heading}</h2>
+      <p className="mt-2 text-sm leading-relaxed text-stone">{t.intro}</p>
 
       {/* Calendar */}
       <div className="mt-5 rounded-2xl border border-char-100 bg-bone p-4">
         <div className="flex items-center justify-between">
           <button
             type="button"
-            aria-label="Previous month"
+            aria-label={t.prevMonth}
             onClick={() => canPrev && setMonth(addMonths(month, -1))}
             disabled={!canPrev}
             className="flex size-8 items-center justify-center rounded-full text-char-700 transition-colors hover:bg-char-50 disabled:opacity-30"
           >
             <ChevronLeft className="size-4" />
           </button>
-          <p className="text-sm font-medium text-ink">{formatMonth(month)}</p>
+          <p className="text-sm font-medium text-ink">{formatMonth(month, locale)}</p>
           <button
             type="button"
-            aria-label="Next month"
+            aria-label={t.nextMonth}
             onClick={() => canNext && setMonth(addMonths(month, 1))}
             disabled={!canNext}
             className="flex size-8 items-center justify-center rounded-full text-char-700 transition-colors hover:bg-char-50 disabled:opacity-30"
@@ -181,7 +188,7 @@ export function BookingPanel({
                 type="button"
                 disabled={!selectable}
                 onClick={() => pickDay(day)}
-                aria-label={formatDate(day)}
+                aria-label={formatDate(day, locale)}
                 aria-pressed={selected}
                 className={cn(
                   "mx-auto flex size-9 items-center justify-center rounded-full text-sm transition-colors",
@@ -201,7 +208,7 @@ export function BookingPanel({
         </div>
         <div className="mt-3 flex items-center justify-between border-t border-char-100 pt-3">
           <p className="text-xs text-stone">
-            Thursday to Sunday · tables up to {space.maxGuests}
+            {fill(t.calendarNote, { max: space.maxGuests })}
           </p>
           {date ? (
             <button
@@ -210,7 +217,7 @@ export function BookingPanel({
               className="inline-flex items-center gap-1 text-xs font-medium text-char-700 hover:text-ember"
             >
               <Undo2 className="size-3" />
-              Clear
+              {t.clear}
             </button>
           ) : null}
         </div>
@@ -219,7 +226,7 @@ export function BookingPanel({
       {/* Sitting */}
       {date ? (
         <div className="mt-5 rounded-2xl bg-char-50 p-4">
-          <p className="text-sm font-medium text-char-900">{formatDate(date)}</p>
+          <p className="text-sm font-medium text-char-900">{formatDate(date, locale)}</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {SERVICES.map((option) => {
               const room = serviceHasRoom(space, blocks, date, option, partySize);
@@ -239,22 +246,20 @@ export function BookingPanel({
                         : "border-char-100 bg-bone/50 text-stone/50 line-through"
                   )}
                 >
-                  {SERVICE_LABELS[option]}
+                  {dict.booking.services[option]}
                 </button>
               );
             })}
           </div>
           {!service ? (
-            <p className="mt-2 text-xs text-stone">
-              Pick lunch or dinner to finish your request.
-            </p>
+            <p className="mt-2 text-xs text-stone">{t.pickSitting}</p>
           ) : null}
         </div>
       ) : null}
 
       {/* How you'd like to be served — same room, same covers, same smoke. */}
       <fieldset className="mt-5">
-        <legend className="text-sm font-medium text-char-900">How would you like to eat?</legend>
+        <legend className="text-sm font-medium text-char-900">{t.formatLegend}</legend>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {DINING_FORMATS.map((option) => (
             <button
@@ -269,14 +274,14 @@ export function BookingPanel({
                   : "cursor-pointer border-char-100 bg-bone text-ink hover:border-char-400"
               )}
             >
-              <span className="block font-medium">{DINING_FORMAT_LABELS[option]}</span>
+              <span className="block font-medium">{dict.booking.formats[option].label}</span>
               <span
                 className={cn(
                   "mt-0.5 block text-xs leading-relaxed",
                   format === option ? "text-bone/80" : "text-stone"
                 )}
               >
-                {DINING_FORMAT_NOTES[option]}
+                {dict.booking.formats[option].note}
               </span>
             </button>
           ))}
@@ -289,6 +294,7 @@ export function BookingPanel({
         <input type="hidden" name="date" value={date ?? ""} />
         <input type="hidden" name="service" value={service ?? ""} />
         <input type="hidden" name="diningFormat" value={format} />
+        <input type="hidden" name="locale" value={locale} />
         {/* Honeypot — humans never see or fill this. */}
         <div aria-hidden="true" className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden">
           <label>
@@ -299,25 +305,25 @@ export function BookingPanel({
 
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="firstName">First name</Label>
+            <Label htmlFor="firstName">{t.firstName}</Label>
             <Input id="firstName" name="firstName" autoComplete="given-name" required maxLength={80} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="lastName">Last name</Label>
+            <Label htmlFor="lastName">{t.lastName}</Label>
             <Input id="lastName" name="lastName" autoComplete="family-name" required maxLength={80} />
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t.email}</Label>
           <Input id="email" name="email" type="email" autoComplete="email" required maxLength={200} />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="phone">Phone <span className="font-normal text-stone">(optional)</span></Label>
+            <Label htmlFor="phone">{t.phone} <span className="font-normal text-stone">{t.optional}</span></Label>
             <Input id="phone" name="phone" type="tel" autoComplete="tel" maxLength={40} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="partySize">How many people?</Label>
+            <Label htmlFor="partySize">{t.partySize}</Label>
             <Input
               id="partySize"
               name="partySize"
@@ -332,36 +338,33 @@ export function BookingPanel({
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="eventType">
-            Occasion <span className="font-normal text-stone">(optional)</span>
+            {t.occasion} <span className="font-normal text-stone">{t.optional}</span>
           </Label>
           <Select id="eventType" name="eventType" defaultValue="">
-            <option value="">No special occasion</option>
-            {EVENT_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
+            <option value="">{t.noOccasion}</option>
+            {EVENT_TYPES.map((option) => (
+              <option key={option.id} value={option.value}>
+                {dict.booking.eventTypes[option.id]}
               </option>
             ))}
           </Select>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="message">
-            Anything else <span className="font-normal text-stone">(optional)</span>
+            {t.anythingElse} <span className="font-normal text-stone">{t.optional}</span>
           </Label>
           <Textarea
             id="message"
             name="message"
             maxLength={2000}
-            placeholder="Allergies, highchairs, a birthday surprise — anything we should know?"
+            placeholder={t.messagePlaceholder}
           />
         </div>
 
         <FormError message={state.error} />
 
-        <SubmitButton disabled={!date || !service} />
-        <p className="text-center text-xs leading-relaxed text-stone">
-          Submitting sends a reservation request — nothing is charged online. We confirm
-          by email.
-        </p>
+        <SubmitButton disabled={!date || !service} idle={t.submit} busy={t.submitting} />
+        <p className="text-center text-xs leading-relaxed text-stone">{t.disclaimer}</p>
       </form>
     </div>
   );

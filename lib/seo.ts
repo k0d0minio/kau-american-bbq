@@ -56,7 +56,7 @@ export function landingMetadata(locale: Locale): Metadata {
   return {
     alternates: {
       canonical: localeHome(locale),
-      languages: languageAlternates,
+      languages: languageAlternates("/"),
     },
   };
 }

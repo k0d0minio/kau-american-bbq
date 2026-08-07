@@ -14,7 +14,10 @@ import {
 import { computeQuote } from "@/lib/booking/pricing";
 import { makeManageToken, makeReference } from "@/lib/booking/tokens";
 import { isDiningFormat } from "@/lib/booking/dining-formats";
-import { EVENT_TYPES } from "@/lib/booking/event-types";
+import { EVENT_TYPE_VALUES } from "@/lib/booking/event-types";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { validationMessage } from "@/lib/i18n/format";
+import { defaultLocale, isLocale, localeHref } from "@/lib/i18n/config";
 import { getCancellationPolicy, getNotifyEmail } from "@/lib/settings";
 import {
   ownerNewRequestEmail,
@@ -34,9 +37,16 @@ export async function requestBooking(
   _previous: BookingFormState,
   formData: FormData
 ): Promise<BookingFormState> {
+  // The form carries the language it was rendered in, so the errors and the
+  // page we land on afterwards stay in the guest's language.
+  const localeRaw = cleanText(formData.get("locale"), 5);
+  const locale = isLocale(localeRaw) ? localeRaw : defaultLocale;
+  const dict = getDictionary(locale);
+  const t = dict.bookingForm.errors;
+
   // Honeypot: real guests never fill this. Bots get waved through to the
   // homepage without a hint that anything was filtered.
-  if (cleanText(formData.get("website"), 100)) redirect("/");
+  if (cleanText(formData.get("website"), 100)) redirect(localeHref(locale, "/"));
 
   const slug = cleanText(formData.get("space"), 100);
   const date = cleanText(formData.get("date"), 10);
@@ -51,27 +61,26 @@ export async function requestBooking(
   const eventTypeRaw = cleanText(formData.get("eventType"), 60);
 
   if (!firstName || !lastName) {
-    return { error: "Please tell us your name." };
+    return { error: t.name };
   }
   if (!EMAIL_PATTERN.test(email)) {
-    return { error: "That email address doesn't look right." };
+    return { error: t.email };
   }
 
   let manageToken: string;
   try {
     const space = await getSpaceBySlug(slug);
     if (!space || !space.active) {
-      return { error: "This space isn't taking bookings right now." };
+      return { error: t.spaceClosed };
     }
 
     // The occasion is optional for every space now, but still has to be one
     // of ours.
-    const eventType =
-      (EVENT_TYPES as readonly string[]).find((t) => t === eventTypeRaw) ?? null;
+    const eventType = EVENT_TYPE_VALUES.find((v) => v === eventTypeRaw) ?? null;
     const service = isService(serviceRaw) ? serviceRaw : null;
     const diningFormat = isDiningFormat(diningFormatRaw) ? diningFormatRaw : null;
     if (!diningFormat) {
-      return { error: "Please choose table service or the counter." };
+      return { error: t.format };
     }
 
     // Authoritative availability check against fresh data.
@@ -85,7 +94,7 @@ export async function requestBooking(
       availability.bookings,
       availability.blackouts
     );
-    if (!validation.ok) return { error: validation.error };
+    if (!validation.ok) return { error: validationMessage(validation.error, dict.booking.errors) };
 
     const startDate = date;
     const endDate = reservationEndDate(date);
@@ -143,7 +152,7 @@ export async function requestBooking(
       }
     }
     if (!booking) {
-      return { error: "Something went wrong saving your request — please try again." };
+      return { error: t.save };
     }
     manageToken = booking.manageToken;
 
@@ -182,10 +191,8 @@ export async function requestBooking(
     ]);
   } catch (error) {
     console.error("Booking request failed:", error);
-    return {
-      error: "Something went wrong sending your request. Please try again, or call us.",
-    };
+    return { error: t.send };
   }
 
-  redirect(`/bookings/${manageToken}?submitted=1`);
+  redirect(`${localeHref(locale, `/bookings/${manageToken}`)}?submitted=1`);
 }

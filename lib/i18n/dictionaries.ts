@@ -153,6 +153,181 @@ const en = {
     rights: "All rights reserved.",
     smokedDaily: "Smoked daily in Malveira, Portugal.",
   },
+
+  // Shared booking vocabulary — the sittings, service formats and occasions
+  // that appear on the reservation form, the status page and the admin.
+  booking: {
+    services: {
+      lunch: "Lunch · 12:00–15:00",
+      dinner: "Dinner · 19:00–22:00",
+    },
+    formats: {
+      table: {
+        label: "Table service",
+        note: "Order from the table and let the meat come to you.",
+      },
+      counter: {
+        label: "The Texan counter",
+        note: "Step up to the counter and watch your meats cut and weighed.",
+      },
+    },
+    eventTypes: {
+      birthday: "Birthday",
+      celebration: "Anniversary or celebration",
+      business: "Business lunch or dinner",
+      group: "Group or team meal",
+      privateEvent: "Full-venue private event",
+      other: "Other",
+    },
+    /** {max} is substituted with a number. */
+    errors: {
+      invalid_date: "Please pick a valid date.",
+      no_service: "Please choose lunch or dinner.",
+      closed_weekday: "We're open Thursday to Sunday — please pick another day.",
+      out_of_window: "Reservations are open up to {max} months ahead for now.",
+      no_party_size: "Please tell us how many people are coming.",
+      party_too_large:
+        "For groups larger than {max}, call us or send an enquiry — we'll sort something out.",
+      closed_day: "We're closed that day — please pick another date.",
+      sitting_full: "That sitting is fully booked — try the other sitting or another day.",
+    },
+  },
+
+  // The space detail page a "Book a table" CTA lands on.
+  spacePage: {
+    back: "All ways to eat",
+    /** {max} is the largest party the room takes. */
+    tablesUpTo: "Tables up to {max}",
+    hours: "Thu–Sun · lunch & dinner",
+    features: "What you'll find",
+    privateHire: "Private hire",
+    perEventDay: "Per event day",
+    priceOnRequest: "Price on request",
+    blocksVenue:
+      "Private hire closes the whole restaurant to other guests — the room, the counter and Godzilla are all yours.",
+    goodToKnow: "Good to know",
+    questionsBefore: "Questions before you book?",
+    or: "or",
+    sendEnquiry: "send an enquiry",
+    alsoAtKau: "Also at KAU",
+    fallbackTitle: "Ways to eat",
+  },
+
+  // The reservation panel — calendar, sitting picker and details form.
+  bookingForm: {
+    eyebrow: "Reserve a table",
+    heading: "Pick your day",
+    intro:
+      "We're open Thursday to Sunday for lunch and dinner. Choose a day and a sitting — we review every request personally.",
+    prevMonth: "Previous month",
+    nextMonth: "Next month",
+    /** {max} is the largest party the room takes. */
+    calendarNote: "Thursday to Sunday · tables up to {max}",
+    clear: "Clear",
+    pickSitting: "Pick lunch or dinner to finish your request.",
+    formatLegend: "How would you like to eat?",
+    firstName: "First name",
+    lastName: "Last name",
+    email: "Email",
+    phone: "Phone",
+    optional: "(optional)",
+    partySize: "How many people?",
+    occasion: "Occasion",
+    noOccasion: "No special occasion",
+    anythingElse: "Anything else",
+    messagePlaceholder:
+      "Allergies, highchairs, a birthday surprise — anything we should know?",
+    submit: "Request a table",
+    submitting: "Sending your request…",
+    disclaimer:
+      "Submitting sends a reservation request — nothing is charged online. We confirm by email.",
+    errors: {
+      name: "Please tell us your name.",
+      email: "That email address doesn't look right.",
+      spaceClosed: "This space isn't taking bookings right now.",
+      format: "Please choose table service or the counter.",
+      save: "Something went wrong saving your request — please try again.",
+      send: "Something went wrong sending your request. Please try again, or call us.",
+    },
+  },
+
+  // The private status page a guest reaches from the form or their email.
+  bookingStatus: {
+    title: "Your reservation",
+    states: {
+      pending: {
+        title: "Request received",
+        body: "We review every request personally and will confirm by email — usually within a few hours.",
+      },
+      approved: {
+        title: "Your table is booked",
+        body: "See you in Malveira — come hungry.",
+      },
+      completed: {
+        title: "Thanks for eating with us",
+        body: "This reservation is done and dusted. We'd love to see you at KAU again.",
+      },
+      declined: {
+        title: "We couldn't seat you this time",
+        body: "See our email for details — the other sitting or another day often works, so do get in touch.",
+      },
+      cancelled: {
+        title: "This reservation is cancelled",
+        body: "If that's a surprise, or you'd like to rebook, call or email us any time.",
+      },
+    },
+    /** {email} is substituted with the guest's address. */
+    submitted:
+      "Your request is on its way — a confirmation email is heading to {email}. Bookmark this page to check your status any time.",
+    cancelPending:
+      "Cancellation requested — we're reviewing it and will confirm by email shortly.",
+    details: "Reservation details",
+    reference: "Reference",
+    where: "Where",
+    date: "Date",
+    sitting: "Sitting",
+    served: "Served",
+    partySize: "Party size",
+    occasion: "Occasion",
+    bookedBy: "Booked by",
+    estimatedTotal: "Estimated total",
+    total: "Total",
+    estimateNote:
+      "An estimate — we confirm the final price when we confirm your booking. Nothing is charged online.",
+    payment: {
+      paid: "Paid in full — thank you.",
+      /** {amount} is a formatted sum; the parenthetical is dropped when unknown. */
+      depositPaid: "Deposit received{amount} — balance due before the event.",
+      refunded: "Refunded.",
+      pending: "We'll be in touch personally about the deposit and payment.",
+    },
+    changeOfPlans: "Change of plans?",
+    withdrawBody: "You can withdraw a pending request at any time — no questions asked.",
+    cancelBody:
+      "Need to move or cancel? Send a cancellation request and we'll take it from there — moving to another day is often easier than you'd think.",
+    policy: "Cancellation policy",
+    questions: "Questions? Call",
+    orEmail: "or email",
+    mailSubject: "Reservation",
+    withdraw: {
+      cta: "Withdraw this request",
+      confirm: "Withdraw your request? The table goes back on sale straight away.",
+      yes: "Yes — withdraw it",
+    },
+    cancel: {
+      cta: "Request cancellation",
+      confirm:
+        "Ask us to cancel this reservation? We'll review it against the cancellation policy and confirm by email.",
+      yes: "Yes — request cancellation",
+    },
+    keep: "Keep my reservation",
+    manageErrors: {
+      notFound: "We couldn't find this booking.",
+      notWithdrawable: "This request can no longer be withdrawn — please contact us.",
+      notApproved: "Only confirmed bookings can request cancellation.",
+      failed: "Something went wrong — please try again or call us.",
+    },
+  },
 };
 
 /**
@@ -308,6 +483,171 @@ const pt: Dictionary = {
     enquire: "Contactos",
     rights: "Todos os direitos reservados.",
     smokedDaily: "Fumado todos os dias na Malveira, Portugal.",
+  },
+
+  booking: {
+    services: {
+      lunch: "Almoço · 12:00–15:00",
+      dinner: "Jantar · 19:00–22:00",
+    },
+    formats: {
+      table: {
+        label: "Serviço de mesa",
+        note: "Peça à mesa e deixe a carne vir ter consigo.",
+      },
+      counter: {
+        label: "O balcão texano",
+        note: "Chegue ao balcão e veja as carnes serem cortadas e pesadas.",
+      },
+    },
+    eventTypes: {
+      birthday: "Aniversário",
+      celebration: "Aniversário de casamento ou celebração",
+      business: "Almoço ou jantar de negócios",
+      group: "Refeição de grupo ou de equipa",
+      privateEvent: "Evento privado com espaço reservado",
+      other: "Outro",
+    },
+    errors: {
+      invalid_date: "Escolha uma data válida.",
+      no_service: "Escolha almoço ou jantar.",
+      closed_weekday: "Abrimos de quinta a domingo — escolha outro dia, por favor.",
+      out_of_window: "De momento, aceitamos reservas até {max} meses de antecedência.",
+      no_party_size: "Diga-nos quantas pessoas são.",
+      party_too_large:
+        "Para grupos com mais de {max} pessoas, ligue-nos ou envie uma mensagem — arranjamos forma.",
+      closed_day: "Estamos fechados nesse dia — escolha outra data, por favor.",
+      sitting_full: "Esse serviço está esgotado — experimente o outro serviço ou outro dia.",
+    },
+  },
+
+  spacePage: {
+    back: "Todas as formas de comer",
+    tablesUpTo: "Mesas até {max} pessoas",
+    hours: "Qui–Dom · almoço e jantar",
+    features: "O que vai encontrar",
+    privateHire: "Espaço reservado",
+    perEventDay: "Por dia de evento",
+    priceOnRequest: "Preço sob consulta",
+    blocksVenue:
+      "O espaço reservado fecha o restaurante aos restantes clientes — a sala, o balcão e o Godzilla são todos seus.",
+    goodToKnow: "A saber",
+    questionsBefore: "Dúvidas antes de reservar?",
+    or: "ou",
+    sendEnquiry: "envie-nos uma mensagem",
+    alsoAtKau: "Também no KAU",
+    fallbackTitle: "Formas de comer",
+  },
+
+  bookingForm: {
+    eyebrow: "Reservar mesa",
+    heading: "Escolha o seu dia",
+    intro:
+      "Abrimos de quinta a domingo, para almoço e jantar. Escolha o dia e o serviço — vemos todos os pedidos pessoalmente.",
+    prevMonth: "Mês anterior",
+    nextMonth: "Mês seguinte",
+    calendarNote: "De quinta a domingo · mesas até {max} pessoas",
+    clear: "Limpar",
+    pickSitting: "Escolha almoço ou jantar para concluir o pedido.",
+    formatLegend: "Como prefere comer?",
+    firstName: "Nome",
+    lastName: "Apelido",
+    email: "Email",
+    phone: "Telemóvel",
+    optional: "(opcional)",
+    partySize: "Quantas pessoas?",
+    occasion: "Ocasião",
+    noOccasion: "Sem ocasião especial",
+    anythingElse: "Mais alguma coisa",
+    messagePlaceholder:
+      "Alergias, cadeiras de bebé, uma surpresa de aniversário — algo que devamos saber?",
+    submit: "Pedir mesa",
+    submitting: "A enviar o seu pedido…",
+    disclaimer:
+      "Ao enviar, faz um pedido de reserva — não se paga nada online. Confirmamos por email.",
+    errors: {
+      name: "Diga-nos o seu nome, por favor.",
+      email: "Esse endereço de email não parece correto.",
+      spaceClosed: "Este espaço não está a aceitar reservas de momento.",
+      format: "Escolha serviço de mesa ou balcão.",
+      save: "Algo correu mal ao guardar o seu pedido — tente novamente, por favor.",
+      send: "Algo correu mal ao enviar o seu pedido. Tente novamente ou ligue-nos.",
+    },
+  },
+
+  bookingStatus: {
+    title: "A sua reserva",
+    states: {
+      pending: {
+        title: "Pedido recebido",
+        body: "Vemos todos os pedidos pessoalmente e confirmamos por email — normalmente em poucas horas.",
+      },
+      approved: {
+        title: "A sua mesa está reservada",
+        body: "Até já na Malveira — venha com fome.",
+      },
+      completed: {
+        title: "Obrigado por ter comido connosco",
+        body: "Esta reserva está concluída. Adorávamos voltar a vê-lo no KAU.",
+      },
+      declined: {
+        title: "Desta vez não conseguimos arranjar mesa",
+        body: "Veja os detalhes no nosso email — o outro serviço ou outro dia costumam resultar, por isso fale connosco.",
+      },
+      cancelled: {
+        title: "Esta reserva foi cancelada",
+        body: "Se isto for uma surpresa, ou quiser voltar a reservar, ligue-nos ou escreva-nos quando quiser.",
+      },
+    },
+    submitted:
+      "O seu pedido está a caminho — vai receber um email de confirmação em {email}. Guarde esta página nos favoritos para consultar o estado quando quiser.",
+    cancelPending:
+      "Cancelamento pedido — estamos a analisá-lo e confirmamos por email em breve.",
+    details: "Detalhes da reserva",
+    reference: "Referência",
+    where: "Onde",
+    date: "Data",
+    sitting: "Serviço",
+    served: "Servido",
+    partySize: "Número de pessoas",
+    occasion: "Ocasião",
+    bookedBy: "Reservado por",
+    estimatedTotal: "Total estimado",
+    total: "Total",
+    estimateNote:
+      "Uma estimativa — confirmamos o preço final quando confirmarmos a reserva. Não se paga nada online.",
+    payment: {
+      paid: "Pago na totalidade — obrigado.",
+      depositPaid: "Sinal recebido{amount} — o restante é devido antes do evento.",
+      refunded: "Reembolsado.",
+      pending: "Falaremos consigo pessoalmente sobre o sinal e o pagamento.",
+    },
+    changeOfPlans: "Mudança de planos?",
+    withdrawBody: "Pode retirar um pedido pendente quando quiser — sem perguntas.",
+    cancelBody:
+      "Precisa de mudar ou cancelar? Envie um pedido de cancelamento e tratamos do resto — mudar para outro dia costuma ser mais fácil do que parece.",
+    policy: "Política de cancelamento",
+    questions: "Dúvidas? Ligue para",
+    orEmail: "ou escreva para",
+    mailSubject: "Reserva",
+    withdraw: {
+      cta: "Retirar este pedido",
+      confirm: "Retirar o seu pedido? A mesa volta a ficar disponível de imediato.",
+      yes: "Sim — retirar",
+    },
+    cancel: {
+      cta: "Pedir cancelamento",
+      confirm:
+        "Quer pedir-nos o cancelamento desta reserva? Vamos analisá-lo à luz da política de cancelamento e confirmamos por email.",
+      yes: "Sim — pedir cancelamento",
+    },
+    keep: "Manter a minha reserva",
+    manageErrors: {
+      notFound: "Não encontrámos esta reserva.",
+      notWithdrawable: "Este pedido já não pode ser retirado — contacte-nos, por favor.",
+      notApproved: "Só reservas confirmadas podem pedir cancelamento.",
+      failed: "Algo correu mal — tente novamente ou ligue-nos.",
+    },
   },
 };
 

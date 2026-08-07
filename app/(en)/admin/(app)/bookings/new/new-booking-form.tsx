@@ -6,7 +6,11 @@ import { Loader2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/app/components/ui/button";
 import { FormError, Input, Label, Select, Textarea } from "@/app/components/ui/field";
-import { SERVICES, SERVICE_LABELS } from "@/lib/booking/availability";
+import { SERVICES } from "@/lib/booking/availability";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+
+// The admin is English-only.
+const SITTINGS = getDictionary("en").booking.services;
 import { createManualBooking, type AdminActionState } from "../actions";
 
 export type SpaceOption = {
@@ -104,7 +108,7 @@ export function NewBookingForm({
           <Select id="service" name="service" defaultValue="dinner">
             {SERVICES.map((option) => (
               <option key={option} value={option}>
-                {SERVICE_LABELS[option]}
+                {SITTINGS[option]}
               </option>
             ))}
           </Select>

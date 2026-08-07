@@ -23,11 +23,6 @@ import { addDays, addMonths, isValidISODate, parseISO, type ISODate } from "./da
 export const SERVICES = ["lunch", "dinner"] as const;
 export type Service = (typeof SERVICES)[number];
 
-export const SERVICE_LABELS: Record<Service, string> = {
-  lunch: "Lunch · 12:00–15:00",
-  dinner: "Dinner · 19:00–22:00",
-};
-
 /** Bare sitting name, for admin list rows where the times would not fit. */
 export const SERVICE_SHORT_LABELS: Record<Service, string> = {
   lunch: "Lunch",
@@ -205,7 +200,23 @@ export function bookingWindow(
   };
 }
 
-export type ValidationResult = { ok: true } | { ok: false; error: string };
+/**
+ * Why a request was rejected. Codes rather than prose: this module is shared by
+ * both languages, so the wording lives in lib/i18n/dictionaries.ts and is
+ * resolved at the edge by `validationMessage`. `max` carries the limit the rule
+ * was measured against, for the messages that quote it.
+ */
+export type ValidationError =
+  | { code: "invalid_date" }
+  | { code: "no_service" }
+  | { code: "closed_weekday" }
+  | { code: "out_of_window"; max: number }
+  | { code: "no_party_size" }
+  | { code: "party_too_large"; max: number }
+  | { code: "closed_day" }
+  | { code: "sitting_full" };
+
+export type ValidationResult = { ok: true } | { ok: false; error: ValidationError };
 
 /**
  * Full server-side validation of a reservation request. The client enforces
@@ -222,48 +233,33 @@ export function validateRequest(
   const { date, service, partySize } = request;
 
   if (!isValidISODate(date)) {
-    return { ok: false, error: "Please pick a valid date." };
+    return { ok: false, error: { code: "invalid_date" } };
   }
   if (!isService(service)) {
-    return { ok: false, error: "Please choose lunch or dinner." };
+    return { ok: false, error: { code: "no_service" } };
   }
   if (!isOpenDay(date)) {
-    return {
-      ok: false,
-      error: "We're open Thursday to Sunday — please pick another day.",
-    };
+    return { ok: false, error: { code: "closed_weekday" } };
   }
 
   const window = bookingWindow(space, today);
   if (date < window.firstStart || date >= window.lastEnd) {
-    return {
-      ok: false,
-      error: `Reservations are open up to ${space.maxHorizonMonths} months ahead for now.`,
-    };
+    return { ok: false, error: { code: "out_of_window", max: space.maxHorizonMonths } };
   }
 
   if (!Number.isInteger(partySize) || partySize < 1) {
-    return { ok: false, error: "Please tell us how many people are coming." };
+    return { ok: false, error: { code: "no_party_size" } };
   }
   if (partySize > space.maxGuests) {
-    return {
-      ok: false,
-      error: `For groups larger than ${space.maxGuests}, call us or send an enquiry — we'll sort something out.`,
-    };
+    return { ok: false, error: { code: "party_too_large", max: space.maxGuests } };
   }
 
   if (isDateBlocked(date, blockedRanges(space, blackouts))) {
-    return {
-      ok: false,
-      error: "We're closed that day — please pick another date.",
-    };
+    return { ok: false, error: { code: "closed_day" } };
   }
 
   if (!serviceHasRoom(space, blocks, date, service, partySize)) {
-    return {
-      ok: false,
-      error: "That sitting is fully booked — try the other sitting or another day.",
-    };
+    return { ok: false, error: { code: "sitting_full" } };
   }
 
   return { ok: true };

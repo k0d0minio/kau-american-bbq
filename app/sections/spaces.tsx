@@ -10,7 +10,7 @@ import { buttonVariants } from "@/app/components/ui/button";
 import { Reveal } from "@/app/components/motion";
 import { useInViewOnce } from "@/app/components/use-in-view";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import type { Locale } from "@/lib/i18n/config";
+import { localeHref, type Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -86,7 +86,7 @@ export function Spaces({ spaces, locale }: { spaces: SpaceCardData[]; locale: Lo
         {space ? (
           <Reveal className="mt-6">
             <Link
-              href={`/spaces/${space.slug}`}
+              href={localeHref(locale, `/spaces/${space.slug}`)}
               className="group relative block overflow-hidden rounded-3xl shadow-soft transition-all duration-500 hover:shadow-lift hover:-translate-y-1"
             >
               <div className="relative min-h-64">
