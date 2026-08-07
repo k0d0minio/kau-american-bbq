@@ -41,7 +41,7 @@ export default async function NewBookingPage({ searchParams }: Props) {
     <div className="space-y-6">
       <Link
         href="/admin/bookings"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-pine-700 hover:text-amber"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-char-700 hover:text-ember"
       >
         <ArrowLeft className="size-4" />
         All bookings

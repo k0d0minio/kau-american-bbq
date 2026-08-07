@@ -21,11 +21,11 @@ export const metadata = { title: "Calendar" };
 
 // One colour per space, assigned by sort order.
 const SPACE_COLORS = [
-  "bg-pine-600 text-cream",
-  "bg-amber text-cream-100",
-  "bg-lake text-cream-100",
-  "bg-stone text-cream-100",
-  "bg-pine-900 text-cream",
+  "bg-char-600 text-bone",
+  "bg-ember text-bone-100",
+  "bg-rust text-bone-100",
+  "bg-stone text-bone-100",
+  "bg-char-900 text-bone",
 ];
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -70,20 +70,20 @@ export default async function CalendarPage({ searchParams }: Props) {
               <Link
                 href={`/admin/calendar?month=${prevMonth}`}
                 aria-label="Previous month"
-                className="flex size-8 items-center justify-center rounded-full text-pine-700 hover:bg-pine-50"
+                className="flex size-8 items-center justify-center rounded-full text-char-700 hover:bg-char-50"
               >
                 <ChevronLeft className="size-4" />
               </Link>
               <Link
                 href={`/admin/calendar?month=${nextMonth}`}
                 aria-label="Next month"
-                className="flex size-8 items-center justify-center rounded-full text-pine-700 hover:bg-pine-50"
+                className="flex size-8 items-center justify-center rounded-full text-char-700 hover:bg-char-50"
               >
                 <ChevronRight className="size-4" />
               </Link>
               <Link
                 href="/admin/calendar"
-                className="ml-2 rounded-full px-3 py-1 text-xs font-medium text-pine-700 hover:bg-pine-50"
+                className="ml-2 rounded-full px-3 py-1 text-xs font-medium text-char-700 hover:bg-char-50"
               >
                 Today
               </Link>
@@ -105,17 +105,17 @@ export default async function CalendarPage({ searchParams }: Props) {
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-px overflow-hidden rounded-xl bg-pine-100">
+          <div className="grid grid-cols-7 gap-px overflow-hidden rounded-xl bg-char-100">
             {WEEKDAYS.map((d) => (
               <div
                 key={d}
-                className="bg-cream px-2 py-1.5 text-center text-[0.65rem] font-medium uppercase tracking-wider text-stone"
+                className="bg-bone px-2 py-1.5 text-center text-[0.65rem] font-medium uppercase tracking-wider text-stone"
               >
                 {d}
               </div>
             ))}
             {Array.from({ length: lead }).map((_, i) => (
-              <div key={`lead-${i}`} className="min-h-24 bg-cream/60" />
+              <div key={`lead-${i}`} className="min-h-24 bg-bone/60" />
             ))}
             {Array.from({ length: dayCount }).map((_, i) => {
               const day = addDays(monthFirst, i);
@@ -127,12 +127,12 @@ export default async function CalendarPage({ searchParams }: Props) {
                 ({ blackout }) => blackout.startDate <= day && day < blackout.endDate
               );
               return (
-                <div key={day} className="min-h-24 space-y-1 bg-cream-100 p-1.5">
+                <div key={day} className="min-h-24 space-y-1 bg-bone-100 p-1.5">
                   <p
                     className={cn(
                       "text-right text-xs",
                       isToday
-                        ? "ml-auto flex size-5 items-center justify-center rounded-full bg-pine-700 font-semibold text-cream"
+                        ? "ml-auto flex size-5 items-center justify-center rounded-full bg-char-700 font-semibold text-bone"
                         : "text-stone"
                     )}
                   >
@@ -194,7 +194,7 @@ export default async function CalendarPage({ searchParams }: Props) {
           {upcomingBlackouts.length === 0 ? (
             <p className="mt-3 text-sm text-stone">Nothing blocked ahead.</p>
           ) : (
-            <ul className="mt-3 divide-y divide-pine-100">
+            <ul className="mt-3 divide-y divide-char-100">
               {upcomingBlackouts.map(({ blackout, spaceName }) => (
                 <li key={blackout.id} className="flex items-center justify-between gap-3 py-2.5">
                   <div>
@@ -215,7 +215,7 @@ export default async function CalendarPage({ searchParams }: Props) {
                     <button
                       type="submit"
                       aria-label="Delete blackout"
-                      className="flex size-8 items-center justify-center rounded-full text-stone transition-colors hover:bg-amber/10 hover:text-[#9a5a12]"
+                      className="flex size-8 items-center justify-center rounded-full text-stone transition-colors hover:bg-ember/10 hover:text-[#7c2d12]"
                     >
                       <Trash2 className="size-4" />
                     </button>

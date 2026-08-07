@@ -22,18 +22,18 @@ export function HistoryHero() {
         sizes="100vw"
         className="object-cover object-center"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-pine-900/70 via-pine-900/45 to-pine-900/92" />
-      <div className="absolute inset-0 bg-gradient-to-t from-cream via-transparent to-transparent opacity-95" />
+      <div className="absolute inset-0 bg-gradient-to-b from-char-900/70 via-char-900/45 to-char-900/92" />
+      <div className="absolute inset-0 bg-gradient-to-t from-bone via-transparent to-transparent opacity-95" />
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-16 sm:px-8 sm:pb-24">
         <Reveal>
-          <p className="eyebrow text-amber-soft">Our Story · Malveira</p>
-          <h1 className="mt-5 max-w-3xl font-display text-[2.6rem] font-light leading-[1.03] text-cream text-balance sm:text-6xl lg:text-7xl">
+          <p className="eyebrow text-ember-soft">Our Story · Malveira</p>
+          <h1 className="mt-5 max-w-3xl font-display text-[2.6rem] font-light leading-[1.03] text-bone text-balance sm:text-6xl lg:text-7xl">
             The couple who
             <br className="hidden sm:block" />{" "}
-            <span className="italic text-amber-soft">brought Texas home</span>
+            <span className="italic text-ember-soft">brought Texas home</span>
           </h1>
-          <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-cream/85 sm:text-lg">
+          <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-bone/85 sm:text-lg">
             KAU began with a bite of brisket in Paris, took shape across years of
             pop-ups and festival queues, and now runs low and slow in a Malveira
             smokehouse built around a smoker called Godzilla.
@@ -50,11 +50,11 @@ export function HistoryHero() {
 
 export function HistoryLede() {
   return (
-    <section className="relative bg-cream py-20 sm:py-28">
+    <section className="relative bg-bone py-20 sm:py-28">
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
         <Reveal>
-          <p className="eyebrow text-amber">A short history</p>
-          <h2 className="mt-4 font-display text-3xl font-light leading-tight text-pine-900 text-balance sm:text-4xl">
+          <p className="eyebrow text-ember">A short history</p>
+          <h2 className="mt-4 font-display text-3xl font-light leading-tight text-char-900 text-balance sm:text-4xl">
             From a Paris brisket to the Malveira smokehouse
           </h2>
         </Reveal>
@@ -64,7 +64,7 @@ export function HistoryLede() {
               Rui and Vera Matias were running <em>O Bolo do Caco</em> when a plate of
               brisket in Paris changed the plan. A research trip to Texas followed, and
               with it a conviction that real American barbecue —{" "}
-              <strong className="font-medium text-pine-900">smoked low and slow, cut fresh,
+              <strong className="font-medium text-char-900">smoked low and slow, cut fresh,
               sold by weight</strong> — belonged in Portugal.
               <Cite n={1} />
             </p>
@@ -79,8 +79,8 @@ export function HistoryLede() {
         </Reveal>
 
         <Reveal delay={0.15}>
-          <figure className="mt-12 border-l-2 border-amber/60 pl-6">
-            <blockquote className="font-display text-2xl font-light italic leading-snug text-pine-700 sm:text-3xl">
+          <figure className="mt-12 border-l-2 border-ember/60 pl-6">
+            <blockquote className="font-display text-2xl font-light italic leading-snug text-char-700 sm:text-3xl">
               “These guys really understand what American BBQ is.”
             </blockquote>
             <figcaption className="mt-3 text-sm text-stone">— Guest review, Google</figcaption>
@@ -100,8 +100,8 @@ export function HistoryTimeline() {
     <section className="relative overflow-hidden bg-parchment py-20 sm:py-28">
       <div className="mx-auto max-w-4xl px-5 sm:px-8">
         <Reveal className="max-w-2xl">
-          <p className="eyebrow text-amber">The story, step by step</p>
-          <h2 className="mt-4 font-display text-3xl font-light leading-tight text-pine-900 text-balance sm:text-4xl">
+          <p className="eyebrow text-ember">The story, step by step</p>
+          <h2 className="mt-4 font-display text-3xl font-light leading-tight text-char-900 text-balance sm:text-4xl">
             The story so far
           </h2>
         </Reveal>
@@ -112,15 +112,15 @@ export function HistoryTimeline() {
               <div className="group relative grid grid-cols-[4.5rem_1fr] gap-7 sm:grid-cols-[7rem_1fr] sm:gap-14">
                 {/* year rail */}
                 <div className="text-right">
-                  <span className="font-display text-lg text-pine-700 sm:text-xl">{e.year}</span>
+                  <span className="font-display text-lg text-char-700 sm:text-xl">{e.year}</span>
                 </div>
                 {/* line + node */}
                 <div className="relative pb-12">
-                  <span className="absolute -left-[1.38rem] top-1.5 size-3 rounded-full border-2 border-amber bg-cream sm:-left-[2.28rem]" />
+                  <span className="absolute -left-[1.38rem] top-1.5 size-3 rounded-full border-2 border-ember bg-bone sm:-left-[2.28rem]" />
                   {i < timeline.length - 1 && (
-                    <span className="absolute -left-4 top-4 h-full w-px bg-pine-900/15 sm:-left-[1.9rem]" />
+                    <span className="absolute -left-4 top-4 h-full w-px bg-char-900/15 sm:-left-[1.9rem]" />
                   )}
-                  <h3 className="font-display text-xl text-pine-900">{e.title}</h3>
+                  <h3 className="font-display text-xl text-char-900">{e.title}</h3>
                   <p className="mt-2 text-pretty leading-relaxed text-ink-soft">
                     {e.body}
                     <Cite n={e.cites} />
@@ -141,11 +141,11 @@ export function HistoryTimeline() {
 
 export function HistoryFigures() {
   return (
-    <section className="relative bg-cream py-20 sm:py-28">
+    <section className="relative bg-bone py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <Reveal className="max-w-2xl">
-          <p className="eyebrow text-amber">The people (and the smoker)</p>
-          <h2 className="mt-4 font-display text-3xl font-light leading-tight text-pine-900 text-balance sm:text-4xl">
+          <p className="eyebrow text-ember">The people (and the smoker)</p>
+          <h2 className="mt-4 font-display text-3xl font-light leading-tight text-char-900 text-balance sm:text-4xl">
             Three names behind the smoke
           </h2>
         </Reveal>
@@ -160,7 +160,7 @@ export function HistoryFigures() {
                 )}
               >
                 <figure className="lg:col-span-2">
-                  <div className="relative mx-auto aspect-4/5 w-full max-w-xs overflow-hidden rounded-3xl bg-pine-900/5 shadow-lift sm:max-w-sm">
+                  <div className="relative mx-auto aspect-4/5 w-full max-w-xs overflow-hidden rounded-3xl bg-char-900/5 shadow-lift sm:max-w-sm">
                     <Image
                       src={f.image}
                       alt={f.alt}
@@ -169,16 +169,16 @@ export function HistoryFigures() {
                       sizes="(max-width: 1024px) 80vw, 40vw"
                       className="object-cover object-top"
                     />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pine-900/85 to-transparent p-5 pt-12">
-                      <p className="font-display text-xl text-cream">{f.name}</p>
-                      <p className="text-xs text-cream/70">{f.life} · {f.role}</p>
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-char-900/85 to-transparent p-5 pt-12">
+                      <p className="font-display text-xl text-bone">{f.name}</p>
+                      <p className="text-xs text-bone/70">{f.life} · {f.role}</p>
                     </div>
                   </div>
                 </figure>
 
                 <div className="lg:col-span-3">
                   <p className="eyebrow text-stone">{f.role}</p>
-                  <h3 className="mt-2 font-display text-2xl font-light text-pine-900 sm:text-3xl">
+                  <h3 className="mt-2 font-display text-2xl font-light text-char-900 sm:text-3xl">
                     {f.name}
                   </h3>
                   <div className="mt-5 space-y-4 text-pretty leading-relaxed text-ink-soft">
@@ -211,14 +211,14 @@ const scaleStats = [
 
 export function HistoryScale() {
   return (
-    <section className="relative overflow-hidden bg-pine-900 py-20 text-cream sm:py-28">
+    <section className="relative overflow-hidden bg-char-900 py-20 text-bone sm:py-28">
       <div className="mx-auto max-w-5xl px-5 sm:px-8">
         <Reveal className="max-w-3xl">
-          <p className="eyebrow text-amber-soft">The mother house</p>
-          <h2 className="mt-4 font-display text-3xl font-light leading-tight text-cream text-balance sm:text-4xl">
+          <p className="eyebrow text-ember-soft">The mother house</p>
+          <h2 className="mt-4 font-display text-3xl font-light leading-tight text-bone text-balance sm:text-4xl">
             One of the biggest steakhouses in the country
           </h2>
-          <p className="mt-6 text-pretty text-lg leading-relaxed text-cream/80">
+          <p className="mt-6 text-pretty text-lg leading-relaxed text-bone/80">
             Malveira is the brand’s mother house, built to be one of the largest steakhouses
             in Portugal and planned around the smoker rather than the other way round.
             <Cite n={[2, 1]} /> Brisket and beef rib Black Angus, St. Louis pork ribs, pulled
@@ -228,15 +228,15 @@ export function HistoryScale() {
           </p>
         </Reveal>
 
-        <Stagger className="mt-14 grid grid-cols-1 gap-6 border-t border-cream/15 pt-10 sm:grid-cols-3">
+        <Stagger className="mt-14 grid grid-cols-1 gap-6 border-t border-bone/15 pt-10 sm:grid-cols-3">
           {scaleStats.map((s) => (
             <StaggerItem key={s.label}>
-              <p className="font-display text-4xl font-light text-amber-soft sm:text-5xl">
+              <p className="font-display text-4xl font-light text-ember-soft sm:text-5xl">
                 {s.value}
               </p>
-              <p className="mt-2 text-sm leading-snug text-cream/70">
+              <p className="mt-2 text-sm leading-snug text-bone/70">
                 {s.label}
-                <Cite n={s.cite} className="text-amber-soft/80" />
+                <Cite n={s.cite} className="text-ember-soft/80" />
               </p>
             </StaggerItem>
           ))}
@@ -252,7 +252,7 @@ export function HistoryScale() {
 
 export function HistoryToday() {
   return (
-    <section className="relative bg-cream py-20 sm:py-28">
+    <section className="relative bg-bone py-20 sm:py-28">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <Reveal className="relative">
@@ -269,8 +269,8 @@ export function HistoryToday() {
           </Reveal>
           <div>
             <Reveal>
-              <p className="eyebrow text-amber">KAU today</p>
-              <h2 className="mt-4 font-display text-3xl font-light leading-tight text-pine-900 text-balance sm:text-4xl">
+              <p className="eyebrow text-ember">KAU today</p>
+              <h2 className="mt-4 font-display text-3xl font-light leading-tight text-char-900 text-balance sm:text-4xl">
                 Come hungry
               </h2>
             </Reveal>
@@ -310,14 +310,14 @@ export function HistoryToday() {
 
 export function HistorySources() {
   return (
-    <section className="relative border-t border-pine-900/10 bg-parchment py-20 sm:py-24">
+    <section className="relative border-t border-char-900/10 bg-parchment py-20 sm:py-24">
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
         <Reveal>
           <div className="flex items-center gap-3">
-            <BookOpen className="size-5 text-amber" />
-            <p className="eyebrow text-amber">Sources & further reading</p>
+            <BookOpen className="size-5 text-ember" />
+            <p className="eyebrow text-ember">Sources & further reading</p>
           </div>
-          <h2 className="mt-4 font-display text-3xl font-light leading-tight text-pine-900 text-balance sm:text-4xl">
+          <h2 className="mt-4 font-display text-3xl font-light leading-tight text-char-900 text-balance sm:text-4xl">
             Where this history comes from
           </h2>
           <p className="mt-5 text-pretty leading-relaxed text-ink-soft">
@@ -332,16 +332,16 @@ export function HistorySources() {
               <li
                 key={s.id}
                 id={`source-${s.id}`}
-                className="scroll-mt-24 grid grid-cols-[2rem_1fr] gap-3 border-b border-pine-900/8 pb-4 text-sm leading-relaxed"
+                className="scroll-mt-24 grid grid-cols-[2rem_1fr] gap-3 border-b border-char-900/8 pb-4 text-sm leading-relaxed"
               >
-                <span className="font-display text-base text-amber">{s.id}.</span>
+                <span className="font-display text-base text-ember">{s.id}.</span>
                 <div>
                   <span className="text-ink-soft">{s.citation}</span>
                   <a
                     href={s.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-1 inline-flex items-center gap-1 break-all text-pine-700 underline-offset-2 hover:underline"
+                    className="mt-1 inline-flex items-center gap-1 break-all text-char-700 underline-offset-2 hover:underline"
                   >
                     <ExternalLink className="size-3 shrink-0" />
                     <span className="break-all">{s.url}</span>

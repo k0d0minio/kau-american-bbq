@@ -58,8 +58,8 @@ export default async function BookingsPage({ searchParams }: Props) {
               className={cn(
                 "rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
                 tab === t.key
-                  ? "bg-pine-700 text-cream"
-                  : "bg-cream-100 text-ink-soft hover:bg-pine-50"
+                  ? "bg-char-700 text-bone"
+                  : "bg-bone-100 text-ink-soft hover:bg-char-50"
               )}
             >
               {t.label}
@@ -96,7 +96,7 @@ export default async function BookingsPage({ searchParams }: Props) {
               <li key={booking.id}>
                 <Link
                   href={`/admin/bookings/${booking.id}`}
-                  className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-2xl border border-pine-100 bg-cream-100 p-4 transition-colors hover:border-pine-400 sm:px-5"
+                  className="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-2xl border border-char-100 bg-bone-100 p-4 transition-colors hover:border-char-400 sm:px-5"
                 >
                   <div className="min-w-40">
                     <p className="font-medium text-ink">

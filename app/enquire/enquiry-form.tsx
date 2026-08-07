@@ -14,7 +14,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className={cn(buttonVariants({ variant: "amber", size: "lg" }), "w-full")}
+      className={cn(buttonVariants({ variant: "ember", size: "lg" }), "w-full")}
     >
       {pending ? (
         <>
@@ -45,11 +45,11 @@ export function EnquiryForm({
 
   if (state.sent) {
     return (
-      <div className="rounded-3xl border border-pine-100 bg-cream-100 p-8 text-center shadow-soft">
-        <span className="inline-flex size-14 items-center justify-center rounded-full bg-pine-50 text-pine-600">
+      <div className="rounded-3xl border border-char-100 bg-bone-100 p-8 text-center shadow-soft">
+        <span className="inline-flex size-14 items-center justify-center rounded-full bg-char-50 text-char-600">
           <MailCheck className="size-7" />
         </span>
-        <h2 className="mt-5 font-display text-2xl text-pine-900">Thank you — it&apos;s on its way</h2>
+        <h2 className="mt-5 font-display text-2xl text-char-900">Thank you — it&apos;s on its way</h2>
         <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink-soft">
           We read every enquiry personally and will come back to you within a day or two. If
           it&apos;s urgent, call us and we&apos;ll answer between briskets.
@@ -61,7 +61,7 @@ export function EnquiryForm({
   return (
     <form
       action={formAction}
-      className="rounded-3xl border border-pine-100 bg-cream-100 p-6 shadow-soft sm:p-8"
+      className="rounded-3xl border border-char-100 bg-bone-100 p-6 shadow-soft sm:p-8"
     >
       {/* Honeypot — humans never see or fill this. */}
       <div aria-hidden="true" className="absolute -left-[9999px] top-auto h-px w-px overflow-hidden">

@@ -31,30 +31,30 @@ export function BookingCta() {
           className="object-cover object-center"
         />
       </motion.div>
-      <div className="absolute inset-0 bg-pine-900/70" />
-      <div className="absolute inset-0 bg-gradient-to-b from-pine-900/40 via-transparent to-pine-900/70" />
+      <div className="absolute inset-0 bg-char-900/70" />
+      <div className="absolute inset-0 bg-gradient-to-b from-char-900/40 via-transparent to-char-900/70" />
 
       <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-5 py-28 text-center sm:px-8 sm:py-36">
         <Reveal>
-          <span className="inline-flex items-center gap-2 rounded-full border border-cream/25 bg-cream/10 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.2em] text-cream backdrop-blur">
+          <span className="inline-flex items-center gap-2 rounded-full border border-bone/25 bg-bone/10 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.2em] text-bone backdrop-blur">
             <CalendarHeart className="size-3.5" />
             Online reservations — mandatory &amp; free
           </span>
         </Reveal>
         <Reveal delay={0.1}>
-          <h2 className="mt-7 font-display text-4xl font-light leading-[1.05] text-cream text-balance sm:text-6xl">
+          <h2 className="mt-7 font-display text-4xl font-light leading-[1.05] text-bone text-balance sm:text-6xl">
             Get your seat at the smoker
           </h2>
         </Reveal>
         <Reveal delay={0.2}>
-          <p className="mx-auto mt-6 max-w-xl text-pretty text-base leading-relaxed text-cream/85 sm:text-lg">
+          <p className="mx-auto mt-6 max-w-xl text-pretty text-base leading-relaxed text-bone/85 sm:text-lg">
             We opened with every table gone in hours, and weekends still sell out. Pick your day,
             pick lunch or dinner, and we&apos;ll confirm by email — nothing is charged online.
           </p>
         </Reveal>
         <Reveal delay={0.3}>
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
-            <a href="#spaces" className={cn(buttonVariants({ variant: "amber", size: "lg" }))}>
+            <a href="#spaces" className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
               <CalendarHeart className="size-4" />
               Book a table
             </a>
@@ -62,9 +62,9 @@ export function BookingCta() {
               Send an enquiry
             </Link>
           </div>
-          <p className="mt-6 text-sm text-cream/70">
+          <p className="mt-6 text-sm text-bone/70">
             Prefer to talk it through?{" "}
-            <a href={site.phoneHref} className="inline-flex items-center gap-1.5 font-medium text-cream underline-offset-4 hover:underline">
+            <a href={site.phoneHref} className="inline-flex items-center gap-1.5 font-medium text-bone underline-offset-4 hover:underline">
               <Phone className="size-3.5" />
               {site.phone}
             </a>

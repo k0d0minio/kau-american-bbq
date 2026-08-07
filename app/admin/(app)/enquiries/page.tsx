@@ -49,8 +49,8 @@ export default async function EnquiriesPage({ searchParams }: Props) {
             className={cn(
               "rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
               filter.key === f.key
-                ? "bg-pine-700 text-cream"
-                : "bg-cream-100 text-ink-soft hover:bg-pine-50"
+                ? "bg-char-700 text-bone"
+                : "bg-bone-100 text-ink-soft hover:bg-char-50"
             )}
           >
             {f.label}
@@ -72,13 +72,13 @@ export default async function EnquiriesPage({ searchParams }: Props) {
             return (
               <li
                 key={enquiry.id}
-                className="rounded-2xl border border-pine-100 bg-cream-100 p-5"
+                className="rounded-2xl border border-char-100 bg-bone-100 p-5"
               >
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                   <p className="font-medium text-ink">{enquiry.name}</p>
                   <a
                     href={`mailto:${enquiry.email}?subject=${encodeURIComponent(`Your enquiry to ${site.fullName}`)}`}
-                    className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-pine-700"
+                    className="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-char-700"
                   >
                     <Mail className="size-3.5 text-stone" />
                     {enquiry.email}
@@ -91,7 +91,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
                   ) : null}
                   <span className="ml-auto flex items-center gap-2">
                     {spaceName ? (
-                      <span className="rounded-full bg-pine-50 px-2.5 py-0.5 text-xs font-medium text-pine-700">
+                      <span className="rounded-full bg-char-50 px-2.5 py-0.5 text-xs font-medium text-char-700">
                         {spaceName}
                       </span>
                     ) : null}
@@ -101,7 +101,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
                 <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-ink-soft">
                   {enquiry.message}
                 </p>
-                <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-pine-100 pt-3 text-sm">
+                <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-char-100 pt-3 text-sm">
                   <span className="text-xs text-stone">
                     {enquiry.createdAt.toLocaleDateString("en-GB", {
                       month: "short",
@@ -115,7 +115,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
                       <form action={setEnquiryStatus}>
                         <input type="hidden" name="enquiryId" value={enquiry.id} />
                         <input type="hidden" name="status" value="replied" />
-                        <button className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-pine-700 transition-colors hover:bg-pine-50">
+                        <button className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-char-700 transition-colors hover:bg-char-50">
                           <Reply className="size-3.5" />
                           Mark replied
                         </button>
@@ -124,7 +124,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
                     {enquiry.status !== "converted" ? (
                       <Link
                         href={convertHref}
-                        className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-pine-700 transition-colors hover:bg-pine-50"
+                        className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-char-700 transition-colors hover:bg-char-50"
                       >
                         <CalendarPlus className="size-3.5" />
                         Convert to booking
@@ -132,7 +132,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
                     ) : enquiry.bookingId ? (
                       <Link
                         href={`/admin/bookings/${enquiry.bookingId}`}
-                        className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-pine-700 transition-colors hover:bg-pine-50"
+                        className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-char-700 transition-colors hover:bg-char-50"
                       >
                         <CalendarPlus className="size-3.5" />
                         View booking
@@ -142,7 +142,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
                       <form action={setEnquiryStatus}>
                         <input type="hidden" name="enquiryId" value={enquiry.id} />
                         <input type="hidden" name="status" value="archived" />
-                        <button className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-stone transition-colors hover:bg-pine-50">
+                        <button className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-stone transition-colors hover:bg-char-50">
                           <Archive className="size-3.5" />
                           Archive
                         </button>
@@ -151,7 +151,7 @@ export default async function EnquiriesPage({ searchParams }: Props) {
                       <form action={setEnquiryStatus}>
                         <input type="hidden" name="enquiryId" value={enquiry.id} />
                         <input type="hidden" name="status" value="new" />
-                        <button className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-stone transition-colors hover:bg-pine-50">
+                        <button className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-medium text-stone transition-colors hover:bg-char-50">
                           <RotateCcw className="size-3.5" />
                           Restore
                         </button>

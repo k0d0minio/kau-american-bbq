@@ -16,7 +16,7 @@ export default function GalleryPage() {
         {gallery.map((photo) => (
           <figure
             key={photo.src}
-            className="group relative aspect-4/3 overflow-hidden rounded-2xl border border-pine-100 bg-pine-50"
+            className="group relative aspect-4/3 overflow-hidden rounded-2xl border border-char-100 bg-char-50"
           >
             <Image
               src={photo.src}

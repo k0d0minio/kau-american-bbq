@@ -32,14 +32,14 @@ export default async function EnquirePage({ searchParams }: Props) {
   return (
     <>
       <Nav />
-      <main className="bg-cream">
-        <section className="bg-pine-900 px-5 pb-16 pt-32 text-center sm:pb-20 sm:pt-40">
+      <main className="bg-bone">
+        <section className="bg-char-900 px-5 pb-16 pt-32 text-center sm:pb-20 sm:pt-40">
           <div className="mx-auto max-w-2xl">
-            <p className="eyebrow text-amber-soft">Enquiries</p>
-            <h1 className="mt-4 font-display text-3xl font-light text-cream sm:text-5xl">
+            <p className="eyebrow text-ember-soft">Enquiries</p>
+            <h1 className="mt-4 font-display text-3xl font-light text-bone sm:text-5xl">
               Tell us what you&apos;re dreaming up
             </h1>
-            <p className="mx-auto mt-4 max-w-lg text-pretty text-sm leading-relaxed text-cream/80 sm:text-base">
+            <p className="mx-auto mt-4 max-w-lg text-pretty text-sm leading-relaxed text-bone/80 sm:text-base">
               Planning a party of twelve, a company feast, or something that doesn&apos;t fit a
               form? Write to us — a real person at the smokehouse reads every message.
             </p>
@@ -52,7 +52,7 @@ export default async function EnquirePage({ searchParams }: Props) {
             Rather talk?{" "}
             <a
               href={site.phoneHref}
-              className="inline-flex items-center gap-1.5 font-medium text-pine-700 hover:text-amber"
+              className="inline-flex items-center gap-1.5 font-medium text-char-700 hover:text-ember"
             >
               <Phone className="size-3.5" />
               {site.phone}

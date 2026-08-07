@@ -30,7 +30,7 @@ export default async function SpacesAdminPage() {
             <li key={space.id}>
               <Link
                 href={`/admin/spaces/${space.id}`}
-                className="flex flex-wrap items-center gap-4 rounded-2xl border border-pine-100 bg-cream-100 p-4 transition-colors hover:border-pine-400"
+                className="flex flex-wrap items-center gap-4 rounded-2xl border border-char-100 bg-bone-100 p-4 transition-colors hover:border-char-400"
               >
                 <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-xl">
                   <Image src={space.image} alt={space.name} fill sizes="96px" className="object-cover" />
@@ -52,7 +52,7 @@ export default async function SpacesAdminPage() {
                     </span>
                   ) : null}
                   {space.blocksEstate ? (
-                    <span className="rounded-full bg-pine-50 px-2.5 py-0.5 text-xs font-medium text-pine-700">
+                    <span className="rounded-full bg-char-50 px-2.5 py-0.5 text-xs font-medium text-char-700">
                       whole estate
                     </span>
                   ) : null}

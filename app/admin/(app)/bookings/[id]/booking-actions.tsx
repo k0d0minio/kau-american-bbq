@@ -43,7 +43,7 @@ function ActionButton({
 }: {
   label: string;
   pendingLabel: string;
-  variant?: "primary" | "amber" | "outline";
+  variant?: "primary" | "ember" | "outline";
 }) {
   const { pending } = useFormStatus();
   return (
@@ -67,7 +67,7 @@ function ActionButton({
 function Saved({ state }: { state: AdminActionState }) {
   if (!state.ok) return null;
   return (
-    <p className="inline-flex items-center gap-1.5 text-sm font-medium text-pine-700">
+    <p className="inline-flex items-center gap-1.5 text-sm font-medium text-char-700">
       <Check className="size-4" />
       Done
     </p>
@@ -88,7 +88,7 @@ export function PendingActions({ booking }: { booking: BookingActionData }) {
   return (
     <div className="space-y-5">
       {booking.conflict ? (
-        <p className="flex items-start gap-2 rounded-2xl bg-amber/10 px-4 py-3 text-sm leading-relaxed text-[#9a5a12]">
+        <p className="flex items-start gap-2 rounded-2xl bg-ember/10 px-4 py-3 text-sm leading-relaxed text-[#7c2d12]">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
           These dates now overlap another confirmed booking, a turnover buffer or a blackout.
           You can still approve if you know it works — the calendar won&apos;t stop you.
@@ -117,7 +117,7 @@ export function PendingActions({ booking }: { booking: BookingActionData }) {
             type="checkbox"
             name="blocksEstate"
             defaultChecked={booking.blocksEstate}
-            className="mt-0.5 size-4 accent-pine-700"
+            className="mt-0.5 size-4 accent-char-700"
           />
           Reserve the whole estate for these dates (blocks every space)
         </label>
@@ -137,7 +137,7 @@ export function PendingActions({ booking }: { booking: BookingActionData }) {
         <FormError message={approveState.error} />
       </form>
 
-      <div className="border-t border-pine-100 pt-4">
+      <div className="border-t border-char-100 pt-4">
         {!declining ? (
           <button
             type="button"
@@ -159,7 +159,7 @@ export function PendingActions({ booking }: { booking: BookingActionData }) {
               />
             </div>
             <div className="flex items-center gap-3">
-              <ActionButton label="Decline request" pendingLabel="Declining…" variant="amber" />
+              <ActionButton label="Decline request" pendingLabel="Declining…" variant="ember" />
               <button
                 type="button"
                 onClick={() => setDeclining(false)}
@@ -220,7 +220,7 @@ export function ApprovedActions({ booking }: { booking: BookingActionData }) {
   return (
     <div className="space-y-5">
       {booking.cancelRequested ? (
-        <p className="flex items-start gap-2 rounded-2xl bg-amber/10 px-4 py-3 text-sm leading-relaxed text-[#9a5a12]">
+        <p className="flex items-start gap-2 rounded-2xl bg-ember/10 px-4 py-3 text-sm leading-relaxed text-[#7c2d12]">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
           The guest has requested a cancellation. Cancel below to confirm it, or contact them
           to talk dates.
@@ -256,7 +256,7 @@ export function ApprovedActions({ booking }: { booking: BookingActionData }) {
         <FormError message={paymentState.error} />
       </form>
 
-      <div className="border-t border-pine-100 pt-4">
+      <div className="border-t border-char-100 pt-4">
         {!cancelling ? (
           <button
             type="button"
@@ -276,7 +276,7 @@ export function ApprovedActions({ booking }: { booking: BookingActionData }) {
               <Textarea id="cancelNote" name="decisionNote" className="min-h-20" />
             </div>
             <div className="flex items-center gap-3">
-              <ActionButton label="Yes — cancel booking" pendingLabel="Cancelling…" variant="amber" />
+              <ActionButton label="Yes — cancel booking" pendingLabel="Cancelling…" variant="ember" />
               <button
                 type="button"
                 onClick={() => setCancelling(false)}

@@ -33,7 +33,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-pine-100 bg-cream-100 p-5 sm:p-6 ${className ?? ""}`}
+      className={`rounded-2xl border border-char-100 bg-bone-100 p-5 sm:p-6 ${className ?? ""}`}
     >
       {children}
     </div>
@@ -54,8 +54,8 @@ export function EmptyState({
   description: string;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-pine-100 bg-cream-100 px-6 py-16 text-center">
-      <div className="flex size-12 items-center justify-center rounded-2xl bg-pine-50 text-pine-600">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-char-100 bg-bone-100 px-6 py-16 text-center">
+      <div className="flex size-12 items-center justify-center rounded-2xl bg-char-50 text-char-600">
         <Icon className="size-6" />
       </div>
       <p className="mt-4 font-display text-lg text-ink">{title}</p>

@@ -51,7 +51,7 @@ export function LoginForm({ from }: { from?: string }) {
             autoFocus
             required
             placeholder="you@example.com"
-            className="h-12 w-full rounded-full border border-pine-100 bg-cream-100 pl-11 pr-4 text-sm text-ink outline-none transition-colors placeholder:text-stone/70 focus:border-pine-400 focus:ring-2 focus:ring-pine-600/20"
+            className="h-12 w-full rounded-full border border-char-100 bg-bone-100 pl-11 pr-4 text-sm text-ink outline-none transition-colors placeholder:text-stone/70 focus:border-char-400 focus:ring-2 focus:ring-char-600/20"
           />
         </div>
       </div>
@@ -72,7 +72,7 @@ export function LoginForm({ from }: { from?: string }) {
             autoComplete="current-password"
             required
             placeholder="Enter your password"
-            className="h-12 w-full rounded-full border border-pine-100 bg-cream-100 pl-11 pr-4 text-sm text-ink outline-none transition-colors placeholder:text-stone/70 focus:border-pine-400 focus:ring-2 focus:ring-pine-600/20"
+            className="h-12 w-full rounded-full border border-char-100 bg-bone-100 pl-11 pr-4 text-sm text-ink outline-none transition-colors placeholder:text-stone/70 focus:border-char-400 focus:ring-2 focus:ring-char-600/20"
           />
         </div>
       </div>
@@ -80,7 +80,7 @@ export function LoginForm({ from }: { from?: string }) {
       {state.error ? (
         <p
           role="alert"
-          className="flex items-start gap-2 rounded-2xl bg-amber/10 px-4 py-3 text-sm text-[#9a5a12]"
+          className="flex items-start gap-2 rounded-2xl bg-ember/10 px-4 py-3 text-sm text-[#7c2d12]"
         >
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
           <span>{state.error}</span>

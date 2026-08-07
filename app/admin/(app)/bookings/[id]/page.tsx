@@ -82,7 +82,7 @@ export default async function BookingDetailPage({ params }: Props) {
     <div className="space-y-6">
       <Link
         href="/admin/bookings"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-pine-700 hover:text-amber"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-char-700 hover:text-ember"
       >
         <ArrowLeft className="size-4" />
         All bookings
@@ -108,7 +108,7 @@ export default async function BookingDetailPage({ params }: Props) {
         <div className="space-y-6">
           <Card>
             <h2 className="font-display text-lg text-ink">Details</h2>
-            <dl className="mt-3 divide-y divide-pine-100">
+            <dl className="mt-3 divide-y divide-char-100">
               {detailRows.map(([label, value]) => (
                 <div key={label} className="flex items-center justify-between gap-4 py-2.5">
                   <dt className="text-sm text-stone">{label}</dt>
@@ -139,7 +139,7 @@ export default async function BookingDetailPage({ params }: Props) {
               ) : null}
             </dl>
             {booking.guestMessage ? (
-              <blockquote className="mt-4 rounded-2xl bg-cream px-4 py-3 text-sm leading-relaxed text-ink-soft">
+              <blockquote className="mt-4 rounded-2xl bg-bone px-4 py-3 text-sm leading-relaxed text-ink-soft">
                 “{booking.guestMessage}”
               </blockquote>
             ) : null}
@@ -154,7 +154,7 @@ export default async function BookingDetailPage({ params }: Props) {
                 href={`${siteBaseUrl()}/bookings/${booking.manageToken}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-medium text-pine-700 hover:text-amber"
+                className="inline-flex items-center gap-1 font-medium text-char-700 hover:text-ember"
               >
                 open <ExternalLink className="size-3" />
               </a>
@@ -169,7 +169,7 @@ export default async function BookingDetailPage({ params }: Props) {
             <div className="mt-2 space-y-1.5 text-sm text-ink-soft">
               <a
                 href={`mailto:${guest.email}?subject=Your Vine Cliff booking ${booking.reference}`}
-                className="flex items-center gap-2 hover:text-pine-700"
+                className="flex items-center gap-2 hover:text-char-700"
               >
                 <Mail className="size-4 text-stone" />
                 {guest.email}
@@ -177,7 +177,7 @@ export default async function BookingDetailPage({ params }: Props) {
               {guest.phone ? (
                 <a
                   href={`tel:${guest.phone}`}
-                  className="flex items-center gap-2 hover:text-pine-700"
+                  className="flex items-center gap-2 hover:text-char-700"
                 >
                   <Phone className="size-4 text-stone" />
                   {guest.phone}
@@ -186,7 +186,7 @@ export default async function BookingDetailPage({ params }: Props) {
             </div>
             <Link
               href={`/admin/guests/${guest.id}`}
-              className="mt-4 inline-block text-sm font-medium text-pine-700 hover:text-amber"
+              className="mt-4 inline-block text-sm font-medium text-char-700 hover:text-ember"
             >
               View guest history →
             </Link>

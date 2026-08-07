@@ -13,7 +13,7 @@ export function Cite({ n, className }: { n: number | number[]; className?: strin
           <a
             href={`#source-${num}`}
             id={`ref-${num}`}
-            className="font-medium text-amber underline-offset-2 hover:underline"
+            className="font-medium text-ember underline-offset-2 hover:underline"
             aria-label={`Jump to source ${num}`}
           >
             {num}
