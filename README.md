@@ -1,12 +1,13 @@
-# Vine Cliff
+# KAU Barbecue
 
-Website and booking platform for **Vine Cliff Vineyards** — an elegant
-170-year-old country estate on the shores of Lake Erie in Brocton, NY,
-offering weekly, weekend and event rentals across a farmhouse, carriage house
-and barn (or the whole estate at once).
+Website and reservation platform for **KAU Barbecue** — the Texas-style
+barbecue restaurant in Malveira, Portugal. Meats are smoked low and slow on
+the house smoker, "Godzilla", cut fresh and sold by weight, served either as
+classic table service or at the authentic Texan counter.
 
-Guests browse each space, check live availability and **request to book**
-online; the owner reviews, approves and runs the whole estate from `/admin`.
+Guests browse the ways to eat, check live availability and **request a table**
+online; the team reviews, confirms and runs the whole restaurant from
+`/admin`.
 
 ## Stack
 
@@ -38,60 +39,61 @@ Open [http://localhost:3000](http://localhost:3000).
 - `npm run db:generate` — generate SQL migrations from `lib/db/schema.ts`
 - `npm run db:migrate` — apply pending migrations to `DATABASE_URL`
 - `npm run db:seed:demo` — fill the database with realistic demo data (guests,
-  bookings, blackouts, enquiries) for showing the platform off; re-run any time
-  to refresh it, or add `-- --reset` to remove it again
+  reservations, closures, enquiries) for showing the platform off; re-run any
+  time to refresh it, or add `-- --reset` to remove it again
 - `npm run db:studio` — open Drizzle Studio against the database
 
-## The booking platform
+## The reservation platform
 
-**Models** (`lib/db/schema.ts`): `spaces` (content, rates, rules — the source
-of truth for the public site), `guests` (deduplicated by email; doubles as a
-CRM), `bookings` (request-to-book with statuses `pending → approved/declined`,
-plus `cancelled`), `blackouts` (owner-blocked dates; spaces are open by
-default), `enquiries`, and `settings` (notification email, cancellation
-policy).
+**Models** (`lib/db/schema.ts`): `spaces` (the dining areas — table service,
+the Texan counter and full-venue private hire — with their copy, photos and
+booking rules), `guests` (deduplicated by email; doubles as a CRM),
+`bookings` (request-to-book with statuses `pending → approved/declined`, plus
+`cancelled`), `blackouts` (closure days; spaces are open by default),
+`enquiries`, and `settings` (notification email, cancellation policy).
 
 **How booking works**
 
 1. Each space has a public page at `/spaces/<slug>` with a live availability
-   calendar and a booking form. Guests pick dates, see an auto-computed
-   estimate (nightly/weekly rates + cleaning fee) and submit a request —
-   nothing is charged online.
-2. Requests arrive as `pending`; only **approved** bookings block the
-   calendar. The owner approves (optionally adjusting the final price and
-   deposit), declines, or cancels from `/admin/bookings`; guests are emailed
-   at every step and get a private status page (`/bookings/<token>`) where
-   they can withdraw a pending request or ask to cancel a confirmed one.
-3. Availability rules are per-space and editable in the admin: minimum stay,
-   turnover buffer days between bookings, minimum lead time, booking horizon,
-   and party-size caps. The barn and the whole-estate package **reserve the
-   entire property**: their bookings block every space, and they're only
-   available when everything is free (overridable per booking at approval).
-4. Payments are tracked manually for now (quoted vs final total, deposit,
+   calendar and a reservation form. A reservation is **one date + one service
+   (lunch or dinner) + a party size** — nothing is charged online.
+2. Requests arrive as `pending`; only **approved** reservations consume
+   capacity. The team confirms, declines, or cancels from `/admin/bookings`;
+   guests are emailed at every step and get a private status page
+   (`/bookings/<token>`) where they can withdraw a pending request or ask to
+   cancel a confirmed one.
+3. Availability rules are per-space and editable in the admin: cover capacity
+   per sitting, party-size caps, lead time and booking horizon. The restaurant
+   is open Thursday to Sunday, lunch 12:00–15:00 and dinner 19:00–22:00.
+   Full-venue private hire **closes the whole restaurant**: its bookings block
+   every space, and it's only available when everything is free (overridable
+   per booking at approval).
+4. Reservations are free. Private-hire totals and deposits are tracked
+   manually for now (quoted vs final total, deposit,
    unpaid/deposit-paid/paid/refunded) — the schema is ready for Stripe later.
 
-**Admin** (`/admin`): dashboard with live stats, booking pipeline with search
-and tabs, manual bookings for phone requests, a month calendar across all
-spaces with blackout management, a guests CRM with notes and history, a
-spaces editor (copy, photos, rates, rules), an enquiries inbox with one-click
-convert-to-booking, and settings.
+**Admin** (`/admin`): dashboard with live stats, reservation pipeline with
+search and tabs, manual bookings for phone requests, a month calendar across
+all spaces with closure management, a guests CRM with notes and history, a
+spaces editor (copy, photos, capacity, rules), an enquiries inbox with
+one-click convert-to-booking, and settings.
 
 **Email** (`lib/email.ts`): transactional email via Resend's HTTP API. With
 no `RESEND_API_KEY` set, sends become logged no-ops — the site works fine
 without email. Set `RESEND_FROM` to a verified sender for production.
 
 **iCal feeds**: every space has a private feed at `/api/ical/<token>` (URL
-shown in the space editor) — subscribe from Google Calendar or paste into
-Airbnb/VRBO so external listings block dates booked here.
+shown in the space editor) — subscribe from Google Calendar to see bookings
+and closures.
 
 ## Structure
 
 ```
 app/
   components/     Nav, Footer, motion primitives, UI primitives, in-view hook
-  sections/       Hero, Estate, Spaces, Gallery, Location, Booking CTA
+  sections/       Hero, Smokehouse, Spaces, Gallery, Location, Booking CTA
   spaces/[slug]/  Space detail pages: availability calendar + booking form
-  bookings/[token]/ Guest booking status page (private tokenized link)
+  bookings/[token]/ Guest reservation status page (private tokenized link)
   enquire/        General enquiry form
   api/ical/[token]/ Private iCal availability feed per space
   admin/          Account-gated admin: dashboard, bookings, calendar,
@@ -105,17 +107,17 @@ lib/
   admin.ts        Admin navigation config
   booking/        Domain logic: dates, pricing, availability, tokens
   email.ts        Resend transactional email + templates
-  settings.ts     Estate-wide settings (notification email, policy)
+  settings.ts     Restaurant-wide settings (notification email, policy)
   db/             Drizzle schema (schema.ts), client (index.ts), queries
   auth/           Password hashing, session tokens, admin action guard
   utils.ts        cn() helper
 tests/            Unit tests for the booking domain (node:test via tsx)
 scripts/
   migrate.ts      Applies pending migrations (used by CI and `db:migrate`)
-  seed-demo.ts    Fills the DB with demo guests, bookings, blackouts & enquiries
+  seed-demo.ts    Fills the DB with demo guests, reservations, closures & enquiries
 drizzle/          Generated SQL migrations + seeds
 middleware.ts     Protects /admin routes behind the login cookie
-public/img/       Estate photography
+public/img/       Restaurant photography
 ```
 
 ## Database (Drizzle + Neon)
@@ -146,9 +148,8 @@ migrations; they read whatever schema production is currently on.
 
 ## Admin section
 
-A private, mobile-responsive admin area lives at `/admin`. It's the foundation
-for managing bookings, enquiries and site content — the pages are scaffolded
-now and will be wired to real data later.
+A private, mobile-responsive admin area lives at `/admin`, for managing
+reservations, enquiries and site content.
 
 Access is tied to individual accounts, each signing in with their own **email
 and password**. Accounts live in the `users` table; passwords are stored only
@@ -169,13 +170,15 @@ environment variables for production. Every `/admin` route is protected by
 without hitting the database; visitors are redirected to `/admin/login` until
 they sign in.
 
-The initial admin account (`wpcarlson@gmail.com`) is created by the
-`0001_seed_admin_user` migration, so it exists as soon as migrations have run.
+The initial admin account is created by the `0001_seed_admin_user` migration,
+so it exists as soon as migrations have run. It ships with Jamie's placeholder
+credentials and a temporary password that must be changed after the first
+login.
 
 ## Design notes
 
 - **Mobile-first** throughout, with a full-screen mobile nav.
-- Warm heritage-estate palette (pine green, cream, sunset amber, lake teal).
+- Texan smokehouse palette — charcoal, bone, smoke and ember.
 - Subtle, tasteful motion: parallax hero, word-by-word headline reveal,
   staggered scroll reveals, image hover zoom. Respects `prefers-reduced-motion`.
-- SEO: Open Graph, Twitter cards, and `LodgingBusiness` structured data.
+- SEO: Open Graph, Twitter cards, and `Restaurant` structured data.

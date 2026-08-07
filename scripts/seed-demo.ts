@@ -40,7 +40,7 @@ import { makeManageToken, makeReference } from "../lib/booking/tokens";
 
 // Everything demo is tagged so a reset can find and remove exactly what this
 // script created — and nothing else.
-const DEMO_EMAIL_DOMAIN = "demo.vinecliff.dev";
+const DEMO_EMAIL_DOMAIN = "demo.kaubarbecue.dev";
 const today = todayAtEstate();
 
 // A stable millisecond clock for created/decided timestamps, anchored to the
