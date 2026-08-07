@@ -24,6 +24,7 @@ function ownerEmailData(
     isEvent: row.space.isEvent,
     startDate: row.booking.startDate,
     endDate: row.booking.endDate,
+    service: row.booking.service,
     partySize: row.booking.partySize,
     guestFirstName: row.guest.firstName,
     manageToken: row.booking.manageToken,

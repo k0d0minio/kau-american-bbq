@@ -3,7 +3,7 @@
 // Configuration (all optional; the module degrades gracefully):
 //   RESEND_API_KEY   — from https://resend.com. When unset, sends become
 //                      logged no-ops so the booking flow never breaks.
-//   RESEND_FROM      — verified sender, e.g. 'Vine Cliff <stay@vinecliff.com>'.
+//   RESEND_FROM      — verified sender, e.g. 'KAU Barbecue <reservas@kaubarbecue.pt>'.
 //                      Defaults to Resend's shared onboarding sender, which
 //                      only delivers to the Resend account owner — fine for
 //                      testing, replace for production.
@@ -15,7 +15,7 @@
 import { site } from "@/lib/site";
 import { formatDate, type ISODate } from "@/lib/booking/dates";
 import { formatMoney, type Quote } from "@/lib/booking/pricing";
-import type { Service } from "@/lib/booking/availability";
+import { SERVICE_LABELS, isService, type Service } from "@/lib/booking/availability";
 
 export function siteBaseUrl(): string {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? site.url).replace(/\/+$/, "");
@@ -44,7 +44,7 @@ export async function sendEmail(message: EmailMessage): Promise<void> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: process.env.RESEND_FROM ?? "Vine Cliff <onboarding@resend.dev>",
+        from: process.env.RESEND_FROM ?? "KAU Barbecue <onboarding@resend.dev>",
         to: [message.to],
         subject: message.subject,
         html: message.html,
@@ -95,8 +95,8 @@ function layout(heading: string, bodyHtml: string): string {
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:${palette.boneLight};border-radius:16px;overflow:hidden;border:1px solid ${palette.border};">
         <tr>
           <td style="background-color:${palette.charDark};padding:28px 32px;text-align:center;">
-            <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:26px;color:${palette.bone};letter-spacing:0.02em;">Vine&nbsp;Cliff</p>
-            <p style="margin:6px 0 0;font-family:Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.28em;text-transform:uppercase;color:#dda657;">Vineyards · Est. 1850</p>
+            <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:26px;color:${palette.bone};letter-spacing:0.02em;">KAU</p>
+            <p style="margin:6px 0 0;font-family:Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.28em;text-transform:uppercase;color:#ea8a4b;">American Barbecue · Malveira</p>
           </td>
         </tr>
         <tr>
@@ -177,13 +177,15 @@ export type BookingEmailData = {
   note?: string | null;
 };
 
-function stayRows(data: BookingEmailData): Array<[string, string]> {
+function bookingRows(data: BookingEmailData): Array<[string, string]> {
   return [
     ["Reference", `<strong>${escapeHtml(data.reference)}</strong>`],
-    ["Space", escapeHtml(data.spaceName)],
-    [data.isEvent ? "First day" : "Check-in", formatDate(data.startDate)],
-    [data.isEvent ? "Last day (departure)" : "Checkout", formatDate(data.endDate)],
-    ["Guests", String(data.partySize)],
+    ["Where", escapeHtml(data.spaceName)],
+    ["Date", formatDate(data.startDate)],
+    ...(isService(data.service)
+      ? ([["Sitting", SERVICE_LABELS[data.service]]] as Array<[string, string]>)
+      : []),
+    ["Party size", String(data.partySize)],
   ];
 }
 
@@ -192,15 +194,15 @@ function statusUrl(token: string): string {
 }
 
 export function requestReceivedEmail(data: BookingEmailData) {
-  const rows = stayRows(data);
-  if (data.quote) rows.push(...quoteRows(data.quote));
+  const rows = bookingRows(data);
+  if (data.quote && data.quote.totalCents > 0) rows.push(...quoteRows(data.quote));
   return {
     subject: `We've received your request — ${data.reference}`,
     html: layout(
       `Thank you, ${escapeHtml(data.guestFirstName)} — your request is in`,
       [
         paragraph(
-          `We've received your request for <strong>${escapeHtml(data.spaceName)}</strong>. Every request is reviewed personally, and we'll come back to you within a day or two.`
+          `We've received your reservation request for <strong>${escapeHtml(data.spaceName)}</strong>. Every request is reviewed personally, and we'll confirm by email — usually within a few hours.`
         ),
         detailRows(rows),
         paragraph(`You can check the status of your request any time:`),
@@ -212,26 +214,29 @@ export function requestReceivedEmail(data: BookingEmailData) {
 }
 
 export function bookingApprovedEmail(data: BookingEmailData) {
-  const rows = stayRows(data);
-  if (data.totalCents != null) {
+  const rows = bookingRows(data);
+  // Reservations are free, so a total only appears on bookings that have one.
+  const totalCents = data.totalCents ?? 0;
+  if (totalCents > 0) {
     rows.push([
       "<strong>Total</strong>",
-      `<strong>${formatMoney(data.totalCents)}</strong>`,
+      `<strong>${formatMoney(totalCents)}</strong>`,
     ]);
   }
   return {
-    subject: `You're booked at Vine Cliff — ${data.reference}`,
+    subject: `You're booked at KAU — ${data.reference}`,
     html: layout(
-      `Wonderful news, ${escapeHtml(data.guestFirstName)} — you're booked`,
+      `Good news, ${escapeHtml(data.guestFirstName)} — your table is booked`,
       [
         paragraph(
-          `Your ${data.isEvent ? "event at" : "stay in"} <strong>${escapeHtml(data.spaceName)}</strong> is confirmed. We can't wait to welcome you to the cliff top.`
+          `Your ${data.isEvent ? "event at" : "table at"} <strong>${escapeHtml(data.spaceName)}</strong> is confirmed. Come hungry — the meat comes off Godzilla all day.`
         ),
         data.note ? paragraph(`<em>“${escapeHtml(data.note)}”</em>`) : "",
         detailRows(rows),
-        paragraph(
-          `We'll be in touch shortly about the deposit and arrival details. Your booking page always has the latest:`
-        ),
+        totalCents > 0
+          ? paragraph(`We'll be in touch shortly about the deposit and details.`)
+          : "",
+        paragraph(`Your booking page always has the latest:`),
         button(statusUrl(data.manageToken), "View your booking"),
         data.policy ? finePrint(escapeHtml(data.policy)) : "",
       ].join("")
@@ -241,17 +246,17 @@ export function bookingApprovedEmail(data: BookingEmailData) {
 
 export function bookingDeclinedEmail(data: BookingEmailData) {
   return {
-    subject: `About your Vine Cliff request — ${data.reference}`,
+    subject: `About your KAU request — ${data.reference}`,
     html: layout(
       `About your request, ${escapeHtml(data.guestFirstName)}`,
       [
         paragraph(
-          `We're sorry — we aren't able to host your requested dates for <strong>${escapeHtml(data.spaceName)}</strong> this time.`
+          `We're sorry — we couldn't seat your party for <strong>${escapeHtml(data.spaceName)}</strong> that day.`
         ),
         data.note ? paragraph(`<em>“${escapeHtml(data.note)}”</em>`) : "",
-        detailRows(stayRows(data)),
+        detailRows(bookingRows(data)),
         paragraph(
-          `Different dates often work beautifully — reply to this email or call us on <a href="tel:${site.phone.replace(/[^+\d]/g, "")}" style="color:${palette.char};">${site.phone}</a> and we'll find them together.`
+          `The other sitting or another day often works — reply to this email or call us on <a href="tel:${site.phone.replace(/[^+\d]/g, "")}" style="color:${palette.char};">${site.phone}</a>.`
         ),
       ].join("")
     ),
@@ -260,15 +265,15 @@ export function bookingDeclinedEmail(data: BookingEmailData) {
 
 export function bookingCancelledEmail(data: BookingEmailData) {
   return {
-    subject: `Your Vine Cliff booking is cancelled — ${data.reference}`,
+    subject: `Your KAU reservation is cancelled — ${data.reference}`,
     html: layout(
       `Your booking has been cancelled`,
       [
         paragraph(
-          `Your ${data.isEvent ? "event" : "stay"} booking for <strong>${escapeHtml(data.spaceName)}</strong> (${data.reference}) has been cancelled.`
+          `Your ${data.isEvent ? "event" : "reservation"} booking for <strong>${escapeHtml(data.spaceName)}</strong> (${data.reference}) has been cancelled.`
         ),
         data.note ? paragraph(`<em>“${escapeHtml(data.note)}”</em>`) : "",
-        detailRows(stayRows(data)),
+        detailRows(bookingRows(data)),
         paragraph(
           `If this is a surprise, or you'd like to rebook, just reply to this email — we'd love to see you another time.`
         ),
@@ -293,21 +298,21 @@ function adminBookingUrl(reference: string): string {
 }
 
 export function ownerNewRequestEmail(data: OwnerBookingEmailData) {
-  const rows = stayRows(data);
-  if (data.eventType) rows.splice(2, 0, ["Occasion", escapeHtml(data.eventType)]);
+  const rows = bookingRows(data);
+  if (data.eventType) rows.push(["Occasion", escapeHtml(data.eventType)]);
   rows.push(
     ["Guest", escapeHtml(data.guestFullName)],
     ["Email", `<a href="mailto:${escapeHtml(data.guestEmail)}" style="color:${palette.char};">${escapeHtml(data.guestEmail)}</a>`]
   );
   if (data.guestPhone) rows.push(["Phone", escapeHtml(data.guestPhone)]);
-  if (data.quote) rows.push(...quoteRows(data.quote));
+  if (data.quote && data.quote.totalCents > 0) rows.push(...quoteRows(data.quote));
   return {
     subject: `New booking request · ${data.spaceName} · ${data.reference}`,
     html: layout(
       "New booking request",
       [
         paragraph(
-          `<strong>${escapeHtml(data.guestFullName)}</strong> has requested ${data.isEvent ? "an event at" : "a stay in"} <strong>${escapeHtml(data.spaceName)}</strong>.`
+          `<strong>${escapeHtml(data.guestFullName)}</strong> has requested ${data.isEvent ? "an event at" : "a table at"} <strong>${escapeHtml(data.spaceName)}</strong>.`
         ),
         detailRows(rows),
         data.message
@@ -326,7 +331,7 @@ export function ownerRequestWithdrawnEmail(data: OwnerBookingEmailData) {
       "A booking request was withdrawn",
       [
         paragraph(
-          `<strong>${escapeHtml(data.guestFullName)}</strong> has withdrawn their pending request <strong>${data.reference}</strong> (${escapeHtml(data.spaceName)}, ${formatDate(data.startDate)}). No action needed — the dates were never blocked.`
+          `<strong>${escapeHtml(data.guestFullName)}</strong> has withdrawn their pending request <strong>${data.reference}</strong> (${escapeHtml(data.spaceName)}, ${formatDate(data.startDate)}). No action needed — the covers were never blocked.`
         ),
         button(adminBookingUrl(data.reference), "View in admin"),
       ].join("")
