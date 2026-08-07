@@ -7,9 +7,9 @@ const stats = [
   { value: "1", label: "Godzilla — our smoker" },
 ];
 
-export function Estate() {
+export function Smokehouse() {
   return (
-    <section id="estate" className="relative bg-bone py-24 sm:py-32">
+    <section id="smokehouse" className="relative bg-bone py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div>

@@ -1,7 +1,7 @@
 import { Nav } from "./components/nav";
 import { Footer } from "./components/footer";
 import { Hero } from "./sections/hero";
-import { Estate } from "./sections/estate";
+import { Smokehouse } from "./sections/smokehouse";
 import { Spaces } from "./sections/spaces";
 import { Gallery } from "./sections/gallery";
 import { Location } from "./sections/location";
@@ -33,7 +33,7 @@ export default async function Home() {
       <Nav />
       <main>
         <Hero />
-        <Estate />
+        <Smokehouse />
         <Spaces spaces={spaceCards} />
         <Gallery />
         <Location />

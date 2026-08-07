@@ -13,7 +13,7 @@ import { buttonVariants } from "./ui/button";
 // nav is rendered on a sub-page so the links jump back to the landing page.
 const sectionLinks = [
   { hash: "#spaces", label: "Book a Table" },
-  { hash: "#estate", label: "The Smokehouse" },
+  { hash: "#smokehouse", label: "The Smokehouse" },
   { hash: "#gallery", label: "Gallery" },
   { hash: "#location", label: "Location" },
 ];
