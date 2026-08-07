@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Phone, Send } from "lucide-react";
+import { Menu, X, Phone, CalendarHeart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { site } from "@/lib/site";
 import { defaultLocale, localeHome, localeMeta, locales, type Locale } from "@/lib/i18n/config";
@@ -27,11 +27,11 @@ export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
   // nav is rendered on a sub-page so the links jump back to it first.
   const sectionHref = (hash: string) => (onHome ? hash : `${home}${hash}`);
   const links = [
-    { href: sectionHref("#spaces"), label: t.sections.spaces },
     { href: sectionHref("#smokehouse"), label: t.sections.smokehouse },
     { href: sectionHref("#gallery"), label: t.sections.gallery },
     { href: sectionHref("#location"), label: t.sections.location },
     { href: "/history", label: t.story },
+    { href: "/enquire", label: t.enquire },
   ];
   const homeHref = onHome ? "#top" : home;
 
@@ -99,13 +99,13 @@ export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
             ))}
             <LanguageSwitch current={locale} label={t.language} scrolled={scrolled} />
             <Link
-              href="/enquire"
+              href="/book"
               className={cn(
-                buttonVariants({ variant: scrolled ? "primary" : "light", size: "sm" })
+                buttonVariants({ variant: scrolled ? "ember" : "light", size: "sm" })
               )}
             >
-              <Send className="size-3.5" />
-              {t.enquire}
+              <CalendarHeart className="size-3.5" />
+              {t.book}
             </Link>
           </div>
 
@@ -163,12 +163,12 @@ export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
             </motion.ul>
             <div className="space-y-3 px-6 pt-10 pb-12">
               <Link
-                href="/enquire"
+                href="/book"
                 onClick={() => setOpen(false)}
                 className={cn(buttonVariants({ variant: "ember", size: "lg" }), "w-full")}
               >
-                <Send className="size-4" />
-                {t.sendEnquiry}
+                <CalendarHeart className="size-4" />
+                {t.book}
               </Link>
               <a
                 href={site.phoneHref}
@@ -176,7 +176,7 @@ export function Nav({ locale = defaultLocale }: { locale?: Locale }) {
                 className={cn(buttonVariants({ variant: "light", size: "lg" }), "w-full")}
               >
                 <Phone className="size-4" />
-                {t.callToEnquire}
+                {t.callSmokehouse}
               </a>
               <LanguageSwitch
                 current={locale}

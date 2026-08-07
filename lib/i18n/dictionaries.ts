@@ -23,17 +23,16 @@ const en = {
   nav: {
     brandLine: "American Barbecue",
     sections: {
-      spaces: "Book a Table",
       smokehouse: "The Smokehouse",
       gallery: "Gallery",
       location: "Location",
     },
     story: "Our Story",
     enquire: "Enquire",
+    book: "Book a table",
     openMenu: "Open menu",
     closeMenu: "Close menu",
-    sendEnquiry: "Send an enquiry",
-    callToEnquire: "Call to enquire",
+    callSmokehouse: "Call the smokehouse",
     language: "Language",
   },
 
@@ -95,6 +94,7 @@ const en = {
     bookBody:
       "Pick your day, lunch or dinner, and how you'd like to be served — we confirm by email.",
     bookImageAlt: "The KAU dining room, ready for service",
+    bookCta: "Book a table",
     freeToBook: "Free to book · reserve online",
     priceOnRequest: "Price on request",
     /** {price} is substituted with a formatted amount, e.g. "€40". */
@@ -180,17 +180,16 @@ const pt: Dictionary = {
   nav: {
     brandLine: "American Barbecue",
     sections: {
-      spaces: "Reservar Mesa",
       smokehouse: "O Fumeiro",
       gallery: "Galeria",
       location: "Onde Estamos",
     },
     story: "A Nossa História",
     enquire: "Contactar",
+    book: "Reservar mesa",
     openMenu: "Abrir menu",
     closeMenu: "Fechar menu",
-    sendEnquiry: "Enviar mensagem",
-    callToEnquire: "Ligar para falar connosco",
+    callSmokehouse: "Ligar para o fumeiro",
     language: "Idioma",
   },
 
@@ -252,6 +251,7 @@ const pt: Dictionary = {
     bookBody:
       "Escolha o dia, almoço ou jantar, e como prefere ser servido — confirmamos por email.",
     bookImageAlt: "A sala do KAU, pronta para o serviço",
+    bookCta: "Reservar mesa",
     freeToBook: "Reserva gratuita · marque online",
     priceOnRequest: "Preço sob consulta",
     fromPerDay: "Desde {price} / dia",

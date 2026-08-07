@@ -112,14 +112,17 @@ export function Spaces({ spaces, locale }: { spaces: SpaceCardData[]; locale: Lo
                     <p className="mt-3 text-pretty text-sm leading-relaxed text-bone/85 sm:text-base">
                       {t.bookBody}
                     </p>
+                    <p className="mt-3 text-xs uppercase tracking-[0.18em] text-bone/60">
+                      {fromLabel(space, t)}
+                    </p>
                   </div>
                   <span
                     className={cn(
-                      buttonVariants({ variant: "light", size: "lg" }),
+                      buttonVariants({ variant: "ember", size: "lg" }),
                       "shrink-0 self-start lg:self-center"
                     )}
                   >
-                    {fromLabel(space, t)}
+                    {t.bookCta}
                     <ArrowUpRight className="size-4" />
                   </span>
                 </div>
