@@ -1,36 +1,32 @@
 import Image from "next/image";
 import { Reveal, Stagger, StaggerItem } from "@/app/components/motion";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/config";
 
-const stats = [
-  { value: "12h+", label: "In the smoke" },
-  { value: "8", label: "Meats by weight" },
-  { value: "1", label: "Godzilla — our smoker" },
-];
+export function Smokehouse({ locale }: { locale: Locale }) {
+  const t = getDictionary(locale).smokehouse;
+  const stats = [
+    { value: "12h+", label: t.stats.hours },
+    { value: "8", label: t.stats.meats },
+    { value: "1", label: t.stats.smoker },
+  ];
 
-export function Smokehouse() {
   return (
     <section id="smokehouse" className="relative bg-bone py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <div>
             <Reveal>
-              <p className="eyebrow text-ember">The Smokehouse</p>
+              <p className="eyebrow text-ember">{t.eyebrow}</p>
               <h2 className="mt-4 font-display text-4xl font-light leading-tight text-char-900 text-balance sm:text-5xl">
-                Real fire, real smoke, real patience
+                {t.heading}
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
               <div className="mt-6 space-y-5 text-pretty text-base leading-relaxed text-ink-soft sm:text-lg">
-                <p>
-                  KAU started with a bite of brisket in Paris and a pilgrimage to Texas. Years of
-                  pop-ups, festivals and sold-out events later, Rui and Vera Matias opened the doors
-                  of their mother house in Malveira — one of the largest steakhouses in the country.
-                </p>
-                <p>
-                  Everything runs through Godzilla, our custom smoker. Meats go in before sunrise and
-                  come out hours later — carved in the moment, weighed at the counter, and served
-                  while the smoke ring is still proud.
-                </p>
+                {t.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
               </div>
             </Reveal>
 
@@ -48,7 +44,7 @@ export function Smokehouse() {
             <div className="relative aspect-4/5 overflow-hidden rounded-3xl shadow-lift">
               <Image
                 src="/img/seasoning.jpg"
-                alt="Seasoning a brisket with rub before it goes into the smoke"
+                alt={t.imageAlt}
                 fill
                 quality={85}
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -58,9 +54,9 @@ export function Smokehouse() {
             {/* floating accent card */}
             <div className="absolute -bottom-6 -left-4 max-w-[15rem] rounded-2xl bg-bone-100 p-5 shadow-lift sm:-left-8">
               <p className="font-display text-lg italic text-char-700">
-                &ldquo;These guys really understand what American BBQ is.&rdquo;
+                &ldquo;{t.quote}&rdquo;
               </p>
-              <p className="mt-2 eyebrow text-stone">Guest review · Google</p>
+              <p className="mt-2 eyebrow text-stone">{t.quoteSource}</p>
             </div>
           </Reveal>
         </div>

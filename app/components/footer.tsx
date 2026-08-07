@@ -1,8 +1,13 @@
 import { Instagram, MapPin, Phone, Mail } from "lucide-react";
 import { site } from "@/lib/site";
+import { defaultLocale, type Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { Reveal } from "./motion";
 
-export function Footer() {
+export function Footer({ locale = defaultLocale }: { locale?: Locale }) {
+  const dict = getDictionary(locale);
+  const t = dict.footer;
+
   return (
     <footer className="relative overflow-hidden bg-char-900 text-bone/80">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
@@ -10,14 +15,14 @@ export function Footer() {
           <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
             <div className="lg:col-span-2">
               <p className="font-display text-3xl text-bone">KAU</p>
-              <p className="mt-1 eyebrow text-ember-soft">American Barbecue · Malveira</p>
+              <p className="mt-1 eyebrow text-ember-soft">{t.brandLine}</p>
               <p className="mt-6 max-w-sm text-pretty text-sm leading-relaxed text-bone/70">
-                {site.tagline}. Thursday to Sunday — lunch 12:00–15:00, dinner 19:00–22:00.
+                {dict.meta.tagline}. {t.hours}
               </p>
             </div>
 
             <div>
-              <h3 className="eyebrow text-bone/50">Visit</h3>
+              <h3 className="eyebrow text-bone/50">{t.visit}</h3>
               <a
                 href={site.mapUrl}
                 target="_blank"
@@ -34,7 +39,7 @@ export function Footer() {
             </div>
 
             <div>
-              <h3 className="eyebrow text-bone/50">Enquire</h3>
+              <h3 className="eyebrow text-bone/50">{t.enquire}</h3>
               <div className="mt-4 space-y-3 text-sm">
                 <a
                   href={site.phoneHref}
@@ -65,8 +70,10 @@ export function Footer() {
         </Reveal>
 
         <div className="mt-16 flex flex-col gap-4 border-t border-bone/10 pt-8 text-xs text-bone/50 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} KAU Barbecue. All rights reserved.</p>
-          <p className="text-bone/40">Smoked daily in Malveira, Portugal.</p>
+          <p>
+            © {new Date().getFullYear()} KAU Barbecue. {t.rights}
+          </p>
+          <p className="text-bone/40">{t.smokedDaily}</p>
         </div>
       </div>
     </footer>

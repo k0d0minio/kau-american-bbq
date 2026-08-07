@@ -5,6 +5,7 @@
 import type { Space } from "@/lib/db/schema";
 import { formatMoney } from "@/lib/booking/pricing";
 import { spaces as staticSpaces } from "@/lib/site";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 export type SpaceCardData = {
   slug: string;
@@ -14,15 +15,20 @@ export type SpaceCardData = {
   image: string;
   blurb: string;
   features: string[];
-  /** How booking is priced, e.g. "Free to book · reserve online". */
-  fromLabel: string;
+  /** Whether booking is charged, and at what rate — see `fromLabel`. */
+  isEvent: boolean;
+  rateCents: number;
 };
 
-function fromLabelFor(space: Pick<Space, "isEvent" | "nightlyRateCents">): string {
-  if (!space.isEvent) return "Free to book · reserve online";
-  return space.nightlyRateCents > 0
-    ? `From ${formatMoney(space.nightlyRateCents)} / day`
-    : "Price on request";
+/**
+ * How booking is priced, in the visitor's language, e.g. "Free to book ·
+ * reserve online". Built from the dictionary rather than baked into the card so
+ * the same row can render on either landing page.
+ */
+export function fromLabel(space: SpaceCardData, t: Dictionary["spaces"]): string {
+  if (!space.isEvent) return t.freeToBook;
+  if (space.rateCents <= 0) return t.priceOnRequest;
+  return t.fromPerDay.replace("{price}", formatMoney(space.rateCents));
 }
 
 export function toSpaceCard(space: Space): SpaceCardData {
@@ -34,7 +40,8 @@ export function toSpaceCard(space: Space): SpaceCardData {
     image: space.image,
     blurb: space.blurb,
     features: space.features,
-    fromLabel: fromLabelFor(space),
+    isEvent: space.isEvent,
+    rateCents: space.nightlyRateCents,
   };
 }
 
@@ -46,5 +53,6 @@ export const fallbackSpaceCards: SpaceCardData[] = staticSpaces.map((s) => ({
   image: s.image,
   blurb: s.blurb,
   features: [...s.features],
-  fromLabel: "Free to book · reserve online",
+  isEvent: false,
+  rateCents: 0,
 }));

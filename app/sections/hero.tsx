@@ -7,9 +7,12 @@ import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { AnimatedWords } from "@/app/components/motion";
 import { buttonVariants } from "@/app/components/ui/button";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { localeHref, type Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 
-export function Hero() {
+export function Hero({ locale }: { locale: Locale }) {
+  const t = getDictionary(locale).hero;
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({
@@ -27,7 +30,7 @@ export function Hero() {
       <motion.div style={{ y, scale }} className="absolute inset-0 will-change-transform">
         <Image
           src="/img/hero-smokehouse.jpg"
-          alt="Lifting the lid on Godzilla, KAU's custom smoker, with briskets inside"
+          alt={t.imageAlt}
           fill
           priority
           quality={90}
@@ -53,14 +56,14 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="eyebrow text-bone/85"
         >
-          Texas-style barbecue · Malveira, Portugal
+          {t.eyebrow}
         </motion.p>
 
         <h1 className="mt-5 max-w-3xl font-display text-[2.75rem] font-light leading-[1.02] text-bone text-balance sm:text-6xl lg:text-7xl">
-          <AnimatedWords text="Low and slow," delay={0.4} />{" "}
+          <AnimatedWords text={t.headline} delay={0.4} />{" "}
           <br className="hidden sm:block" />
           <span className="italic text-ember-soft">
-            <AnimatedWords text="worth the wait" delay={0.7} />
+            <AnimatedWords text={t.headlineAccent} delay={0.7} />
           </span>
         </h1>
 
@@ -70,9 +73,7 @@ export function Hero() {
           transition={{ duration: 0.9, delay: 1.1 }}
           className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-bone/85 sm:text-lg"
         >
-          Brisket, beef ribs and pulled pork smoked for hours on Godzilla, our custom smoker —
-          cut fresh, sold by weight, and served the way Texas intended. Thursday to Sunday,
-          lunch and dinner.
+          {t.body}
         </motion.p>
 
         <motion.div
@@ -81,19 +82,19 @@ export function Hero() {
           transition={{ duration: 0.9, delay: 1.3 }}
           className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
         >
-          <Link href="/book" className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
-            Book a table
+          <Link href={localeHref(locale, "/book")} className={cn(buttonVariants({ variant: "ember", size: "lg" }))}>
+            {t.ctaPrimary}
             <ArrowRight className="size-4" />
           </Link>
-          <Link href="/enquire" className={cn(buttonVariants({ variant: "light", size: "lg" }))}>
-            Plan a private feast
+          <Link href={localeHref(locale, "/enquire")} className={cn(buttonVariants({ variant: "light", size: "lg" }))}>
+            {t.ctaSecondary}
           </Link>
         </motion.div>
       </motion.div>
 
       <motion.a
         href="#smokehouse"
-        aria-label="Scroll to explore"
+        aria-label={t.scrollLabel}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.6, duration: 1 }}

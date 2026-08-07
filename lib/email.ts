@@ -15,7 +15,8 @@
 import { site } from "@/lib/site";
 import { formatDate, type ISODate } from "@/lib/booking/dates";
 import { formatMoney, type Quote } from "@/lib/booking/pricing";
-import { SERVICE_LABELS, isService, type Service } from "@/lib/booking/availability";
+import { isService, type Service } from "@/lib/booking/availability";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export function siteBaseUrl(): string {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? site.url).replace(/\/+$/, "");
@@ -183,7 +184,7 @@ function bookingRows(data: BookingEmailData): Array<[string, string]> {
     ["Where", escapeHtml(data.spaceName)],
     ["Date", formatDate(data.startDate)],
     ...(isService(data.service)
-      ? ([["Sitting", SERVICE_LABELS[data.service]]] as Array<[string, string]>)
+      ? ([["Sitting", getDictionary("en").booking.services[data.service]]] as Array<[string, string]>)
       : []),
     ["Party size", String(data.partySize)],
   ];

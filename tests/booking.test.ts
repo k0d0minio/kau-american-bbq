@@ -21,12 +21,13 @@ import {
   type BlackoutBlock,
   type BookingBlock,
   type SpaceRules,
+  type ValidationError,
+  type ValidationResult,
 } from "../lib/booking/availability";
-import {
-  DINING_FORMATS,
-  DINING_FORMAT_LABELS,
-  isDiningFormat,
-} from "../lib/booking/dining-formats";
+import { DINING_FORMATS, isDiningFormat } from "../lib/booking/dining-formats";
+import { locales } from "../lib/i18n/config";
+import { getDictionary } from "../lib/i18n/dictionaries";
+import { validationMessage } from "../lib/i18n/format";
 
 describe("dates", () => {
   it("validates ISO dates including impossible calendar days", () => {
@@ -146,9 +147,13 @@ describe("dining formats", () => {
     assert.equal(isDiningFormat(null), false);
   });
 
-  it("labels both formats for the booking form and emails", () => {
-    for (const format of DINING_FORMATS) {
-      assert.equal(typeof DINING_FORMAT_LABELS[format], "string");
+  it("labels both formats in every language", () => {
+    for (const locale of locales) {
+      const labels = getDictionary(locale).booking.formats;
+      for (const format of DINING_FORMATS) {
+        assert.ok(labels[format].label.length > 0);
+        assert.ok(labels[format].note.length > 0);
+      }
     }
   });
 });
@@ -228,6 +233,23 @@ describe("availability", () => {
   });
 });
 
+/**
+ * `validateRequest` deals in error codes so the wording can live in the
+ * dictionary; these read the code, and the English message where a test cares
+ * about the number a rule quotes back.
+ */
+function errorCode(result: ValidationResult): string | undefined {
+  return result.ok ? undefined : result.error.code;
+}
+
+function message(result: ValidationResult): string {
+  assert.equal(result.ok, false);
+  return validationMessage(
+    (result as { ok: false; error: ValidationError }).error,
+    getDictionary("en").booking.errors
+  );
+}
+
 describe("validateRequest", () => {
   const today = "2026-06-01";
   const request = { date: "2026-06-05", service: "lunch" as const, partySize: 4 };
@@ -245,18 +267,18 @@ describe("validateRequest", () => {
       []
     );
     assert.equal(badDate.ok, false);
-    assert.match((badDate as { error: string }).error, /valid date/);
+    assert.equal(errorCode(badDate), "invalid_date");
 
     const noService = validateRequest(diningRoom, { ...request, service: null }, today, [], []);
     assert.equal(noService.ok, false);
-    assert.match((noService as { error: string }).error, /lunch or dinner/);
+    assert.equal(errorCode(noService), "no_service");
   });
 
   it("rejects closed weekdays", () => {
     // 2026-06-09 is a Tuesday.
     const result = validateRequest(diningRoom, { ...request, date: "2026-06-09" }, today, [], []);
     assert.equal(result.ok, false);
-    assert.match((result as { error: string }).error, /Thursday to Sunday/);
+    assert.equal(errorCode(result), "closed_weekday");
   });
 
   it("rejects past dates and anything beyond the horizon", () => {
@@ -264,17 +286,20 @@ describe("validateRequest", () => {
     assert.equal(past.ok, false);
     const far = validateRequest(diningRoom, { ...request, date: "2026-10-02" }, today, [], []);
     assert.equal(far.ok, false);
-    assert.match((far as { error: string }).error, /3 months ahead/);
+    assert.equal(errorCode(far), "out_of_window");
+    // The horizon the guest is told about is the space's own limit.
+    assert.match(message(far), /3 months/);
   });
 
   it("caps the party size a single online booking may request", () => {
     const result = validateRequest(diningRoom, { ...request, partySize: 9 }, today, [], []);
     assert.equal(result.ok, false);
-    assert.match((result as { error: string }).error, /larger than 8/);
+    assert.equal(errorCode(result), "party_too_large");
+    assert.match(message(result), /larger than 8/);
 
     const none = validateRequest(diningRoom, { ...request, partySize: 0 }, today, [], []);
     assert.equal(none.ok, false);
-    assert.match((none as { error: string }).error, /how many people/);
+    assert.equal(errorCode(none), "no_party_size");
   });
 
   it("rejects closure days", () => {
@@ -283,7 +308,7 @@ describe("validateRequest", () => {
     ];
     const result = validateRequest(diningRoom, request, today, [], closed);
     assert.equal(result.ok, false);
-    assert.match((result as { error: string }).error, /closed that day/);
+    assert.equal(errorCode(result), "closed_day");
   });
 
   it("rejects a party that would push the sitting past capacity", () => {
@@ -294,7 +319,7 @@ describe("validateRequest", () => {
     const tight: SpaceRules = { ...diningRoom, capacityCovers: 12 };
     const overflow = validateRequest(tight, { ...request, partySize: 5 }, today, blocks, []);
     assert.equal(overflow.ok, false);
-    assert.match((overflow as { error: string }).error, /fully booked/);
+    assert.equal(errorCode(overflow), "sitting_full");
 
     const roomier: SpaceRules = { ...diningRoom, capacityCovers: 13 };
     assert.deepEqual(
@@ -310,7 +335,7 @@ describe("validateRequest", () => {
     // A buyout blocks an ordinary reservation for that sitting...
     const blocked = validateRequest(diningRoom, request, today, [buyout], []);
     assert.equal(blocked.ok, false);
-    assert.match((blocked as { error: string }).error, /fully booked/);
+    assert.equal(errorCode(blocked), "sitting_full");
 
     // ...and any booking blocks a buyout for that sitting.
     const hireRequest = { date: "2026-07-03", service: "dinner" as const, partySize: 80 };

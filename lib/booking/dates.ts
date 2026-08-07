@@ -9,7 +9,14 @@
 // [2026-06-08, 2026-06-09), so two bookings sharing a boundary date do not
 // overlap.
 
+import { localeMeta, defaultLocale, type Locale } from "@/lib/i18n/config";
+
 export type ISODate = string;
+
+/** Formatting language. Defaults to English so admin call sites stay unchanged. */
+function intl(locale: Locale = defaultLocale): string {
+  return localeMeta[locale].intl;
+}
 
 const DAY_MS = 86_400_000;
 
@@ -67,9 +74,9 @@ export function todayAtRestaurant(): ISODate {
   }).format(new Date());
 }
 
-/** "Fri, 5 Jun 2026" */
-export function formatDate(date: ISODate): string {
-  return new Intl.DateTimeFormat("en-GB", {
+/** "Fri, 5 Jun 2026" / "sex., 5 de jun. de 2026" */
+export function formatDate(date: ISODate, locale?: Locale): string {
+  return new Intl.DateTimeFormat(intl(locale), {
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -79,8 +86,8 @@ export function formatDate(date: ISODate): string {
 }
 
 /** "5 Jun" — compact, for calendars and dense lists. */
-export function formatDayMonth(date: ISODate): string {
-  return new Intl.DateTimeFormat("en-GB", {
+export function formatDayMonth(date: ISODate, locale?: Locale): string {
+  return new Intl.DateTimeFormat(intl(locale), {
     month: "short",
     day: "numeric",
     timeZone: "UTC",
@@ -88,8 +95,8 @@ export function formatDayMonth(date: ISODate): string {
 }
 
 /** "June 2026" — month headings. */
-export function formatMonth(date: ISODate): string {
-  return new Intl.DateTimeFormat("en-GB", {
+export function formatMonth(date: ISODate, locale?: Locale): string {
+  return new Intl.DateTimeFormat(intl(locale), {
     month: "long",
     year: "numeric",
     timeZone: "UTC",
@@ -100,6 +107,6 @@ export function formatMonth(date: ISODate): string {
  * Display a date range. The half-open endDate is shown as-is; the last
  * *included* day is endDate − 1.
  */
-export function formatRange(startDate: ISODate, endDate: ISODate): string {
-  return `${formatDate(startDate)} → ${formatDate(endDate)}`;
+export function formatRange(startDate: ISODate, endDate: ISODate, locale?: Locale): string {
+  return `${formatDate(startDate, locale)} → ${formatDate(endDate, locale)}`;
 }
