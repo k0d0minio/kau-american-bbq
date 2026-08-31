@@ -27,18 +27,27 @@ whether that happened, so the working assumption has to be that it has not.
 
 1. **Confirm whether `kau2026` still authenticates** on the production admin. That is the
    only thing that decides how urgent the rest is.
-2. **Rotate both seeded accounts' passwords** if so — the accounts belong to the client,
-   so the rotation is a conversation with them, not a silent change.
+   - **Confirmed by Jamie, 2026-08-31: yes, it still works.** Both seeded accounts are a
+     live, working credential in git history right now.
+2. **Rotate both seeded accounts' passwords** — the accounts belong to the client, so the
+   rotation is a conversation with them, not a silent change. **Still open** — this needs
+   Jamie and the client to change both passwords through the app; no session does this.
 3. **Remove the plaintext from the migration comment.** Editing an applied migration is
    normally wrong, but a comment carries no schema meaning, so amending the line in place
-   is safe for future runs. It does **not** remove it from history — that needs a history
-   rewrite, which is a separate decision and probably not worth it once the password is
-   dead.
+   is safe for future runs. **Done** — `drizzle/0001_seed_admin_user.sql:6`. It does
+   **not** remove it from history — that needs a history rewrite, which is a separate
+   decision and probably not worth it once the password is dead.
 4. Replace the pattern: seed the account with no usable password and force a set-password
-   flow on first login, so there is never a shared secret to leak.
+   flow on first login, so there is never a shared secret to leak. **Proposed, not
+   built** — see the new epic at `.icm/intake/admin-first-login-password/`.
 
 Deliberately not done in the rollout PR that found it: rotating a live client credential
-is Jamie's call, and a docs PR is the wrong place for it.
+is Jamie's call, and a docs PR is the wrong place for it. Still true here — this PR only
+strips the plaintext (item 3) and proposes item 4's fix; items 1 and 2 stay with Jamie
+and the client, outside any repo change.
+
+**This stub stays open** (not moved to `_done/`) until item 2 (rotation) is confirmed
+done. It doesn't block item 4's epic, which can proceed independently.
 
 ## Prompt
 

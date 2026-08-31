@@ -3,7 +3,12 @@
 -- The password hashes below are scrypt(<password>, random-salt) in the format
 -- produced by lib/auth/password.ts (scrypt$<saltHex>$<derivedHex>).
 --
--- Temporary password "kau2026" — TODO(jamie): change after first login.
+-- This comment used to carry the temporary password in plaintext, which is
+-- how it was found and reported. It has been removed from here, but not from
+-- git history, and confirmed as of 2026-08-31 to still authenticate — Jamie
+-- and the client (its owners) need to rotate both accounts' passwords through
+-- the app. See .icm/intake/triage/rotate-seeded-admin-password.md. Do not put
+-- a real password in this file again, even temporarily.
 --
 -- Idempotent: ON CONFLICT keeps re-runs safe and never clobbers a password
 -- that has since been changed through the app.
