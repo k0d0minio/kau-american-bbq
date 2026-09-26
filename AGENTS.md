@@ -65,3 +65,12 @@ hashes. `middleware.ts` validates a signed httpOnly session cookie on the Edge f
 - **Gates are human checkboxes** — read them, never tick them.
 - **No secrets in git, ever.** Env vars only (`DATABASE_URL`, `AUTH_SECRET`); flag any
   plaintext credential found.
+
+## Dormant — when this repo is picked up again
+
+Parked on 2026-09-26 (Jamie: dormant altogether; every open ticket removed rather than kept — a dormant repo carries no backlog). To wake it:
+
+1. `git rm .icm/dormant`.
+2. From icm-board, `_system/scripts/icm-sync.sh --apply projects/kau-american-bbq` to adopt the pipeline template, then `/setup` here to fill the project-owned files.
+3. Cut fresh stubs from what the pick-up is for — never resurrect the old ones from history.
+- **Before anything else:** the seeded admin password in `drizzle/0006_kau_accounts_and_settings.sql` is a plaintext credential in a public repository — rotate it, strip it from the migration and from history, and only then cut work. (Estate audit 2026-09-26; the value is deliberately not repeated here.)
